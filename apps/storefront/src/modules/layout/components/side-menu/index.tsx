@@ -1,143 +1,190 @@
 "use client"
 
 import { Popover, PopoverPanel, Transition } from "@headlessui/react"
+import Image from "next/image"
 import useToggleState from "@lib/hooks/use-toggle-state"
 import { ArrowRightMini, XMark } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { Text, clx } from "@modules/common/components/ui"
+import { clx } from "@modules/common/components/ui"
 import { Fragment } from "react"
 import CountrySelect from "../country-select"
 import LanguageSelect from "../language-select"
 import { Locale } from "@lib/data/locales"
+import { ChevronRight } from "lucide-react"
 
-
-const SideMenuItems = {
-  Home: "/",
-  Store: "/store",
-  Account: "/account",
-  Cart: "/cart",
+type CategoryItem = {
+  name: string
+  handle: string
+  hasChildren?: boolean
 }
 
 type SideMenuProps = {
   regions: HttpTypes.StoreRegion[] | null
   locales: Locale[] | null
   currentLocale: string | null
+  categories?: CategoryItem[]
 }
 
-const SideMenu = ({ regions, locales, currentLocale }: SideMenuProps) => {
+const SideMenu = ({ regions, locales, currentLocale, categories = [] }: SideMenuProps) => {
   const countryToggleState = useToggleState()
   const languageToggleState = useToggleState()
 
   return (
-    <div className="h-full">
-      <div className="flex items-center h-full">
-        <Popover className="h-full flex">
-          {({ open, close }) => (
-            <>
-              <div className="relative flex h-full">
-                <Popover.Button
-                  data-testid="nav-menu-button"
-                  className="relative h-full flex items-center transition-all ease-out duration-200 focus:outline-none hover:text-ui-fg-base"
-                >
-                  Menu
-                </Popover.Button>
-              </div>
+    <div className="h-full flex items-center">
+      <Popover className="h-full flex items-center">
+        {({ open, close }) => (
+          <>
+            <Popover.Button
+              data-testid="nav-menu-button"
+              className="p-2 rounded-full border border-[#F1F1F3] text-[#382C2C] hover:border-[#980000] hover:text-[#980000] transition-colors focus:outline-none"
+              title="Open Menu"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </Popover.Button>
 
-              {open && (
-                <div
-                  className="fixed inset-0 z-[50] bg-black/0 pointer-events-auto"
-                  onClick={close}
-                  data-testid="side-menu-backdrop"
-                />
-              )}
+            {open && (
+              <div
+                className="fixed inset-0 z-[50] bg-black/40 backdrop-blur-sm pointer-events-auto transition-opacity"
+                onClick={close}
+                data-testid="side-menu-backdrop"
+              />
+            )}
 
-              <Transition
-                show={open}
-                as={Fragment}
-                enter="transition ease-out duration-150"
-                enterFrom="opacity-0"
-                enterTo="opacity-100 backdrop-blur-2xl"
-                leave="transition ease-in duration-150"
-                leaveFrom="opacity-100 backdrop-blur-2xl"
-                leaveTo="opacity-0"
-              >
-                <PopoverPanel className="flex flex-col absolute w-full pr-4 sm:pr-0 sm:w-1/3 2xl:w-1/4 sm:min-w-min h-[calc(100vh-1rem)] z-[51] inset-x-0 text-sm text-ui-fg-on-color m-2 backdrop-blur-2xl">
-                  <div
-                    data-testid="nav-menu-popup"
-                    className="flex flex-col h-full bg-[rgba(3,7,18,0.5)] rounded-rounded justify-between p-6"
-                  >
-                    <div className="flex justify-end" id="xmark">
-                      <button data-testid="close-menu-button" onClick={close}>
-                        <XMark />
-                      </button>
-                    </div>
-                    <ul className="flex flex-col gap-6 items-start justify-start">
-                      {Object.entries(SideMenuItems).map(([name, href]) => {
-                        return (
-                          <li key={name}>
-                            <LocalizedClientLink
-                              href={href}
-                              className="text-3xl leading-10 hover:text-ui-fg-disabled"
-                              onClick={close}
-                              data-testid={`${name.toLowerCase()}-link`}
-                            >
-                              {name}
-                            </LocalizedClientLink>
-                          </li>
-                        )
-                      })}
-                    </ul>
-                    <div className="flex flex-col gap-y-6">
-                      {!!locales?.length && (
-                        <div
-                          className="flex justify-between"
-                          onMouseEnter={languageToggleState.open}
-                          onMouseLeave={languageToggleState.close}
+            <Transition
+              show={open}
+              as={Fragment}
+              enter="transition ease-out duration-300 transform"
+              enterFrom="-translate-x-full"
+              enterTo="translate-x-0"
+              leave="transition ease-in duration-200 transform"
+              leaveFrom="translate-x-0"
+              leaveTo="-translate-x-full"
+            >
+              <PopoverPanel className="fixed inset-y-0 left-0 z-[51] w-4/5 max-w-sm bg-white shadow-2xl flex flex-col justify-between overflow-y-auto">
+                <div data-testid="nav-menu-popup" className="flex flex-col h-full bg-white">
+                  {/* Clean All-White Logo Header (No Wine BG) */}
+                  <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-white">
+                    <LocalizedClientLink href="/" onClick={close}>
+                      <Image
+                        src="/images/logo.png"
+                        alt="Eric-Emanuel Schmitt Logo"
+                        width={140}
+                        height={40}
+                        className="h-9 w-auto object-contain"
+                      />
+                    </LocalizedClientLink>
+                    <button
+                      data-testid="close-menu-button"
+                      onClick={close}
+                      className="p-1 rounded-full text-gray-500 hover:text-black hover:bg-gray-100 transition-colors"
+                    >
+                      <XMark className="w-6 h-6" />
+                    </button>
+                  </div>
+
+                  {/* Navigation Links (No Section Title, No Border Bottoms) */}
+                  <div className="p-6 flex-1 bg-white">
+                    <ul className="flex flex-col gap-y-4">
+                      {/* Fixed Home */}
+                      <li>
+                        <LocalizedClientLink
+                          href="/"
+                          className="text-base font-semibold text-[#382C2C] hover:text-[#980000] py-1 flex items-center justify-between transition-colors"
+                          onClick={close}
                         >
-                          <LanguageSelect
-                            toggleState={languageToggleState}
-                            locales={locales}
-                            currentLocale={currentLocale}
-                          />
-                          <ArrowRightMini
-                            className={clx(
-                              "transition-transform duration-150",
-                              languageToggleState.state ? "-rotate-90" : ""
+                          <span>Home</span>
+                        </LocalizedClientLink>
+                      </li>
+
+                      {/* Dynamic Categories (Only render '>' if hasChildren is true) */}
+                      {categories.map((cat) => (
+                        <li key={cat.handle}>
+                          <LocalizedClientLink
+                            href={`/categories/${cat.handle}`}
+                            className="text-base font-semibold text-[#382C2C] hover:text-[#980000] py-1 flex items-center justify-between transition-colors"
+                            onClick={close}
+                          >
+                            <span>{cat.name}</span>
+                            {cat.hasChildren && (
+                              <ChevronRight className="w-4 h-4 text-gray-400" />
                             )}
-                          />
-                        </div>
-                      )}
+                          </LocalizedClientLink>
+                        </li>
+                      ))}
+
+                      {/* Fixed Contact */}
+                      <li>
+                        <LocalizedClientLink
+                          href="/store"
+                          className="text-base font-semibold text-[#382C2C] hover:text-[#980000] py-1 flex items-center justify-between transition-colors"
+                          onClick={close}
+                        >
+                          <span>Contact</span>
+                        </LocalizedClientLink>
+                      </li>
+
+                      {/* Account */}
+                      <li>
+                        <LocalizedClientLink
+                          href="/account"
+                          className="text-base font-semibold text-[#382C2C] hover:text-[#980000] py-1 flex items-center justify-between transition-colors"
+                          onClick={close}
+                        >
+                          <span>Account</span>
+                        </LocalizedClientLink>
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* All-White Sidebar Footer (No Background Color, No Copyright) */}
+                  <div className="p-6 bg-white border-t border-gray-100 flex flex-col gap-y-4">
+                    {!!locales?.length && (
                       <div
-                        className="flex justify-between"
+                        className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-200"
+                        onMouseEnter={languageToggleState.open}
+                        onMouseLeave={languageToggleState.close}
+                      >
+                        <LanguageSelect
+                          toggleState={languageToggleState}
+                          locales={locales}
+                          currentLocale={currentLocale}
+                        />
+                        <ArrowRightMini
+                          className={clx(
+                            "transition-transform duration-150 text-gray-400",
+                            languageToggleState.state ? "-rotate-90" : ""
+                          )}
+                        />
+                      </div>
+                    )}
+                    {regions && (
+                      <div
+                        className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-200"
                         onMouseEnter={countryToggleState.open}
                         onMouseLeave={countryToggleState.close}
                       >
-                        {regions && (
-                          <CountrySelect
-                            toggleState={countryToggleState}
-                            regions={regions}
-                          />
-                        )}
+                        <CountrySelect
+                          toggleState={countryToggleState}
+                          regions={regions}
+                        />
                         <ArrowRightMini
                           className={clx(
-                            "transition-transform duration-150",
+                            "transition-transform duration-150 text-gray-400",
                             countryToggleState.state ? "-rotate-90" : ""
                           )}
                         />
                       </div>
-                      <Text className="flex justify-between txt-compact-small">
-                        © {new Date().getFullYear()} Ayo LLC Bookstore. All rights
-                        reserved.
-                      </Text>
-                    </div>
+                    )}
                   </div>
-                </PopoverPanel>
-              </Transition>
-            </>
-          )}
-        </Popover>
-      </div>
+                </div>
+              </PopoverPanel>
+            </Transition>
+          </>
+        )}
+      </Popover>
     </div>
   )
 }

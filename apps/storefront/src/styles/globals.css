@@ -2,6 +2,25 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+@layer base {
+  body {
+    color: #4D4C4C;
+    font-family: var(--font-inter), sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    color: #382C2C;
+  }
+  button[data-variant="primary"],
+  .btn-primary {
+    background-color: #980000 !important;
+    color: #ffffff !important;
+  }
+  button[data-variant="primary"]:hover,
+  .btn-primary:hover {
+    background-color: #7a0000 !important;
+  }
+}
+
 @layer utilities {
   /* Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {

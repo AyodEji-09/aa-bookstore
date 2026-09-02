@@ -20,6 +20,12 @@ module.exports = {
         padding: "padding-top padding-right padding-bottom padding-left",
       },
       colors: {
+        brand: {
+          primary: "#980000",
+          hover: "#7a0000",
+          text: "#4D4C4C",
+          heading: "#382C2C",
+        },
         grey: {
           0: "#FFFFFF",
           5: "#F9FAFB",
@@ -59,6 +65,7 @@ module.exports = {
       },
       fontFamily: {
         sans: [
+          "var(--font-inter)",
           "Inter",
           "-apple-system",
           "BlinkMacSystemFont",

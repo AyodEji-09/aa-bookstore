@@ -2,13 +2,15 @@ import { Metadata } from "next"
 
 import FeaturedProducts from "@modules/home/components/featured-products"
 import Hero from "@modules/home/components/hero"
+import FeatureBar from "@modules/home/components/feature-bar"
+import PlaceholderRail from "@modules/home/components/placeholder-rail"
 import { listCollections } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
 
 export const metadata: Metadata = {
-  title: "Ayo LLC Bookstore",
+  title: "Ayodeji Anifowose Bookstore",
   description:
-    "Ayo LLC Bookstore e-commerce storefront powered by Next.js and Medusa.",
+    "Ayodeji Anifowose Bookstore e-commerce storefront powered by Next.js and Medusa.",
 }
 
 export default async function Home(props: {
@@ -24,18 +26,24 @@ export default async function Home(props: {
     fields: "id, handle, title",
   })
 
-  if (!collections || !region) {
-    return null
-  }
-
   return (
-    <>
+    <div className="bg-white">
       <Hero />
-      <div className="py-12">
-        <ul className="flex flex-col gap-x-6">
-          <FeaturedProducts collections={collections} region={region} />
-        </ul>
-      </div>
-    </>
+      <FeatureBar />
+
+      {/* Placeholder Collection Rails matching exact homepage design */}
+      <PlaceholderRail title="Selected for you" />
+      <PlaceholderRail title="Trending books" />
+      <PlaceholderRail title="Recently released ebooks" />
+
+      {/* Dynamic Medusa Collections if present in DB */}
+      {region && collections && collections.length > 0 && (
+        <div className="py-4">
+          <ul className="flex flex-col">
+            <FeaturedProducts collections={collections} region={region} />
+          </ul>
+        </div>
+      )}
+    </div>
   )
 }
