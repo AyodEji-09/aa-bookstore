@@ -60,12 +60,12 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   try {
     const productCategory = await getCategoryByHandle(params.category)
 
-    const title = productCategory.name + " | Ayo LLC Bookstore"
+    const title = productCategory.name + " | Ayodeji Anifowose Bookstore"
 
     const description = productCategory.description ?? `${title} category.`
 
     return {
-      title: `${title} | Ayo LLC Bookstore`,
+      title: `${title} | Ayodeji Anifowose Bookstore`,
       description,
       alternates: {
         canonical: `${params.category.join("/")}`,

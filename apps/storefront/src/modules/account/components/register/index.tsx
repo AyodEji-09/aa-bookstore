@@ -21,10 +21,10 @@ const Register = ({ setCurrentView }: Props) => {
       data-testid="register-page"
     >
       <h1 className="text-large-semi uppercase mb-6">
-        Become an Ayo LLC Bookstore Member
+        Become an Ayodeji Anifowose Bookstore Member
       </h1>
       <p className="text-center text-base-regular text-ui-fg-base mb-4">
-        Create your Ayo LLC Bookstore Member profile, and get access to an enhanced
+        Create your Ayodeji Anifowose Bookstore Member profile, and get access to an enhanced
         shopping experience.
       </p>
       {message?.state === "verification_required" && (
@@ -81,7 +81,7 @@ const Register = ({ setCurrentView }: Props) => {
           data-testid="register-error"
         />
         <span className="text-center text-ui-fg-base text-small-regular mt-6">
-          By creating an account, you agree to Ayo LLC Bookstore&apos;s{" "}
+          By creating an account, you agree to Ayodeji Anifowose Bookstore&apos;s{" "}
           <LocalizedClientLink
             href="/content/privacy-policy"
             className="underline"
