@@ -27,23 +27,48 @@ export const listCategories = async (query?: Record<string, unknown>) => {
 }
 
 export const getCategoryByHandle = async (categoryHandle: string[]) => {
-  const handle = `${categoryHandle.join("/")}`
+  const rawHandle = categoryHandle.join("/")
+  const decodedHandle = categoryHandle
+    .map((segment) => {
+      try {
+        return decodeURIComponent(segment)
+      } catch {
+        return segment
+      }
+    })
+    .join("/")
 
   const next = {
     ...(await getCacheOptions("categories")),
   }
 
-  return sdk.client
-    .fetch<HttpTypes.StoreProductCategoryListResponse>(
+  // Try decoded handle first
+  let res = await sdk.client.fetch<HttpTypes.StoreProductCategoryListResponse>(
+    `/store/product-categories`,
+    {
+      query: {
+        fields: "*category_children, *products",
+        handle: decodedHandle,
+      },
+      next,
+      cache: "force-cache",
+    }
+  )
+
+  // Fallback to raw handle if decoded had no results
+  if (!res.product_categories?.length && decodedHandle !== rawHandle) {
+    res = await sdk.client.fetch<HttpTypes.StoreProductCategoryListResponse>(
       `/store/product-categories`,
       {
         query: {
           fields: "*category_children, *products",
-          handle,
+          handle: rawHandle,
         },
         next,
         cache: "force-cache",
       }
     )
-    .then(({ product_categories }) => product_categories[0])
+  }
+
+  return res.product_categories?.[0]
 }

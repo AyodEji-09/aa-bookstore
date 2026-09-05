@@ -99,6 +99,17 @@ const SideMenu = ({ regions, locales, currentLocale, categories = [] }: SideMenu
                         </LocalizedClientLink>
                       </li>
 
+                      {/* Fixed All Books */}
+                      <li>
+                        <LocalizedClientLink
+                          href="/store"
+                          className="text-base font-semibold text-[#382C2C] hover:text-[#980000] py-1 flex items-center justify-between transition-colors"
+                          onClick={close}
+                        >
+                          <span>All Books</span>
+                        </LocalizedClientLink>
+                      </li>
+
                       {/* Dynamic Categories (Only render '>' if hasChildren is true) */}
                       {categories.map((cat) => (
                         <li key={cat.handle}>
@@ -115,14 +126,14 @@ const SideMenu = ({ regions, locales, currentLocale, categories = [] }: SideMenu
                         </li>
                       ))}
 
-                      {/* Fixed Contact */}
+                      {/* Digital Library */}
                       <li>
                         <LocalizedClientLink
-                          href="/store"
+                          href="/account/library"
                           className="text-base font-semibold text-[#382C2C] hover:text-[#980000] py-1 flex items-center justify-between transition-colors"
                           onClick={close}
                         >
-                          <span>Contact</span>
+                          <span>My Library</span>
                         </LocalizedClientLink>
                       </li>
 

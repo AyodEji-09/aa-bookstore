@@ -34,7 +34,7 @@ export default async function Nav() {
 
   const displayCategories =
     topCategories.length > 0
-      ? topCategories.slice(0, 4).map((c) => ({
+      ? topCategories.map((c) => ({
           name: c.name,
           handle: c.handle,
           hasChildren: (c.category_children?.length || 0) > 0,

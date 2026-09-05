@@ -6,7 +6,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { HttpTypes } from "@medusajs/types"
 import { getProductPrice } from "@lib/util/get-product-price"
 import { addToCart } from "@lib/data/cart"
-import { ChevronLeft, ChevronRight, BookOpen, Star, Minus, Plus, Heart } from "lucide-react"
+import { ChevronLeft, ChevronRight, BookOpen, Minus, Plus, Heart } from "lucide-react"
 
 type ProductShowcaseProps = {
   product: HttpTypes.StoreProduct
@@ -29,11 +29,25 @@ export default function ProductShowcase({
   const { cheapestPrice } = getProductPrice({ product })
   const firstVariantId = product.variants?.[0]?.id
 
-  const displayImages = images.length > 0
-    ? images
-    : product.thumbnail
-    ? [{ id: "thumb", url: product.thumbnail }]
-    : []
+  // Collect and deduplicate all images from props, product.images, and product.thumbnail
+  const candidateImages = [
+    ...(images || []),
+    ...(product.images || []),
+    ...(product.thumbnail ? [{ id: "thumb", url: product.thumbnail }] : []),
+  ]
+
+  const displayImages: { id?: string; url: string }[] = []
+  const seenUrls = new Set<string>()
+
+  for (const img of candidateImages) {
+    if (img && img.url && !seenUrls.has(img.url)) {
+      seenUrls.add(img.url)
+      displayImages.push({
+        id: img.id || img.url,
+        url: img.url,
+      })
+    }
+  }
 
   const currentImage = displayImages[selectedImageIndex] || displayImages[0]
 
@@ -84,10 +98,10 @@ export default function ProductShowcase({
         {/* Left Column: Image Gallery Thumbnails & Main Showcase (7 Cols) */}
         <div className="lg:col-span-7 flex flex-col sm:flex-row gap-5 items-start">
           
-          {/* Vertical Thumbnails List */}
-          <div className="flex sm:flex-col gap-3 overflow-x-auto sm:overflow-y-auto no-scrollbar flex-shrink-0 w-full sm:w-20">
-            {displayImages.length > 0 ? (
-              displayImages.map((img, idx) => (
+          {/* Vertical Thumbnails List (Only rendered if product has multiple images) */}
+          {displayImages.length > 1 && (
+            <div className="flex sm:flex-col gap-3 overflow-x-auto sm:overflow-y-auto no-scrollbar flex-shrink-0 w-full sm:w-20">
+              {displayImages.map((img, idx) => (
                 <button
                   key={img.id || idx}
                   onClick={() => setSelectedImageIndex(idx)}
@@ -110,32 +124,17 @@ export default function ProductShowcase({
                     </div>
                   )}
                 </button>
-              ))
-            ) : (
-              // Fallback thumbnail placeholders if product has 1 image
-              [0, 1, 2, 3].map((idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setSelectedImageIndex(0)}
-                  className={`w-20 h-24 rounded-lg border-2 overflow-hidden relative transition-all ${
-                    idx === selectedImageIndex ? "border-[#980000]" : "border-red-200"
-                  }`}
-                >
-                  <div className="w-full h-full bg-slate-900 flex items-center justify-center text-amber-300 text-[10px] text-center p-1 font-bold">
-                    TRICK OR TREAT
-                  </div>
-                </button>
-              ))
-            )}
-          </div>
+              ))}
+            </div>
+          )}
 
           {/* Main Book Cover Display */}
           <div className="flex-1 w-full bg-slate-900 rounded-xl overflow-hidden shadow-xl relative min-h-[440px] sm:min-h-[520px] flex flex-col justify-between p-6 text-white border border-gray-100">
             
-            {/* Top Overlay Pill Badge: "flips a few pages" */}
+            {/* Top Overlay Pill Badge */}
             <div className="self-start bg-white/95 text-[#382C2C] px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-x-2 shadow-md">
               <BookOpen className="w-4 h-4 text-[#980000]" />
-              <span>flips a few pages</span>
+              <span>Book Preview</span>
             </div>
 
             {/* Book Cover Content if no external image */}
@@ -150,10 +149,10 @@ export default function ProductShowcase({
             ) : (
               <div className="my-auto text-center p-8 space-y-4">
                 <h2 className="text-3xl sm:text-4xl font-black italic tracking-tight font-serif text-amber-300 drop-shadow-md">
-                  TRICK OR TREAT, DADDY
+                  {product.title}
                 </h2>
                 <p className="text-xs tracking-widest text-gray-300 uppercase font-sans">
-                  WRITTEN BY AYODEJI ANIFOWOSE
+                  WRITTEN BY {(product.metadata?.author as string) || "AYODEJI ANIFOWOSE"}
                 </p>
               </div>
             )}
@@ -189,20 +188,8 @@ export default function ProductShowcase({
               {product.title}
             </h1>
             <p className="text-base text-gray-500 font-medium">
-              {product.subtitle || product.collection?.title || "Eric-Emanuel Schmitt"}
+              {(product.metadata?.author as string) || product.subtitle || "Ayodeji Anifowose"}
             </p>
-          </div>
-
-          {/* Rating */}
-          <div className="flex items-center gap-x-2">
-            <div className="flex items-center text-amber-400">
-              <Star className="w-4 h-4 fill-amber-400" />
-              <Star className="w-4 h-4 fill-amber-400" />
-              <Star className="w-4 h-4 fill-amber-400" />
-              <Star className="w-4 h-4 fill-amber-400" />
-              <Star className="w-4 h-4 fill-amber-400 text-amber-400/50" />
-            </div>
-            <span className="text-xs font-bold text-gray-700">4.5</span>
           </div>
 
           {/* Price */}
@@ -217,7 +204,7 @@ export default function ProductShowcase({
           {/* Description */}
           <p className="text-sm text-[#4D4C4C] leading-relaxed">
             {product.description ||
-              "From acclaimed international bestselling author Eric-Emanuel Schmitt comes a deeply moving masterpiece where human emotion, mystery, and destiny unfold in unforgettable literary prose."}
+              "Explore this title by Ayodeji Anifowose, crafted to inspire, guide, and enrich your life."}
           </p>
 
           {/* Quantity Selector */}
@@ -263,29 +250,64 @@ export default function ProductShowcase({
           {/* Thin Red Divider & Product Specs Metadata Grid */}
           <div className="border-t border-red-200 pt-6 mt-6 grid grid-cols-2 gap-y-4 gap-x-6 text-xs">
             <div>
+              <span className="text-red-300 font-semibold block mb-0.5">Author :</span>
+              <span className="text-[#382C2C] font-medium">
+                {(product.metadata?.author as string) || "Ayodeji Anifowose"}
+              </span>
+            </div>
+            <div>
               <span className="text-red-300 font-semibold block mb-0.5">Publisher :</span>
-              <span className="text-[#382C2C] font-medium">Margaret K. Books</span>
+              <span className="text-[#382C2C] font-medium">
+                {(product.metadata?.publisher as string) || "Ayodeji Anifowose Publishing"}
+              </span>
             </div>
             <div>
               <span className="text-red-300 font-semibold block mb-0.5">Publication date :</span>
-              <span className="text-[#382C2C] font-medium">March 3, 2020</span>
+              <span className="text-[#382C2C] font-medium">
+                {(product.metadata?.publication_date as string) ||
+                  (product.metadata?.publicationDate as string) ||
+                  (product.metadata?.year as string) ||
+                  "2024"}
+              </span>
             </div>
             <div>
               <span className="text-red-300 font-semibold block mb-0.5">Language :</span>
-              <span className="text-[#382C2C] font-medium">English</span>
+              <span className="text-[#382C2C] font-medium">
+                {(product.metadata?.language as string) || "English"}
+              </span>
             </div>
-            <div>
-              <span className="text-red-300 font-semibold block mb-0.5">Reading age :</span>
-              <span className="text-[#382C2C] font-medium">14+</span>
-            </div>
-            <div>
-              <span className="text-red-300 font-semibold block mb-0.5">Print length :</span>
-              <span className="text-[#382C2C] font-medium">592 pages</span>
-            </div>
-            <div>
-              <span className="text-red-300 font-semibold block mb-0.5">Dimensions :</span>
-              <span className="text-[#382C2C] font-medium">6 x 1.8 x 9 inches</span>
-            </div>
+            {Boolean(product.metadata?.reading_age || product.metadata?.readingAge) && (
+              <div>
+                <span className="text-red-300 font-semibold block mb-0.5">Reading age :</span>
+                <span className="text-[#382C2C] font-medium">
+                  {String(product.metadata?.reading_age || product.metadata?.readingAge)}
+                </span>
+              </div>
+            )}
+            {Boolean(product.metadata?.print_length || product.metadata?.pages) && (
+              <div>
+                <span className="text-red-300 font-semibold block mb-0.5">Print length :</span>
+                <span className="text-[#382C2C] font-medium">
+                  {String(product.metadata?.print_length || `${product.metadata?.pages} pages`)}
+                </span>
+              </div>
+            )}
+            {Boolean(product.metadata?.isbn) && (
+              <div>
+                <span className="text-red-300 font-semibold block mb-0.5">ISBN :</span>
+                <span className="text-[#382C2C] font-medium">
+                  {String(product.metadata?.isbn)}
+                </span>
+              </div>
+            )}
+            {Boolean(product.metadata?.dimensions) && (
+              <div>
+                <span className="text-red-300 font-semibold block mb-0.5">Dimensions :</span>
+                <span className="text-[#382C2C] font-medium">
+                  {String(product.metadata?.dimensions)}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>

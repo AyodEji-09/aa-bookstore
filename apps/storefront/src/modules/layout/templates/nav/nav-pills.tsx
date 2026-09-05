@@ -19,17 +19,29 @@ export default function NavPills({ categories }: NavPillsProps) {
   const pathWithoutCountry = pathname.replace(/^\/[a-z]{2}/, "") || "/"
 
   return (
-    <div className="hidden lg:flex items-center gap-x-2.5">
+    <div className="hidden lg:flex items-center gap-x-2 overflow-x-auto no-scrollbar scroll-smooth whitespace-nowrap max-w-[45vw] xl:max-w-[55vw] py-1 px-1">
       {/* Fixed Link 1: Home */}
       <LocalizedClientLink
         href="/"
-        className={`px-5 py-1.5 text-xs font-semibold rounded-full transition-all ${
+        className={`px-4 py-1.5 text-xs font-semibold rounded-full transition-all flex-shrink-0 ${
           pathWithoutCountry === "/"
             ? "bg-[#980000] text-white shadow-sm"
             : "border border-gray-200 text-[#4D4C4C] hover:border-[#980000] hover:text-[#980000]"
         }`}
       >
         Home
+      </LocalizedClientLink>
+
+      {/* Fixed Link 2: All Books */}
+      <LocalizedClientLink
+        href="/store"
+        className={`px-4 py-1.5 text-xs font-semibold rounded-full transition-all flex-shrink-0 ${
+          pathWithoutCountry === "/store" || pathWithoutCountry.startsWith("/store")
+            ? "bg-[#980000] text-white shadow-sm"
+            : "border border-gray-200 text-[#4D4C4C] hover:border-[#980000] hover:text-[#980000]"
+        }`}
+      >
+        All Books
       </LocalizedClientLink>
 
       {/* Dynamic Category Pill Links from Backend */}
@@ -40,7 +52,7 @@ export default function NavPills({ categories }: NavPillsProps) {
           <LocalizedClientLink
             key={cat.handle}
             href={catPath}
-            className={`px-5 py-1.5 text-xs font-semibold rounded-full transition-all ${
+            className={`px-4 py-1.5 text-xs font-semibold rounded-full transition-all flex-shrink-0 ${
               isActive
                 ? "bg-[#980000] text-white shadow-sm"
                 : "border border-gray-200 text-[#4D4C4C] hover:border-[#980000] hover:text-[#980000]"
@@ -50,18 +62,6 @@ export default function NavPills({ categories }: NavPillsProps) {
           </LocalizedClientLink>
         )
       })}
-
-      {/* Fixed Link 2: Contact */}
-      <LocalizedClientLink
-        href="/store"
-        className={`px-5 py-1.5 text-xs font-semibold rounded-full transition-all ${
-          pathWithoutCountry.startsWith("/contact")
-            ? "bg-[#980000] text-white shadow-sm"
-            : "border border-gray-200 text-[#4D4C4C] hover:border-[#980000] hover:text-[#980000]"
-        }`}
-      >
-        Contact
-      </LocalizedClientLink>
     </div>
   )
 }
