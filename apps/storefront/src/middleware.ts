@@ -10,6 +10,10 @@ const regionMapCache = {
   regionMapUpdated: Date.now(),
 }
 
+const REGION_CACHE_TIME = process.env.NEXT_PUBLIC_REVALIDATE_TIME
+  ? parseInt(process.env.NEXT_PUBLIC_REVALIDATE_TIME, 10)
+  : 15
+
 async function getRegionMap(cacheId: string) {
   const { regionMap, regionMapUpdated } = regionMapCache
 
@@ -21,7 +25,7 @@ async function getRegionMap(cacheId: string) {
 
   if (
     !regionMap.keys().next().value ||
-    regionMapUpdated < Date.now() - 3600 * 1000
+    regionMapUpdated < Date.now() - REGION_CACHE_TIME * 1000
   ) {
     // Fetch regions from Medusa. We can't use the JS client here because middleware is running on Edge and the client needs a Node environment.
     const response = await fetch(`${BACKEND_URL}/store/regions`, {
@@ -30,7 +34,7 @@ async function getRegionMap(cacheId: string) {
         "x-publishable-api-key": PUBLISHABLE_API_KEY!,
       },
       next: {
-        revalidate: 3600,
+        revalidate: REGION_CACHE_TIME,
         tags: [`regions-${cacheId}`],
       },
       cache: "force-cache",

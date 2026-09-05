@@ -33,9 +33,14 @@ export const getCacheTag = async (tag: string): Promise<string> => {
   }
 }
 
+export const DEFAULT_CACHE_REVALIDATE = process.env.NEXT_PUBLIC_REVALIDATE_TIME
+  ? parseInt(process.env.NEXT_PUBLIC_REVALIDATE_TIME, 10)
+  : 15
+
 export const getCacheOptions = async (
-  tag: string
-): Promise<{ tags: string[] } | Record<string, never>> => {
+  tag: string,
+  customRevalidate?: number
+): Promise<{ tags: string[]; revalidate: number } | Record<string, never>> => {
   if (typeof window !== "undefined") {
     return {}
   }
@@ -46,7 +51,10 @@ export const getCacheOptions = async (
     return {}
   }
 
-  return { tags: [`${cacheTag}`] }
+  const revalidate =
+    customRevalidate !== undefined ? customRevalidate : DEFAULT_CACHE_REVALIDATE
+
+  return { tags: [`${cacheTag}`], revalidate }
 }
 
 // `sameSite: "lax"` rather than `"strict"`: the customer returns from a
