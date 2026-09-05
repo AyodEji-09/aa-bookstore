@@ -13,15 +13,17 @@ import NavPills from "./nav-pills"
 import { ArrowUpRightIcon } from "lucide-react"
 
 export default async function Nav() {
-  const [regions, locales, currentLocale, productCategories] = await Promise.all([
-    listRegions().then((regions: StoreRegion[]) => regions),
-    listLocales(),
-    getLocale(),
-    listCategories().catch(() => []),
-  ])
+  const [regions, locales, currentLocale, productCategories] =
+    await Promise.all([
+      listRegions().then((regions: StoreRegion[]) => regions),
+      listLocales(),
+      getLocale(),
+      listCategories().catch(() => []),
+    ])
 
   // Filter top-level categories from backend
-  const topCategories = productCategories?.filter((c) => !c.parent_category) || []
+  const topCategories =
+    productCategories?.filter((c) => !c.parent_category) || []
 
   // Fallback category items if backend DB has no categories yet
   const fallbackCategories = [
@@ -30,13 +32,14 @@ export default async function Nav() {
     { name: "Plays & Theater", handle: "plays-theater" },
   ]
 
-  const displayCategories = topCategories.length > 0
-    ? topCategories.slice(0, 4).map((c) => ({
-        name: c.name,
-        handle: c.handle,
-        hasChildren: (c.category_children?.length || 0) > 0,
-      }))
-    : fallbackCategories.map((c) => ({ ...c, hasChildren: false }))
+  const displayCategories =
+    topCategories.length > 0
+      ? topCategories.slice(0, 4).map((c) => ({
+          name: c.name,
+          handle: c.handle,
+          hasChildren: (c.category_children?.length || 0) > 0,
+        }))
+      : fallbackCategories.map((c) => ({ ...c, hasChildren: false }))
 
   return (
     <>
@@ -56,7 +59,7 @@ export default async function Nav() {
           >
             <Image
               src="/images/logo.png"
-              alt="Eric-Emanuel Schmitt Logo"
+              alt="Logo"
               width={160}
               height={44}
               className="h-9 w-auto object-contain"
