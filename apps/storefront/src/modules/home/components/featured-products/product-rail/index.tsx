@@ -42,7 +42,7 @@ export default function ProductRail({
   }
 
   return (
-    <div className="content-container py-10 border-b border-gray-100">
+    <div className="content-container py-10">
       {/* Header with Title and Top-Right Navigation Buttons */}
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-2xl sm:text-3xl font-extrabold text-[#382C2C] tracking-tight">
@@ -73,7 +73,10 @@ export default function ProductRail({
         className="flex flex-nowrap overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory gap-6 pb-4 -mx-4 px-4 sm:mx-0 sm:px-0"
       >
         {products.map((product) => (
-          <div key={product.id} className="w-[240px] sm:w-[260px] flex-shrink-0 snap-start">
+          <div
+            key={product.id}
+            className="w-[240px] sm:w-[260px] flex-shrink-0 snap-start"
+          >
             <ProductPreview product={product} region={region} isFeatured />
           </div>
         ))}
@@ -85,7 +88,9 @@ export default function ProductRail({
           <span
             key={dotIdx}
             className={`transition-all duration-200 rounded-full ${
-              dotIdx === activeDot ? "w-2.5 h-2.5 bg-[#980000]" : "w-2 h-2 bg-red-200"
+              dotIdx === activeDot
+                ? "w-2.5 h-2.5 bg-[#980000]"
+                : "w-2 h-2 bg-red-200"
             }`}
           />
         ))}

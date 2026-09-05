@@ -3,7 +3,7 @@ import { Metadata } from "next"
 import FeaturedProducts from "@modules/home/components/featured-products"
 import Hero from "@modules/home/components/hero"
 import FeatureBar from "@modules/home/components/feature-bar"
-import PlaceholderRail from "@modules/home/components/placeholder-rail"
+// import PlaceholderRail from "@modules/home/components/placeholder-rail"
 import { listCollections } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
 
@@ -32,9 +32,9 @@ export default async function Home(props: {
       <FeatureBar />
 
       {/* Placeholder Collection Rails matching exact homepage design */}
-      <PlaceholderRail title="Selected for you" />
-      <PlaceholderRail title="Trending books" />
-      <PlaceholderRail title="Recently released ebooks" />
+      {/* <PlaceholderRail title="Selected for you" /> */}
+      {/* <PlaceholderRail title="Trending books" /> */}
+      {/* <PlaceholderRail title="Recently released ebooks" /> */}
 
       {/* Dynamic Medusa Collections if present in DB */}
       {region && collections && collections.length > 0 && (

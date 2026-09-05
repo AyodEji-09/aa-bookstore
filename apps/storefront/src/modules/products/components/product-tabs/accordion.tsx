@@ -4,6 +4,7 @@ import React from "react"
 
 type AccordionItemProps = AccordionPrimitive.AccordionItemProps & {
   title: string
+  titleClassName?: string
   subtitle?: string
   description?: string
   required?: boolean
@@ -33,6 +34,7 @@ const Accordion: React.FC<AccordionProps> & {
 
 const Item: React.FC<AccordionItemProps> = ({
   title,
+  titleClassName,
   subtitle,
   description,
   children,
@@ -56,7 +58,7 @@ const Item: React.FC<AccordionItemProps> = ({
         <div className="flex flex-col">
           <div className="flex w-full items-center justify-between">
             <div className="flex items-center gap-4">
-              <Text className="text-ui-fg-subtle text-sm">{title}</Text>
+              <Text className={clx("text-ui-fg-subtle text-sm", titleClassName)}>{title}</Text>
             </div>
             <AccordionPrimitive.Trigger>
               {customTrigger || <MorphingTrigger />}

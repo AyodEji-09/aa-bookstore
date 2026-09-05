@@ -4,11 +4,16 @@
 
 @layer base {
   body {
-    color: #4D4C4C;
+    color: #4d4c4c;
     font-family: var(--font-inter), sans-serif;
   }
-  h1, h2, h3, h4, h5, h6 {
-    color: #382C2C;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: #382c2c;
   }
   button[data-variant="primary"],
   .btn-primary {
@@ -34,6 +39,25 @@
   .no-scrollbar {
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
+  }
+
+  .thin-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .thin-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 9999px;
+  }
+
+  .thin-scrollbar::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  .thin-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
   }
 
   input:focus ~ label,

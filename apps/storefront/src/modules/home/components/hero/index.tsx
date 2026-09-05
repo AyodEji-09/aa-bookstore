@@ -23,9 +23,9 @@ const HERO_SLIDES: Slide[] = [
   {
     id: 0,
     tag: "Author of august",
-    heading: "Eric-Emanuel Schmitt",
+    heading: "Ayodeji Anifowose",
     description:
-      "Eric-Emmanuel Schmitt has been awarded more than 20 literary prizes and distinctions, and in 2001 he received the title of Chevalier des Arts et des Lettres. His books have been translated into over 40 languages.",
+      "Ayodeji Anifowose has been awarded more than 20 literary prizes and distinctions, and in 2001 he received the title of Chevalier des Arts et des Lettres. His books have been translated into over 40 languages.",
     buttonText: "View his books",
     buttonHref: "/store",
     rightHeader: ["AUTOGRAPHED", "BOOKS + 30%", "DISCOUNT"],
@@ -116,10 +116,8 @@ const Hero = () => {
       className="w-full bg-white py-10 lg:py-14 relative overflow-hidden"
     >
       <div className="content-container flex flex-col lg:flex-row items-center justify-between gap-10">
-        
         {/* Left Column: 1px Line Indicators & Text Content */}
         <div className="flex items-stretch gap-x-5 flex-1 max-w-2xl">
-          
           {/* Vertical 1px Line Segments with Gaps */}
           <div className="flex flex-col justify-between py-1 gap-y-3 flex-shrink-0">
             {HERO_SLIDES.map((_, i) => {
@@ -141,8 +139,17 @@ const Hero = () => {
                         : "transition-none"
                     }`}
                     style={{
-                      height: isActive ? (animatingFill && !isPaused ? "100%" : "0%") : isPassed ? "100%" : "0%",
-                      transitionDuration: isActive && animatingFill && !isPaused ? "5000ms" : "0ms",
+                      height: isActive
+                        ? animatingFill && !isPaused
+                          ? "100%"
+                          : "0%"
+                        : isPassed
+                        ? "100%"
+                        : "0%",
+                      transitionDuration:
+                        isActive && animatingFill && !isPaused
+                          ? "5000ms"
+                          : "0ms",
                     }}
                   />
                 </button>
