@@ -11,6 +11,7 @@ import ChevronDown from "@modules/common/icons/chevron-down"
 import MapPin from "@modules/common/icons/map-pin"
 import Package from "@modules/common/icons/package"
 import User from "@modules/common/icons/user"
+import { BookOpen } from "lucide-react"
 
 const AccountNav = ({
   customer,
@@ -45,6 +46,19 @@ const AccountNav = ({
             </div>
             <div className="text-base-regular">
               <ul>
+                <li>
+                  <LocalizedClientLink
+                    href="/account/library"
+                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
+                    data-testid="library-link"
+                  >
+                    <div className="flex items-center gap-x-2">
+                      <BookOpen size={20} />
+                      <span>My Library</span>
+                    </div>
+                    <ChevronDown className="transform -rotate-90" />
+                  </LocalizedClientLink>
+                </li>
                 <li>
                   <LocalizedClientLink
                     href="/account/profile"
@@ -121,6 +135,15 @@ const AccountNav = ({
                   data-testid="overview-link"
                 >
                   Overview
+                </AccountNavLink>
+              </li>
+              <li>
+                <AccountNavLink
+                  href="/account/library"
+                  route={route!}
+                  data-testid="library-link"
+                >
+                  My Library
                 </AccountNavLink>
               </li>
               <li>
