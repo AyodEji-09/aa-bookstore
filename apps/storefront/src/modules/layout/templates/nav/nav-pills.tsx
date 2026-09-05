@@ -62,6 +62,18 @@ export default function NavPills({ categories }: NavPillsProps) {
           </LocalizedClientLink>
         )
       })}
+
+      {/* Fixed Link 3: Contact */}
+      <LocalizedClientLink
+        href="/contact"
+        className={`px-4 py-1.5 text-xs font-semibold rounded-full transition-all flex-shrink-0 ${
+          pathWithoutCountry.startsWith("/contact")
+            ? "bg-[#980000] text-white shadow-sm"
+            : "border border-gray-200 text-[#4D4C4C] hover:border-[#980000] hover:text-[#980000]"
+        }`}
+      >
+        Contact
+      </LocalizedClientLink>
     </div>
   )
 }
