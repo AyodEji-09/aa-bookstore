@@ -106,27 +106,9 @@ export default function AudiobookPlayer({
           console.error("Audio playback error:", err)
           setIsLoading(false)
           setIsPlaying(false)
-          // Try fallback directly to track streamUrl if proxy had issue
-          if (
-            currentTrack?.streamUrl &&
-            audioRef.current?.src !== currentTrack.streamUrl
-          ) {
-            if (audioRef.current) {
-              audioRef.current.src = currentTrack.streamUrl
-              audioRef.current
-                .play()
-                .then(() => setIsPlaying(true))
-                .catch(() => {
-                  setAudioError(
-                    "Unable to play audio. Please ensure an audio file is uploaded for this book."
-                  )
-                })
-            }
-          } else {
-            setAudioError(
-              "Unable to play audio. Please ensure an audio file is uploaded for this book."
-            )
-          }
+          setAudioError(
+            "Unable to play audio. Please ensure an audio file is uploaded for this book."
+          )
         })
     }
   }

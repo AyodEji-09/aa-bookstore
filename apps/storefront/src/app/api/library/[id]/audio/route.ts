@@ -1,4 +1,4 @@
-import { getLibraryItemAccess } from "@lib/data/library"
+import { getLibraryItemAccessInternal } from "@lib/data/library"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function GET(
@@ -6,7 +6,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
-  const access = await getLibraryItemAccess(id)
+  const access = await getLibraryItemAccessInternal(id)
 
   if (!access || access.item?.format !== "audiobook") {
     return new NextResponse("Unauthorized or not an audiobook", { status: 404 })
@@ -46,9 +46,11 @@ export async function GET(
     const headers = new Headers()
     headers.set("Content-Type", contentType)
     headers.set("Accept-Ranges", acceptRanges)
+    headers.set("Content-Disposition", "inline")
+    headers.set("X-Content-Type-Options", "nosniff")
     if (contentLength) headers.set("Content-Length", contentLength)
     if (contentRange) headers.set("Content-Range", contentRange)
-    headers.set("Cache-Control", "private, max-age=3600")
+    headers.set("Cache-Control", "private, no-transform, max-age=3600")
 
     return new NextResponse(upstreamRes.body, {
       status: upstreamRes.status === 206 ? 206 : 200,

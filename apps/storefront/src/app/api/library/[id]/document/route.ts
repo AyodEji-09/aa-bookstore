@@ -1,4 +1,4 @@
-import { getLibraryItemAccess } from "@lib/data/library"
+import { getLibraryItemAccessInternal } from "@lib/data/library"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function GET(
@@ -6,7 +6,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
-  const access = await getLibraryItemAccess(id)
+  const access = await getLibraryItemAccessInternal(id)
 
   if (!access || !access.item?.file_url) {
     return new NextResponse("Unauthorized or file not found", { status: 404 })
@@ -30,7 +30,8 @@ export async function GET(
       headers: {
         "Content-Type": contentType,
         "Content-Disposition": "inline",
-        "Cache-Control": "private, max-age=3600",
+        "X-Content-Type-Options": "nosniff",
+        "Cache-Control": "private, no-transform, max-age=3600",
       },
     })
   } catch (err) {

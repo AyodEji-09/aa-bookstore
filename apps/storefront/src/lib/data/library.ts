@@ -56,6 +56,8 @@ export type LibraryAccessPayload = {
     }
     file_url?: string | null
     media_key?: string | null
+    has_document?: boolean
+    document_type?: "pdf" | "epub" | "chapters"
     tracks?: AudiobookTrack[]
     chapters?: EbookChapter[]
   }
@@ -86,7 +88,11 @@ export async function listLibraryItems(): Promise<LibraryItem[]> {
   }
 }
 
-export async function getLibraryItemAccess(
+/**
+ * Server-only function used by streaming API route handlers.
+ * Preserves the upstream file_url for server-side proxying.
+ */
+export async function getLibraryItemAccessInternal(
   itemId: string
 ): Promise<LibraryAccessPayload | null> {
   const authHeaders = await getAuthHeaders()
@@ -110,6 +116,49 @@ export async function getLibraryItemAccess(
   } catch (error) {
     console.error(`Failed to get access for library item ${itemId}`, error)
     return null
+  }
+}
+
+/**
+ * Public Server Action called by client components.
+ * Strips raw Cloudflare R2 / S3 URLs so they are NEVER sent to the browser.
+ */
+export async function getLibraryItemAccess(
+  itemId: string
+): Promise<LibraryAccessPayload | null> {
+  const data = await getLibraryItemAccessInternal(itemId)
+  if (!data || !data.item) {
+    return null
+  }
+
+  const rawUrl = data.item.file_url || data.item.media_key || ""
+  const isAudio = data.item.format === "audiobook"
+  const hasDoc = Boolean(rawUrl && !isAudio)
+  const docType = rawUrl.toLowerCase().includes(".pdf")
+    ? "pdf"
+    : rawUrl.toLowerCase().includes(".epub")
+    ? "epub"
+    : "chapters"
+
+  const sanitizedTracks = isAudio
+    ? (data.item.tracks || [{ id: 1, title: data.item.product.title, duration: 3600, streamUrl: "" }]).map(
+        (track, idx) => ({
+          ...track,
+          streamUrl: `/api/library/${itemId}/audio?track=${idx}`,
+        })
+      )
+    : undefined
+
+  return {
+    item: {
+      ...data.item,
+      // Security: Never leak raw storage URLs to the browser client
+      file_url: null,
+      media_key: null,
+      has_document: hasDoc,
+      document_type: docType,
+      tracks: sanitizedTracks,
+    },
   }
 }
 

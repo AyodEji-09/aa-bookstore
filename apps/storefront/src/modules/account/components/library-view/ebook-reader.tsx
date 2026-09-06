@@ -22,7 +22,8 @@ type EbookReaderProps = {
   itemId: string
   title: string
   author: string
-  fileUrl?: string | null
+  documentType?: "pdf" | "epub" | "chapters"
+  hasDocument?: boolean
   chapters?: EbookChapter[]
   initialChapter?: number
   onClose: () => void
@@ -34,7 +35,8 @@ export default function EbookReader({
   itemId,
   title,
   author,
-  fileUrl,
+  documentType = "pdf",
+  hasDocument = true,
   chapters = [],
   initialChapter = 1,
   onClose,
@@ -44,9 +46,9 @@ export default function EbookReader({
   const renderTaskRef = useRef<any>(null)
 
   const isPdf = Boolean(
-    fileUrl &&
-      (fileUrl.toLowerCase().includes(".pdf") ||
-        fileUrl.includes("application/pdf"))
+    documentType === "pdf" ||
+      hasDocument ||
+      (!chapters || chapters.length <= 1)
   )
 
   // State
@@ -158,23 +160,7 @@ export default function EbookReader({
       } catch (err: any) {
         if (isMounted) {
           console.error("PDF load error:", err)
-          // Fallback to direct fileUrl if proxy failed
-          if (fileUrl) {
-            try {
-              const pdfjs = (window as any).pdfjsLib
-              const doc = await pdfjs.getDocument(fileUrl).promise
-              if (!isMounted) return
-              setPdfDoc(doc)
-              setTotalPages(doc.numPages)
-              const startPage = Math.max(1, Math.min(initialChapter || 1, doc.numPages))
-              setCurrentPage(startPage)
-              setIsPdfLoading(false)
-              return
-            } catch (fallbackErr) {
-              console.error("PDF fallback load error:", fallbackErr)
-            }
-          }
-          setPdfError(err?.message || "Failed to load PDF document.")
+          setPdfError(err?.message || "Failed to load digital book.")
         }
       } finally {
         if (isMounted) {
@@ -187,7 +173,7 @@ export default function EbookReader({
     return () => {
       isMounted = false
     }
-  }, [isPdf, itemId, fileUrl, initialChapter])
+  }, [isPdf, itemId, initialChapter])
 
   // PDF Page Renderer to Canvas
   const renderPdfPage = useCallback(
@@ -298,6 +284,16 @@ export default function EbookReader({
       onContextMenu={(e) => e.preventDefault()}
       onDragStart={(e) => e.preventDefault()}
     >
+      {/* Anti-print protection */}
+      <style>{`
+        @media print {
+          body, html, * {
+            display: none !important;
+            visibility: hidden !important;
+          }
+        }
+      `}</style>
+
       {/* Top Header Controls Bar */}
       <header
         className={`flex items-center justify-between px-4 sm:px-6 py-3 backdrop-blur-sm sticky top-0 z-10 transition-colors ${themeClasses[theme].header}`}

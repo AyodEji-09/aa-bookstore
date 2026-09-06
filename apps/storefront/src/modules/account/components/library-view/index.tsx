@@ -245,7 +245,8 @@ export default function LibraryView({ items }: LibraryViewProps) {
           itemId={activeAccess.item.id}
           title={activeAccess.item.product.title}
           author={activeAccess.item.product.author}
-          fileUrl={activeAccess.item.file_url}
+          documentType={activeAccess.item.document_type}
+          hasDocument={activeAccess.item.has_document}
           chapters={activeAccess.item.chapters}
           initialChapter={activeAccess.item.progress?.last_chapter || 1}
           onClose={() => setActiveAccess(null)}

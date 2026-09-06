@@ -1,62 +1,120 @@
-<p align="center">
-  <a href="https://www.medusajs.com">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/59018053/229103275-b5e482bb-4601-46e6-8142-244f531cebdb.svg">
-    <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg">
-    <img alt="Medusa logo" src="https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg">
-    </picture>
-  </a>
-</p>
-<h1 align="center">
-  Medusa
-</h1>
+# Ayodeji Anifowose Bookstore — Backend
 
-<h4 align="center">
-  <a href="https://docs.medusajs.com">Documentation</a> |
-  <a href="https://www.medusajs.com">Website</a>
-</h4>
+The backend commerce application for the Ayodeji Anifowose Bookstore, powered by **Medusa v2** (`@medusajs/medusa`).
 
-<p align="center">
-  Building blocks for digital commerce
-</p>
-<p align="center">
-  <a href="https://github.com/medusajs/medusa/blob/master/CONTRIBUTING.md">
-    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat" alt="PRs welcome!" />
-  </a>
-    <a href="https://www.producthunt.com/posts/medusa"><img src="https://img.shields.io/badge/Product%20Hunt-%231%20Product%20of%20the%20Day-%23DA552E" alt="Product Hunt"></a>
-  <a href="https://discord.gg/xpCwq3Kfn8">
-    <img src="https://img.shields.io/badge/chat-on%20discord-7289DA.svg" alt="Discord Chat" />
-  </a>
-  <a href="https://twitter.com/intent/follow?screen_name=medusajs">
-    <img src="https://img.shields.io/twitter/follow/medusajs.svg?label=Follow%20@medusajs" alt="Follow @medusajs" />
-  </a>
-</p>
+---
 
-## Compatibility
+## Directory Structure
 
-This starter is compatible with versions >= 2 of `@medusajs/medusa`. 
+```text
+apps/backend/
+├── medusa-config.ts            # Medusa configuration: database, CORS, R2/S3 storage, modules
+├── src/
+│   ├── admin/
+│   │   └── widgets/            # Admin dashboard extensions (Digital Book Assets uploader)
+│   ├── api/
+│   │   ├── admin/              # File-based admin endpoints (/admin/products/:id/digital-assets)
+│   │   └── store/              # File-based store endpoints (/store/me/library)
+│   ├── modules/
+│   │   └── library/            # Custom digital library module (models, service, migrations)
+│   ├── scripts/
+│   │   └── seed-digital-shipping.ts # Seed script for $0.00 Digital Delivery option
+│   └── subscribers/
+│       └── order-placed-digital-entitlement.ts # Grants digital book access on order placement
+```
 
-## Getting Started
+---
 
-Visit the [Quickstart Guide](https://docs.medusajs.com/learn/installation) to set up a server.
+## Custom Architecture & Features
 
-Visit the [Docs](https://docs.medusajs.com/learn/installation#get-started) to learn more about our system requirements.
+### 1. Custom Library Module (`src/modules/library`)
+Stores and manages digital library items for customers:
+- Tracks product ID, format (`ebook` or `audiobook`), and customer association.
+- Persists reading progress: last read chapter, completion status, and audio timestamp.
+- Accessible by the customer via `/store/me/library` endpoints with customer session authentication.
 
-## What is Medusa
+### 2. Order Placed Entitlement Subscriber (`src/subscribers/order-placed-digital-entitlement.ts`)
+Listens to the `order.placed` event:
+- Checks order line items for digital formats (`ebook`, `audiobook`).
+- Automatically creates library entitlement records in the `library` module for the purchasing customer.
+- Prevents duplicate entitlements if a customer somehow completed an order for an already owned item.
 
-Medusa is a set of commerce modules and tools that allow you to build rich, reliable, and performant commerce applications without reinventing core commerce logic. The modules can be customized and used to build advanced ecommerce stores, marketplaces, or any product that needs foundational commerce primitives. All modules are open-source and freely available on npm.
+### 3. Digital Book Assets Admin Widget (`src/admin/widgets/product-digital-assets.tsx`)
+Injected directly into the Medusa Admin Product Details page:
+- Filters variants to show only digital editions (`Ebook`, `Audiobook`).
+- Hides physical variants (`Hardcover`, `Paperback`).
+- Provides a direct file uploader (PDF, EPUB, MP3, M4A) and URL/Key editor that writes directly to the variant's `metadata`.
 
-Learn more about [Medusa’s architecture](https://docs.medusajs.com/learn/introduction/architecture) and [commerce modules](https://docs.medusajs.com/learn/fundamentals/modules/commerce-modules) in the Docs.
+### 4. Digital Shipping Seed Script (`src/scripts/seed-digital-shipping.ts`)
+A dedicated Medusa script that creates the free `$0.00` "Digital Delivery" shipping option attached to your default shipping profile and service zone.
 
-## Community & Contributions
+Run with:
+```bash
+npx medusa exec ./src/scripts/seed-digital-shipping.ts
+```
 
-The community and core team are available in [GitHub Discussions](https://github.com/medusajs/medusa/discussions), where you can ask for support, discuss roadmap, and share ideas.
+### 5. Cloudflare R2 / S3 File Service
+Configured in `medusa-config.ts` using `@medusajs/medusa/file-s3`:
+- Enabled automatically when `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`, and `R2_ENDPOINT` are set.
+- Media uploaded through the Admin dashboard or widgets is saved directly to your R2 bucket.
 
-Join our [Discord server](https://discord.com/invite/medusajs) to meet other community members.
+---
 
-## Other channels
+## Development Setup
 
-- [GitHub Issues](https://github.com/medusajs/medusa/issues)
-- [Twitter](https://twitter.com/medusajs)
-- [LinkedIn](https://www.linkedin.com/company/medusajs)
-- [Medusa Blog](https://medusajs.com/blog/)
+### 1. Environment Setup
+
+Copy the environment template:
+```bash
+cp .env.template .env
+```
+
+Ensure the following variables are configured in `.env`:
+```env
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/ayollc_bookstore
+JWT_SECRET=supersecret_jwt_key
+COOKIE_SECRET=supersecret_cookie_key
+STORE_CORS=http://localhost:8000
+ADMIN_CORS=http://localhost:9000
+AUTH_CORS=http://localhost:9000
+```
+
+### 2. Database Migrations
+
+Apply database migrations:
+```bash
+npx medusa db:migrate
+```
+
+### 3. Create Admin User
+
+Create an admin account:
+```bash
+npx medusa user -e admin@example.com -p YourPassword123
+```
+
+### 4. Seed Digital Shipping
+
+```bash
+npx medusa exec ./src/scripts/seed-digital-shipping.ts
+```
+
+### 5. Start Development Server
+
+```bash
+npm run dev
+```
+
+The API will be available at `http://localhost:9000` and the Admin dashboard at `http://localhost:9000/app`.
+
+---
+
+## Code Style & Guidelines
+
+- **Linting**: The backend must satisfy `@medusajs/eslint-plugin` rules.
+  Run `npm run lint` before committing.
+- **Formatting**: 2-space indentation, double quotes, no semicolons.
+- **Conventions**:
+  - File-based routing in `src/api/store/*` and `src/api/admin/*`.
+  - Business logic belongs in workflows and custom module services.
+  - No emojis in code, comments, or commit messages.
