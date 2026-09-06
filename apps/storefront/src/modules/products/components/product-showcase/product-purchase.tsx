@@ -6,6 +6,7 @@ import { HttpTypes } from "@medusajs/types"
 import { addToCart } from "@lib/data/cart"
 import { isDigitalVariant } from "@lib/util/is-digital"
 import { listLibraryItems } from "@lib/data/library"
+import { useWishlist } from "@lib/context/wishlist-context"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 type ProductPurchaseProps = {
@@ -26,7 +27,8 @@ export default function ProductPurchase({
 }: ProductPurchaseProps) {
   const [quantity] = useState(1)
   const [isAdding, setIsAdding] = useState(false)
-  const [isFavorite, setIsFavorite] = useState(false)
+  const { isWishlisted, toggleWishlist } = useWishlist()
+  const isFavorite = isWishlisted(product.id || "")
   const [ownedFormats, setOwnedFormats] = useState<string[]>([])
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -126,7 +128,9 @@ export default function ProductPurchase({
             )}
 
             <button
-              onClick={() => setIsFavorite(!isFavorite)}
+              onClick={() =>
+                toggleWishlist(product.id || "", selectedVariant?.id)
+              }
               className={`w-full sm:flex-1 py-3 px-8 border text-sm font-bold rounded transition-colors flex items-center justify-center gap-x-2 ${
                 isFavorite
                   ? "border-[#980000] bg-[#980000]/10 text-[#980000]"
@@ -136,7 +140,7 @@ export default function ProductPurchase({
               <Heart
                 className={`w-4 h-4 ${isFavorite ? "fill-[#980000]" : ""}`}
               />
-              <span>Favorite</span>
+              <span>{isFavorite ? "Favorited" : "Favorite"}</span>
             </button>
           </div>
         </div>

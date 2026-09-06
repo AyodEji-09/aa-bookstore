@@ -137,6 +137,17 @@ const SideMenu = ({ regions, locales, currentLocale, categories = [] }: SideMenu
                         </LocalizedClientLink>
                       </li>
 
+                      {/* Wishlist */}
+                      <li>
+                        <LocalizedClientLink
+                          href="/account/wishlist"
+                          className="text-base font-semibold text-[#382C2C] hover:text-[#980000] py-1 flex items-center justify-between transition-colors"
+                          onClick={close}
+                        >
+                          <span>Wishlist</span>
+                        </LocalizedClientLink>
+                      </li>
+
                       {/* Contact */}
                       <li>
                         <LocalizedClientLink

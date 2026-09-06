@@ -7,6 +7,10 @@ export default defineMiddlewares({
       middlewares: [authenticate("customer", ["session", "bearer"])],
     },
     {
+      matcher: "/store/me/wishlist*",
+      middlewares: [authenticate("customer", ["session", "bearer"])],
+    },
+    {
       matcher: "/admin/products/:id/digital-assets*",
       middlewares: [authenticate("user", ["session", "bearer", "api-key"])],
     },

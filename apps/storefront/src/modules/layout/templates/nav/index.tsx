@@ -7,6 +7,7 @@ import { getLocale } from "@lib/data/locale-actions"
 import { StoreRegion } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CartButton from "@modules/layout/components/cart-button"
+import WishlistButton from "@modules/layout/components/wishlist-button"
 import SideMenu from "@modules/layout/components/side-menu"
 import CountrySelectNav from "@modules/layout/components/country-select-nav"
 import NavPills from "./nav-pills"
@@ -100,6 +101,9 @@ export default async function Nav() {
                 />
               </svg>
             </LocalizedClientLink>
+
+            {/* Wishlist Button */}
+            <WishlistButton />
 
             {/* Cart Button */}
             <Suspense

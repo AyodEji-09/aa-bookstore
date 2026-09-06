@@ -25,6 +25,9 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/library",
     },
+    {
+      resolve: "./src/modules/wishlist",
+    },
     ...(isR2Configured
       ? [
           {
