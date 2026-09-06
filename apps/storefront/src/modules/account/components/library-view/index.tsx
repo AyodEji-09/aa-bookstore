@@ -240,11 +240,12 @@ export default function LibraryView({ items }: LibraryViewProps) {
       )}
 
       {/* Active eBook Reader Modal */}
-      {activeAccess && activeAccess.item.format === "ebook" && activeAccess.item.chapters && (
+      {activeAccess && activeAccess.item.format === "ebook" && (
         <EbookReader
           itemId={activeAccess.item.id}
           title={activeAccess.item.product.title}
           author={activeAccess.item.product.author}
+          fileUrl={activeAccess.item.file_url}
           chapters={activeAccess.item.chapters}
           initialChapter={activeAccess.item.progress?.last_chapter || 1}
           onClose={() => setActiveAccess(null)}

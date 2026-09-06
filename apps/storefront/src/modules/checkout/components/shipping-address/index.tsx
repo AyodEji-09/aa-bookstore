@@ -12,11 +12,13 @@ const ShippingAddress = ({
   cart,
   checked,
   onChange,
+  isDigital = false,
 }: {
   customer: HttpTypes.StoreCustomer | null
   cart: HttpTypes.StoreCart | null
   checked: boolean
   onChange: () => void
+  isDigital?: boolean
 }) => {
   const [formData, setFormData] = useState<Record<string, string>>({
     "shipping_address.first_name": cart?.shipping_address?.first_name || "",
@@ -92,6 +94,64 @@ const ShippingAddress = ({
       ...formData,
       [e.target.name]: e.target.value,
     })
+  }
+
+  if (isDigital) {
+    return (
+      <div className="space-y-4">
+        <div className="p-3.5 bg-red-50/60 border border-[#980000]/20 rounded-lg text-xs text-[#382C2C] flex items-center justify-between">
+          <span>Digital items will be delivered instantly to your account library after purchase.</span>
+          <span className="font-bold text-[#980000] uppercase text-[10px] tracking-wider px-2 py-0.5 bg-white rounded border border-[#980000]/30">Instant Access</span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            label="First name"
+            name="shipping_address.first_name"
+            autoComplete="given-name"
+            value={formData["shipping_address.first_name"]}
+            onChange={handleChange}
+            required
+            data-testid="shipping-first-name-input"
+          />
+          <Input
+            label="Last name"
+            name="shipping_address.last_name"
+            autoComplete="family-name"
+            value={formData["shipping_address.last_name"]}
+            onChange={handleChange}
+            required
+            data-testid="shipping-last-name-input"
+          />
+          <Input
+            label="Email"
+            name="email"
+            type="email"
+            title="Enter a valid email address."
+            autoComplete="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            data-testid="shipping-email-input"
+          />
+          <CountrySelect
+            name="shipping_address.country_code"
+            autoComplete="country"
+            region={cart?.region}
+            value={formData["shipping_address.country_code"]}
+            onChange={handleChange}
+            required
+            data-testid="shipping-country-select"
+          />
+
+          {/* Hidden inputs to satisfy Medusa standard address fields for digital orders */}
+          <input type="hidden" name="shipping_address.address_1" value="Digital Delivery" />
+          <input type="hidden" name="shipping_address.city" value="Digital" />
+          <input type="hidden" name="shipping_address.postal_code" value="00000" />
+          <input type="hidden" name="same_as_billing" value="on" />
+        </div>
+      </div>
+    )
   }
 
   return (

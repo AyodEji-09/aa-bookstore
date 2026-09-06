@@ -1,10 +1,10 @@
 "use client"
 
 import { Heading, Text, clx } from "@modules/common/components/ui"
-
 import PaymentButton from "../payment-button"
 import { useSearchParams } from "next/navigation"
 import { HttpTypes } from "@medusajs/types"
+import { isDigitalCart } from "@lib/util/is-digital"
 
 const Review = ({ cart }: { cart: HttpTypes.StoreCart }) => {
   const searchParams = useSearchParams()
@@ -15,9 +15,11 @@ const Review = ({ cart }: { cart: HttpTypes.StoreCart }) => {
     (cart as unknown as Record<string, unknown>)?.gift_cards && ((cart as unknown as Record<string, unknown>)?.gift_cards as unknown[])?.length > 0 && cart?.total === 0
   )
 
+  const isDigital = isDigitalCart(cart)
+
   const previousStepsCompleted =
     cart.shipping_address &&
-    (cart.shipping_methods?.length ?? 0) > 0 &&
+    (isDigital || (cart.shipping_methods?.length ?? 0) > 0) &&
     (cart.payment_collection || paidByGiftcard)
 
   return (

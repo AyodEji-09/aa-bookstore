@@ -2,6 +2,7 @@
 
 import { isManual, isStripeLike } from "@lib/constants"
 import { placeOrder } from "@lib/data/cart"
+import { isDigitalCart } from "@lib/util/is-digital"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@modules/common/components/ui"
 import { useElements, useStripe } from "@stripe/react-stripe-js"
@@ -18,12 +19,13 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   cart,
   "data-testid": dataTestId,
 }) => {
+  const isDigital = isDigitalCart(cart)
   const notReady =
     !cart ||
     !cart.shipping_address ||
     !cart.billing_address ||
     !cart.email ||
-    (cart.shipping_methods?.length ?? 0) < 1
+    (!isDigital && (cart.shipping_methods?.length ?? 0) < 1)
 
   const paymentSession = cart.payment_collection?.payment_sessions?.[0]
 

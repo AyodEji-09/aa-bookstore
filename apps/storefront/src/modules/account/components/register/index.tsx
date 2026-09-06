@@ -1,6 +1,7 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import Input from "@modules/common/components/input"
 import { LOGIN_VIEW } from "@modules/account/templates/login-template"
 import ErrorMessage from "@modules/checkout/components/error-message"
@@ -14,6 +15,17 @@ type Props = {
 
 const Register = ({ setCurrentView }: Props) => {
   const [message, formAction] = useActionState(signup, null)
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (message?.state === "success") {
+      const returnUrl = searchParams.get("return_url")
+      if (returnUrl) {
+        router.push(returnUrl)
+      }
+    }
+  }, [message, searchParams, router])
 
   return (
     <div
@@ -37,6 +49,13 @@ const Register = ({ setCurrentView }: Props) => {
         </div>
       )}
       <form className="w-full flex flex-col" action={formAction}>
+        {searchParams.get("return_url") && (
+          <input
+            type="hidden"
+            name="return_url"
+            value={searchParams.get("return_url") || ""}
+          />
+        )}
         <div className="flex flex-col w-full gap-y-2">
           <Input
             label="First name"

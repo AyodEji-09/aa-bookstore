@@ -18,6 +18,7 @@ export default async function orderPlacedDigitalEntitlementHandler({
       entity: "order",
       fields: [
         "id",
+        "email",
         "customer_id",
         "items.*",
         "items.variant.*",
@@ -29,7 +30,26 @@ export default async function orderPlacedDigitalEntitlementHandler({
     })
 
     const order = orders?.[0]
-    if (!order || !order.customer_id || !order.items?.length) {
+    if (!order || !order.items?.length) {
+      return
+    }
+
+    let customerId = order.customer_id
+    if (!customerId && order.email) {
+      const { data: customers } = await query.graph({
+        entity: "customer",
+        fields: ["id", "email"],
+        filters: { email: order.email },
+      })
+      if (customers?.length) {
+        customerId = customers[0].id
+      }
+    }
+
+    if (!customerId) {
+      logger.warn(
+        `Digital items in order ${orderId} skipped: no customer account associated with email ${order.email}`
+      )
       return
     }
 
@@ -62,14 +82,14 @@ export default async function orderPlacedDigitalEntitlementHandler({
 
       if (format && item.product_id) {
         const existing = await libraryService.listCustomerLibraryItems({
-          customer_id: order.customer_id,
+          customer_id: customerId,
           product_id: item.product_id,
           format,
         })
 
         if (!existing.length) {
           await libraryService.createCustomerLibraryItems({
-            customer_id: order.customer_id,
+            customer_id: customerId,
             product_id: item.product_id,
             variant_id: item.variant_id ?? "",
             format,
@@ -83,7 +103,7 @@ export default async function orderPlacedDigitalEntitlementHandler({
           })
 
           logger.info(
-            `Granted ${format} entitlement for product ${item.product_id} to customer ${order.customer_id}`
+            `Granted ${format} entitlement for product ${item.product_id} to customer ${customerId}`
           )
         }
       }

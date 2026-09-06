@@ -7,11 +7,15 @@ import {
   Pause,
   RotateCcw,
   RotateCw,
+  SkipBack,
+  SkipForward,
   Volume2,
   VolumeX,
   X,
   ListMusic,
   Headphones,
+  Loader2,
+  AlertCircle,
 } from "lucide-react"
 import { AudiobookTrack, updateLibraryProgress } from "@lib/data/library"
 
@@ -40,14 +44,19 @@ export default function AudiobookPlayer({
 }: AudiobookPlayerProps) {
   const [currentTrackIndex, setCurrentTrackIndex] = useState(initialTrackIndex)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [currentTime, setCurrentTime] = useState(initialTimestamp)
   const [duration, setDuration] = useState(0)
   const [speedIndex, setSpeedIndex] = useState(0)
   const [isMuted, setIsMuted] = useState(false)
   const [showChapters, setShowChapters] = useState(false)
+  const [audioError, setAudioError] = useState<string | null>(null)
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const currentTrack = tracks[currentTrackIndex] || tracks[0]
+
+  // Use same-origin audio proxy if available, with fallback to direct track streamUrl
+  const audioSource = `/api/library/${itemId}/audio?track=${currentTrackIndex}`
 
   useEffect(() => {
     if (audioRef.current) {
@@ -65,6 +74,8 @@ export default function AudiobookPlayer({
   const handleLoadedMetadata = () => {
     if (audioRef.current) {
       setDuration(audioRef.current.duration)
+      setIsLoading(false)
+      setAudioError(null)
       if (initialTimestamp > 0 && currentTime === initialTimestamp) {
         audioRef.current.currentTime = initialTimestamp
       }
@@ -73,6 +84,8 @@ export default function AudiobookPlayer({
 
   const togglePlay = () => {
     if (!audioRef.current) return
+    setAudioError(null)
+
     if (isPlaying) {
       audioRef.current.pause()
       setIsPlaying(false)
@@ -82,13 +95,48 @@ export default function AudiobookPlayer({
         timestamp_seconds: Math.floor(currentTime),
       })
     } else {
-      audioRef.current.play().then(() => setIsPlaying(true)).catch(console.error)
+      setIsLoading(true)
+      audioRef.current
+        .play()
+        .then(() => {
+          setIsPlaying(true)
+          setIsLoading(false)
+        })
+        .catch((err) => {
+          console.error("Audio playback error:", err)
+          setIsLoading(false)
+          setIsPlaying(false)
+          // Try fallback directly to track streamUrl if proxy had issue
+          if (
+            currentTrack?.streamUrl &&
+            audioRef.current?.src !== currentTrack.streamUrl
+          ) {
+            if (audioRef.current) {
+              audioRef.current.src = currentTrack.streamUrl
+              audioRef.current
+                .play()
+                .then(() => setIsPlaying(true))
+                .catch(() => {
+                  setAudioError(
+                    "Unable to play audio. Please ensure an audio file is uploaded for this book."
+                  )
+                })
+            }
+          } else {
+            setAudioError(
+              "Unable to play audio. Please ensure an audio file is uploaded for this book."
+            )
+          }
+        })
     }
   }
 
   const skipSeconds = (seconds: number) => {
     if (!audioRef.current) return
-    const nextTime = Math.max(0, Math.min(duration, audioRef.current.currentTime + seconds))
+    const nextTime = Math.max(
+      0,
+      Math.min(duration, audioRef.current.currentTime + seconds)
+    )
     audioRef.current.currentTime = nextTime
     setCurrentTime(nextTime)
   }
@@ -112,13 +160,16 @@ export default function AudiobookPlayer({
   }
 
   const selectTrack = (index: number) => {
+    if (index < 0 || index >= tracks.length) return
     setCurrentTrackIndex(index)
     setCurrentTime(0)
+    setAudioError(null)
     setIsPlaying(true)
     setShowChapters(false)
   }
 
   const formatTime = (secs: number) => {
+    if (isNaN(secs) || secs < 0) return "0:00"
     const m = Math.floor(secs / 60)
     const s = Math.floor(secs % 60)
     return `${m}:${s < 10 ? "0" : ""}${s}`
@@ -126,13 +177,13 @@ export default function AudiobookPlayer({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 select-none"
+      className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 select-none"
       onContextMenu={(e) => e.preventDefault()}
     >
-      <div className="bg-[#1A1818] text-white w-full max-w-lg rounded-t-2xl sm:rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="bg-[#1A1818] text-white w-full max-w-lg rounded-t-2xl sm:rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col max-h-[92vh]">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-red-400">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 shrink-0">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#980000]">
             <Headphones className="w-4 h-4 text-[#980000]" />
             <span>Audiobook Player</span>
           </div>
@@ -145,10 +196,10 @@ export default function AudiobookPlayer({
           </button>
         </div>
 
-        {/* Content Body */}
-        <div className="p-6 flex flex-col items-center text-center">
+        {/* Scrollable Content Body (ensures controls are NEVER cut off) */}
+        <div className="flex-1 overflow-y-auto no-scrollbar p-4 sm:p-6 flex flex-col items-center text-center min-h-0">
           {/* Cover Art */}
-          <div className="w-40 h-52 relative rounded-lg overflow-hidden shadow-2xl mb-5 bg-[#2A2626] border border-white/10">
+          <div className="w-28 h-36 sm:w-36 sm:h-48 relative rounded-lg overflow-hidden shadow-2xl mb-4 bg-[#2A2626] border border-white/10 shrink-0">
             {thumbnail ? (
               <Image
                 src={thumbnail}
@@ -158,26 +209,52 @@ export default function AudiobookPlayer({
               />
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center text-gray-500">
-                <Headphones className="w-12 h-12 mb-2 stroke-[1.5]" />
+                <Headphones className="w-10 h-10 mb-2 stroke-[1.5]" />
                 <span className="text-xs font-semibold">Audiobook</span>
               </div>
             )}
           </div>
 
-          <h3 className="text-lg font-bold text-white tracking-tight line-clamp-1">
+          <h3 className="text-base sm:text-lg font-bold text-white tracking-tight line-clamp-1">
             {title}
           </h3>
-          <p className="text-xs text-gray-400 mt-1 font-medium">{author}</p>
-          <div className="mt-2 inline-block px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-semibold text-gray-300">
-            {currentTrack?.title}
+          <p className="text-xs text-gray-400 mt-0.5 font-medium">{author}</p>
+          <div className="mt-1.5 inline-block px-3 py-0.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-semibold text-gray-300">
+            {currentTrack?.title || "Track 1"}
           </div>
+
+          {/* Error Message */}
+          {audioError && (
+            <div className="w-full mt-3 p-2.5 rounded-lg bg-red-950/50 border border-red-800/60 text-xs text-red-300 flex items-center gap-2 text-left">
+              <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
+              <span>{audioError}</span>
+            </div>
+          )}
 
           {/* Hidden Audio Stream Element */}
           <audio
             ref={audioRef}
-            src={currentTrack?.streamUrl}
+            src={audioSource}
             onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={handleLoadedMetadata}
+            onWaiting={() => setIsLoading(true)}
+            onPlaying={() => setIsLoading(false)}
+            onError={() => {
+              setIsLoading(false)
+              setIsPlaying(false)
+              if (
+                currentTrack?.streamUrl &&
+                audioRef.current?.src !== currentTrack.streamUrl
+              ) {
+                if (audioRef.current) {
+                  audioRef.current.src = currentTrack.streamUrl
+                }
+              } else {
+                setAudioError(
+                  "Unable to play audio. Please ensure an audio file is uploaded for this book."
+                )
+              }
+            }}
             onEnded={() => {
               if (currentTrackIndex < tracks.length - 1) {
                 selectTrack(currentTrackIndex + 1)
@@ -189,7 +266,7 @@ export default function AudiobookPlayer({
           />
 
           {/* Scrub Bar */}
-          <div className="w-full mt-6 space-y-1.5">
+          <div className="w-full mt-5 space-y-1.5">
             <input
               type="range"
               min="0"
@@ -204,16 +281,27 @@ export default function AudiobookPlayer({
             </div>
           </div>
 
-          {/* Controls */}
-          <div className="flex items-center justify-center gap-6 mt-6 w-full">
+          {/* Controls Bar - Always Fully Visible */}
+          <div className="flex items-center justify-center gap-3 sm:gap-5 mt-5 w-full">
             {/* Speed Control */}
             <button
               type="button"
               onClick={toggleSpeed}
-              className="px-2.5 py-1 text-xs font-bold rounded-md bg-white/10 hover:bg-white/20 text-white transition-colors"
+              className="px-2 py-1 text-xs font-bold rounded-md bg-white/10 hover:bg-white/20 text-white transition-colors"
               title="Playback speed"
             >
               {SPEED_OPTIONS[speedIndex]}x
+            </button>
+
+            {/* Previous Track */}
+            <button
+              type="button"
+              onClick={() => selectTrack(currentTrackIndex - 1)}
+              disabled={currentTrackIndex <= 0}
+              className="p-2 text-gray-300 hover:text-white disabled:opacity-20 transition-colors"
+              title="Previous track"
+            >
+              <SkipBack className="w-5 h-5" />
             </button>
 
             {/* 15s Back */}
@@ -226,13 +314,16 @@ export default function AudiobookPlayer({
               <RotateCcw className="w-5 h-5" />
             </button>
 
-            {/* Play/Pause Button */}
+            {/* Play/Pause Main Button */}
             <button
               type="button"
               onClick={togglePlay}
-              className="w-14 h-14 rounded-full bg-[#980000] hover:bg-[#800000] text-white flex items-center justify-center shadow-lg transition-transform transform active:scale-95"
+              className="w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-[#980000] hover:bg-[#800000] text-white flex items-center justify-center shadow-lg transition-transform transform active:scale-95 shrink-0"
+              title={isPlaying ? "Pause" : "Play"}
             >
-              {isPlaying ? (
+              {isLoading ? (
+                <Loader2 className="w-6 h-6 animate-spin" />
+              ) : isPlaying ? (
                 <Pause className="w-6 h-6 fill-current" />
               ) : (
                 <Play className="w-6 h-6 fill-current ml-0.5" />
@@ -249,27 +340,44 @@ export default function AudiobookPlayer({
               <RotateCw className="w-5 h-5" />
             </button>
 
+            {/* Next Track */}
+            <button
+              type="button"
+              onClick={() => selectTrack(currentTrackIndex + 1)}
+              disabled={currentTrackIndex >= tracks.length - 1}
+              className="p-2 text-gray-300 hover:text-white disabled:opacity-20 transition-colors"
+              title="Next track"
+            >
+              <SkipForward className="w-5 h-5" />
+            </button>
+
             {/* Chapter Drawer Toggle */}
             <button
               type="button"
               onClick={() => setShowChapters(!showChapters)}
               className={`p-2 rounded-md transition-colors ${
-                showChapters ? "text-[#980000] bg-white/10" : "text-gray-300 hover:text-white"
+                showChapters
+                  ? "text-[#980000] bg-white/10"
+                  : "text-gray-300 hover:text-white"
               }`}
-              title="Chapter list"
+              title="Track list"
             >
               <ListMusic className="w-5 h-5" />
             </button>
           </div>
 
           {/* Secondary bar: Mute toggle & DRM note */}
-          <div className="flex items-center justify-between w-full mt-6 pt-4 border-t border-white/10 text-xs text-gray-400">
+          <div className="flex items-center justify-between w-full mt-5 pt-3.5 border-t border-white/10 text-xs text-gray-400">
             <button
               type="button"
               onClick={toggleMute}
               className="flex items-center gap-1.5 text-gray-400 hover:text-white transition-colors"
             >
-              {isMuted ? <VolumeX className="w-4 h-4 text-red-400" /> : <Volume2 className="w-4 h-4" />}
+              {isMuted ? (
+                <VolumeX className="w-4 h-4 text-red-400" />
+              ) : (
+                <Volume2 className="w-4 h-4" />
+              )}
               <span>{isMuted ? "Unmute" : "Mute"}</span>
             </button>
             <span className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">
@@ -280,9 +388,9 @@ export default function AudiobookPlayer({
 
         {/* Chapters Drawer */}
         {showChapters && (
-          <div className="border-t border-white/10 bg-[#141212] p-4 max-h-56 overflow-y-auto space-y-1">
+          <div className="border-t border-white/10 bg-[#141212] p-4 max-h-52 overflow-y-auto space-y-1 shrink-0">
             <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 text-left">
-              Track List
+              Track List ({tracks.length})
             </div>
             {tracks.map((track, idx) => (
               <button
@@ -296,7 +404,9 @@ export default function AudiobookPlayer({
                 }`}
               >
                 <div className="flex items-center gap-2 truncate">
-                  <span className="text-[10px] text-gray-500 font-mono w-4">{idx + 1}</span>
+                  <span className="text-[10px] text-gray-500 font-mono w-4">
+                    {idx + 1}
+                  </span>
                   <span className="truncate">{track.title}</span>
                 </div>
                 <span className="text-[10px] text-gray-500 font-mono flex-shrink-0">

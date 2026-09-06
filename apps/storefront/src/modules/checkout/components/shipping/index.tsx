@@ -5,6 +5,7 @@ import { calculatePriceForShippingOption } from "@lib/data/fulfillment"
 import { convertToLocale } from "@lib/util/money"
 import { CheckCircleSolid, Loader } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
+import { isDigitalCart } from "@lib/util/is-digital"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import Divider from "@modules/common/components/divider"
 import MedusaRadio from "@modules/common/components/radio"
@@ -68,10 +69,20 @@ const Shipping: React.FC<ShippingProps> = ({
   const pathname = usePathname()
 
   const isOpen = searchParams.get("step") === "delivery"
+  const isDigital = isDigitalCart(cart)
 
-  const _shippingMethods = availableShippingMethods?.filter(
-    (sm) => (sm as unknown as { service_zone?: { fulfillment_set?: { type?: string; location?: { address: HttpTypes.StoreCartAddress } } } }).service_zone?.fulfillment_set?.type !== "pickup"
-  )
+  const _shippingMethods = availableShippingMethods
+    ?.filter(
+      (sm) => (sm as unknown as { service_zone?: { fulfillment_set?: { type?: string; location?: { address: HttpTypes.StoreCartAddress } } } }).service_zone?.fulfillment_set?.type !== "pickup"
+    )
+    ?.filter((sm) => {
+      const isDigitalOption =
+        sm.name?.toLowerCase().includes("digital") ||
+        (sm.metadata as Record<string, unknown> | undefined)?.is_digital === true
+      if (!isDigital && isDigitalOption) return false
+      if (isDigital && !isDigitalOption) return false
+      return true
+    })
 
   const _pickupMethods = availableShippingMethods?.filter(
     (sm) => (sm as unknown as { service_zone?: { fulfillment_set?: { type?: string; location?: { address: HttpTypes.StoreCartAddress } } } }).service_zone?.fulfillment_set?.type === "pickup"

@@ -121,7 +121,8 @@ export async function signup(
 
   // Continue by logging in. The login response tells us whether the backend
   // requires email verification — we don't need a storefront-side flag.
-  return completeLogin(customerForm.email, password)
+  const returnUrl = formData.get("return_url") as string
+  return completeLogin(customerForm.email, password, returnUrl)
 }
 
 export async function login(
@@ -130,8 +131,9 @@ export async function login(
 ): Promise<CustomerAuthState> {
   const email = formData.get("email") as string
   const password = formData.get("password") as string
+  const returnUrl = formData.get("return_url") as string
 
-  return completeLogin(email, password)
+  return completeLogin(email, password, returnUrl)
 }
 
 // Logs the customer in and reconciles the customer record. The behavior is
@@ -139,7 +141,8 @@ export async function login(
 // email verification is enabled.
 async function completeLogin(
   email: string,
-  password: string
+  password: string,
+  returnUrl?: string | null
 ): Promise<CustomerAuthState> {
   let result: Awaited<ReturnType<typeof sdk.auth.login>>
 
@@ -227,6 +230,10 @@ async function completeLogin(
     await transferCart()
   } catch (error) {
     return { state: "error", error: String(error) }
+  }
+
+  if (returnUrl) {
+    redirect(returnUrl)
   }
 
   return { state: "success" }

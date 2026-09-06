@@ -54,6 +54,8 @@ export type LibraryAccessPayload = {
       author: string
       thumbnail?: string
     }
+    file_url?: string | null
+    media_key?: string | null
     tracks?: AudiobookTrack[]
     chapters?: EbookChapter[]
   }

@@ -16,6 +16,7 @@ import {
   clx,
 } from "@modules/common/components/ui"
 import { HttpTypes } from "@medusajs/types"
+import { isDigitalCart } from "@lib/util/is-digital"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
 
@@ -57,8 +58,10 @@ const Payment = ({
     (cart as unknown as Record<string, unknown>)?.gift_cards && ((cart as unknown as Record<string, unknown>)?.gift_cards as unknown[])?.length > 0 && cart?.total === 0
   )
 
+  const isDigital = isDigitalCart(cart)
+
   const paymentReady =
-    (activeSession && (cart?.shipping_methods?.length ?? 0) !== 0) || paidByGiftcard
+    (activeSession && (isDigital || (cart?.shipping_methods?.length ?? 0) !== 0)) || paidByGiftcard
 
   const createQueryString = useCallback(
     (name: string, value: string) => {

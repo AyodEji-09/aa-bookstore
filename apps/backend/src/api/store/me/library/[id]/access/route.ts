@@ -36,53 +36,69 @@ export async function GET(
 
   const product = products?.[0]
 
-  // Mock sample chapters for reader and audio tracks for streaming player
-  // In production with R2, presigned streaming chunk URLs or secure chapter JSONs are generated here
-  const sampleAudioTracks = [
-    {
-      id: 1,
-      title: "Prologue - The Letter",
-      duration: 312,
-      streamUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-    },
-    {
-      id: 2,
-      title: "Chapter 1 - Sunday Morning",
-      duration: 480,
-      streamUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
-    },
-    {
-      id: 3,
-      title: "Chapter 2 - The Encounter",
-      duration: 540,
-      streamUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
-    },
-  ]
+  let fileUrl = item.media_key
+
+  // 1. If not stored on the library item, check the specific variant
+  if (!fileUrl && item.variant_id) {
+    const { data: variants } = await query.graph({
+      entity: "product_variant",
+      fields: ["id", "metadata"],
+      filters: { id: item.variant_id },
+    })
+    const vMeta = (variants?.[0]?.metadata || {}) as Record<string, unknown>
+    fileUrl = (vMeta?.file_url as string) || (vMeta?.media_key as string) || null
+  }
+
+  // 2. Fallback: check all variants of the product matching the format
+  if (!fileUrl && item.product_id) {
+    const { data: variants } = await query.graph({
+      entity: "product_variant",
+      fields: ["id", "metadata", "title"],
+      filters: { product_id: item.product_id },
+    })
+    for (const v of variants || []) {
+      const vMeta = (v.metadata || {}) as Record<string, unknown>
+      const vFormat =
+        vMeta?.format ||
+        (v.title?.toLowerCase().includes("ebook")
+          ? "ebook"
+          : v.title?.toLowerCase().includes("audio")
+          ? "audiobook"
+          : null)
+      if (vFormat === item.format && (vMeta?.file_url || vMeta?.media_key)) {
+        fileUrl = (vMeta.file_url as string) || (vMeta.media_key as string)
+        break
+      }
+    }
+  }
+
+  // Audio track configuration
+  const audioTracks =
+    fileUrl && (fileUrl.includes(".mp3") || fileUrl.includes(".m4b") || fileUrl.includes(".m4a") || item.format === "audiobook")
+      ? [
+          {
+            id: 1,
+            title: product?.title || "Audiobook",
+            duration: 3600,
+            streamUrl: fileUrl,
+          },
+        ]
+      : [
+          {
+            id: 1,
+            title: "Prologue - The Letter",
+            duration: 312,
+            streamUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+          },
+        ]
 
   const sampleEbookChapters = [
     {
       id: 1,
       title: "Prologue",
       content: [
-        "My name is Oscar, I am ten years old, I have set fire to the cat, the dog, the house (I think I even toasted the goldfish) and this is the first letter I am sending to you because before, I didn't have time on account of my studies.",
-        "I need to warn you right away: I hate writing. I only do it because Granny Rose told me that if you write to God, He might answer, or at least it might make things lighter.",
-        "Here at the hospital, everyone is kind, but everyone has that look when they know something you don't know.",
-      ],
-    },
-    {
-      id: 2,
-      title: "Chapter 1 - Granny Rose",
-      content: [
-        "Granny Rose is the oldest of the pink ladies who visit the children. She claims she used to be a professional wrestler named the Strangler of Languedoc. None of the other nurses believe her, but I do.",
-        "She told me: Oscar, life is a funny gift. In the beginning, we overestimate it: we think we've been given eternal life. Then we underestimate it: we find it rotten, too short, we're almost ready to throw it away. In the end, we realize that it wasn't a gift, just a loan. So we try to deserve it.",
-      ],
-    },
-    {
-      id: 3,
-      title: "Chapter 2 - The Twelve Days",
-      content: [
-        "Today Granny Rose made a proposition: 'From now on, Oscar, you will pretend that every single day is worth ten years of your life. That way, in twelve days, you will have lived one hundred and twenty years.'",
-        "It sounded like a game, but like all of Granny Rose's games, it felt truer than the medicine.",
+        "Sample Preview: No digital file was attached to this book yet in the admin dashboard.",
+        "To read the complete book, please upload the EPUB or PDF file in the Medusa Admin under Digital Products & Formats.",
       ],
     },
   ]
@@ -91,6 +107,8 @@ export async function GET(
     item: {
       id: item.id,
       format: item.format,
+      file_url: fileUrl || null,
+      media_key: fileUrl || null,
       progress: item.progress || {
         last_chapter: 1,
         completed: false,
@@ -102,8 +120,7 @@ export async function GET(
         author: (product?.metadata?.author as string) || "Eric-Emmanuel Schmitt",
         thumbnail: product?.thumbnail,
       },
-      // Stream / Reader payload: Content is strictly served in-memory for the web client
-      tracks: item.format === "audiobook" ? sampleAudioTracks : undefined,
+      tracks: item.format === "audiobook" ? audioTracks : undefined,
       chapters: item.format === "ebook" ? sampleEbookChapters : undefined,
     },
   })

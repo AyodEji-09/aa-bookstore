@@ -15,6 +15,10 @@ import {
 } from "./cookies"
 import { getRegion } from "./regions"
 import { getLocale } from "./locale-actions"
+import { isDigitalCart, isDigitalItem, isDigitalVariant } from "@lib/util/is-digital"
+import { retrieveVariant } from "./variants"
+import { listLibraryItems } from "./library"
+import { listCartShippingMethods } from "./fulfillment"
 
 /**
  * Retrieves a cart by its ID. If no ID is provided, it will use the cart ID from the cookies.
@@ -137,6 +141,35 @@ export async function addToCart({
     throw new Error("Error retrieving or creating cart")
   }
 
+  // Check if item is already in cart
+  const fullCart = await retrieveCart(cart.id)
+  const existingItem = fullCart?.items?.find((item) => item.variant_id === variantId)
+
+  if (existingItem && isDigitalItem(existingItem)) {
+    // Digital items are limited to a quantity of 1 per order
+    return
+  }
+
+  let finalQuantity = quantity
+  const variant = await retrieveVariant(variantId)
+  if (variant && isDigitalVariant(variant)) {
+    finalQuantity = 1
+
+    // Check if customer already owns this digital format in their library
+    const libraryItems = await listLibraryItems().catch(() => [])
+    const format =
+      (variant.metadata?.format as string) ||
+      (variant.title?.toLowerCase().includes("audio")
+        ? "audiobook"
+        : "ebook")
+    const alreadyOwned = libraryItems.some(
+      (item) => item.product?.id === variant.product_id && item.format === format
+    )
+    if (alreadyOwned) {
+      throw new Error("You already own this digital format in your library.")
+    }
+  }
+
   const headers = {
     ...(await getAuthHeaders()),
   }
@@ -146,7 +179,7 @@ export async function addToCart({
       cart.id,
       {
         variant_id: variantId,
-        quantity,
+        quantity: finalQuantity,
       },
       {},
       headers
@@ -178,12 +211,19 @@ export async function updateLineItem({
     throw new Error("Missing cart ID when updating line item")
   }
 
+  const currentCart = await retrieveCart(cartId)
+  const existingItem = currentCart?.items?.find((item) => item.id === lineId)
+  let finalQuantity = quantity
+  if (existingItem && isDigitalItem(existingItem) && quantity > 1) {
+    finalQuantity = 1
+  }
+
   const headers = {
     ...(await getAuthHeaders()),
   }
 
   await sdk.store.cart
-    .updateLineItem(cartId, lineId, { quantity }, {}, headers)
+    .updateLineItem(cartId, lineId, { quantity: finalQuantity }, {}, headers)
     .then(async () => {
       const cartCacheTag = await getCacheTag("carts")
       revalidateTag(cartCacheTag)
@@ -228,6 +268,19 @@ export async function setShippingMethod({
   cartId: string
   shippingMethodId: string
 }) {
+  const currentCart = await retrieveCart(cartId)
+  if (currentCart && !isDigitalCart(currentCart)) {
+    const availableMethods = await listCartShippingMethods(cartId).catch(() => [])
+    const selectedMethod = availableMethods?.find((sm) => sm.id === shippingMethodId)
+    if (
+      selectedMethod &&
+      (selectedMethod.name?.toLowerCase().includes("digital") ||
+        (selectedMethod.metadata as Record<string, unknown> | undefined)?.is_digital === true)
+    ) {
+      throw new Error("Digital delivery is not available for orders containing physical items.")
+    }
+  }
+
   const headers = {
     ...(await getAuthHeaders()),
   }
@@ -352,14 +405,14 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
       shipping_address: {
         first_name: formData.get("shipping_address.first_name"),
         last_name: formData.get("shipping_address.last_name"),
-        address_1: formData.get("shipping_address.address_1"),
+        address_1: formData.get("shipping_address.address_1") || "Digital Delivery",
         address_2: "",
         company: formData.get("shipping_address.company"),
-        postal_code: formData.get("shipping_address.postal_code"),
-        city: formData.get("shipping_address.city"),
+        postal_code: formData.get("shipping_address.postal_code") || "00000",
+        city: formData.get("shipping_address.city") || "Digital",
         country_code: formData.get("shipping_address.country_code"),
         province: formData.get("shipping_address.province"),
-        phone: formData.get("shipping_address.phone"),
+        phone: formData.get("shipping_address.phone") || "",
       },
       email: formData.get("email"),
     } as any
@@ -371,22 +424,44 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
       data.billing_address = {
         first_name: formData.get("billing_address.first_name"),
         last_name: formData.get("billing_address.last_name"),
-        address_1: formData.get("billing_address.address_1"),
+        address_1: formData.get("billing_address.address_1") || "Digital Delivery",
         address_2: "",
         company: formData.get("billing_address.company"),
-        postal_code: formData.get("billing_address.postal_code"),
-        city: formData.get("billing_address.city"),
-        country_code: formData.get("billing_address.country_code"),
+        postal_code: formData.get("billing_address.postal_code") || "00000",
+        city: formData.get("billing_address.city") || "Digital",
+        country_code: formData.get("billing_address.country_code") || formData.get("shipping_address.country_code"),
         province: formData.get("billing_address.province"),
-        phone: formData.get("billing_address.phone"),
+        phone: formData.get("billing_address.phone") || "",
       }
     await updateCart(data)
   } catch (e: any) {
     return e.message
   }
 
+  const currentCart = await retrieveCart()
+  const isDigital = isDigitalCart(currentCart)
+  const countryCode = String(formData.get("shipping_address.country_code") || "").toLowerCase()
+
+  if (isDigital && currentCart?.id) {
+    try {
+      const shippingOptions = await listCartShippingMethods(currentCart.id)
+      const digitalOption =
+        shippingOptions?.find((o) => o.name?.toLowerCase().includes("digital")) ||
+        shippingOptions?.find((o) => o.amount === 0) ||
+        shippingOptions?.[0]
+      if (digitalOption) {
+        await setShippingMethod({
+          cartId: currentCart.id,
+          shippingMethodId: digitalOption.id,
+        })
+      }
+    } catch (err) {
+      console.error("Auto digital shipping error in setAddresses:", err)
+    }
+  }
+
   redirect(
-    `/${formData.get("shipping_address.country_code")}/checkout?step=delivery`
+    `/${countryCode}/checkout?step=${isDigital ? "payment" : "delivery"}`
   )
 }
 
