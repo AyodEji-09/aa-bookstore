@@ -48,9 +48,13 @@ const Payment = ({
     setError(null)
     setSelectedPaymentMethod(method)
     if (isStripeLike(method)) {
-      await initiatePaymentSession(cart, {
-        provider_id: method,
-      })
+      try {
+        await initiatePaymentSession(cart, {
+          provider_id: method,
+        })
+      } catch (err) {
+        setError(err instanceof Error ? err.message : String(err))
+      }
     }
   }
 

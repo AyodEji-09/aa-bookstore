@@ -10,6 +10,8 @@ const isR2Configured = Boolean(
   process.env.R2_FILE_URL
 )
 
+const isStripeConfigured = Boolean(process.env.STRIPE_API_KEY)
+
 module.exports = defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
@@ -28,6 +30,27 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/wishlist",
     },
+    ...(isStripeConfigured
+      ? [
+          {
+            resolve: "@medusajs/medusa/payment",
+            options: {
+              providers: [
+                {
+                  resolve: "@medusajs/medusa/payment-stripe",
+                  id: "stripe",
+                  options: {
+                    apiKey: process.env.STRIPE_API_KEY,
+                    webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+                    automaticPaymentMethods: true,
+                    capture: true,
+                  },
+                },
+              ],
+            },
+          },
+        ]
+      : []),
     ...(isR2Configured
       ? [
           {

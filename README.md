@@ -28,6 +28,7 @@ The platform supports physical editions (Hardcover, Paperback) with real-world s
   - [5. Seed Digital Delivery Option](#5-seed-digital-delivery-option)
   - [6. Configure Storefront](#6-configure-storefront)
   - [7. Run Development Servers](#7-run-development-servers)
+  - [8. Configure Stripe Payments](#8-configure-stripe-payments)
 - [Environment Variables Reference](#environment-variables-reference)
   - [Backend (`apps/backend/.env`)](#backend-appsbackendenv)
   - [Storefront (`apps/storefront/.env.local`)](#storefront-appsstorefrontenvlocal)
@@ -286,6 +287,37 @@ npm run backend:dev     # Backend at http://localhost:9000 (Admin at http://loca
 npm run storefront:dev  # Storefront at http://localhost:8000
 ```
 
+### 8. Configure Stripe Payments
+
+To enable live or test credit card payments and digital wallets (Apple Pay, Google Pay) via Stripe:
+
+1. **Add Stripe API Keys**:
+   - In `apps/backend/.env`:
+     ```env
+     STRIPE_API_KEY=sk_test_...
+     STRIPE_WEBHOOK_SECRET=whsec_...
+     ```
+   - In `apps/storefront/.env.local`:
+     ```env
+     NEXT_PUBLIC_STRIPE_KEY=pk_test_...
+     ```
+
+2. **Link Stripe Provider to Store Regions**:
+   Run the seeding script to enable `pp_stripe_stripe` on all existing store regions:
+   ```bash
+   cd apps/backend
+   npx medusa exec ./src/scripts/seed-stripe-provider.ts
+   ```
+   *(Alternatively, toggle Stripe on your regions in the Admin Dashboard at **Settings** -> **Regions**).*
+
+3. **Configure Stripe Webhooks**:
+   - Webhook endpoint URL: `https://<your-backend-domain>/hooks/payment/stripe`
+   - Subscribed events: `payment_intent.succeeded`, `payment_intent.amount_capturable_updated`, `payment_intent.payment_failed`
+   - **Local Testing**: Forward events using the Stripe CLI:
+     ```bash
+     stripe listen --forward-to localhost:9000/hooks/payment/stripe
+     ```
+
 ---
 
 ## Environment Variables Reference
@@ -307,6 +339,8 @@ npm run storefront:dev  # Storefront at http://localhost:8000
 | `R2_SECRET_ACCESS_KEY` | Optional | Cloudflare R2 API token secret key | — |
 | `R2_FILE_URL` | Optional | Public or custom domain URL for media files | — |
 | `R2_REGION` | Optional | R2 region (typically `auto`) | `auto` |
+| `STRIPE_API_KEY` | Optional | Stripe secret key (`sk_test_...`) | — |
+| `STRIPE_WEBHOOK_SECRET` | Optional | Stripe webhook signing secret (`whsec_...`) | — |
 
 ### Storefront (`apps/storefront/.env.local`)
 
@@ -316,7 +350,7 @@ npm run storefront:dev  # Storefront at http://localhost:8000
 | `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` | Yes | Medusa publishable API key | — |
 | `NEXT_PUBLIC_BASE_URL` | Yes | Public URL of the storefront | `http://localhost:8000` |
 | `NEXT_PUBLIC_DEFAULT_REGION` | No | Default region country code | `us` |
-| `NEXT_PUBLIC_STRIPE_KEY` | Optional | Stripe publishable key | — |
+| `NEXT_PUBLIC_STRIPE_KEY` | Optional | Stripe publishable key (`pk_test_...`) | — |
 
 ---
 
@@ -339,6 +373,7 @@ Backend-specific commands (`cd apps/backend`):
 npx medusa db:migrate                                 # Run database migrations
 npx medusa user -e <email> -p <password>              # Create admin user
 npx medusa exec ./src/scripts/seed-digital-shipping.ts # Seed digital delivery option
+npx medusa exec ./src/scripts/seed-stripe-provider.ts   # Enable Stripe on all store regions
 npm run lint                                          # Run Medusa framework linter
 ```
 

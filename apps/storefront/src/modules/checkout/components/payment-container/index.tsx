@@ -108,6 +108,13 @@ export const StripePaymentContainer = ({
               }}
             />
           </div>
+        ) : !process.env.NEXT_PUBLIC_STRIPE_KEY ? (
+          <div className="my-3 p-3 text-xs bg-amber-50 text-amber-900 border border-amber-200 rounded-lg">
+            <p className="font-semibold">Stripe is not configured</p>
+            <p className="mt-1 text-amber-700">
+              Please set <code className="font-mono bg-amber-100 px-1 py-0.5 rounded">NEXT_PUBLIC_STRIPE_KEY</code> in your environment to process card payments.
+            </p>
+          </div>
         ) : (
           <SkeletonCardDetails />
         ))}
