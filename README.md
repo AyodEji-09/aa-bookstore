@@ -100,6 +100,13 @@ Digital media is accessed directly inside the customer account area (`/account/l
 - Purely digital carts automatically skip the shipping step and attach the digital fulfillment option.
 - Server-side validation in `setShippingMethod` prevents physical orders from bypassing real shipping rates.
 
+### Store Information & Support Pages
+
+- **`/about`**: Comprehensive author biography, literary philosophy, multi-format reading vision, and quality guarantee.
+- **`/contact`**: Interactive inquiry form dispatching customer emails via Resend, alongside telephone, office location, business hours, and instant digital library access.
+- **`/shipping-returns`**: Delivery timelines for physical books, instant access guarantee for digital assets, and 30-day replacement policy.
+- **`/privacy` & `/terms`**: Detailed GDPR data protection, Stripe transaction processing, and single-user digital licensing terms.
+
 ---
 
 ## Digital Assets & Metadata Specification
@@ -319,9 +326,9 @@ To enable live or test credit card payments and digital wallets (Apple Pay, Goog
      stripe listen --forward-to localhost:9000/hooks/payment/stripe
      ```
 
-### 9. Configure Resend Email Notifications
+### 9. Configure Resend Email Notifications & Audiences
 
-To enable branded transactional emails (Order Confirmations with direct Digital Library links, Password Reset links):
+To enable transactional emails (Order Confirmations with direct Digital Library access links, Password Reset links), Contact Form inquiries, and Newsletter Audience sync:
 
 1. **Add Resend API Keys**:
    - In `apps/backend/.env`:
@@ -330,9 +337,21 @@ To enable branded transactional emails (Order Confirmations with direct Digital 
      RESEND_FROM_EMAIL="Ayodeji Anifowose Bookstore <onboarding@resend.dev>"
      STOREFRONT_URL=http://localhost:8000
      ```
+   - In `apps/storefront/.env.local`:
+     ```env
+     RESEND_API_KEY=re_...
+     RESEND_FROM_EMAIL="Ayodeji Anifowose Bookstore <onboarding@resend.dev>"
+     RESEND_AUDIENCE_ID=e8f882c7-598a-46bd-8720-ab7affbb1185
+     ```
 
-2. **Development Mode**:
-   - If `RESEND_API_KEY` is not provided, the notification provider safely simulates email delivery and outputs preview logs to the terminal (`[Resend Dev Mode] Simulated email to: ...`), preventing failed transactions during local testing.
+2. **Newsletter Audience & Segments**:
+   - Newsletter submissions route contacts directly to the **`aa-bookstore`** segment in Resend (`RESEND_AUDIENCE_ID`), preventing subscriber collisions and isolating readership marketing lists without requiring a separate database model.
+
+3. **Contact Form Inquiries**:
+   - Customer questions submitted through `/contact` automatically format and dispatch inquiry emails with the customer's email set as `reply_to`.
+
+4. **Development Mode**:
+   - If `RESEND_API_KEY` is not set, notification providers and contact actions run in safe simulated mode and log to the terminal console, preventing blocked transactions during local development.
 
 ---
 
@@ -370,6 +389,9 @@ To enable branded transactional emails (Order Confirmations with direct Digital 
 | `NEXT_PUBLIC_BASE_URL` | Yes | Public URL of the storefront | `http://localhost:8000` |
 | `NEXT_PUBLIC_DEFAULT_REGION` | No | Default region country code | `us` |
 | `NEXT_PUBLIC_STRIPE_KEY` | Optional | Stripe publishable key (`pk_test_...`) | — |
+| `RESEND_API_KEY` | Optional | Resend API key for contact inquiries and audience sync | — |
+| `RESEND_FROM_EMAIL` | Optional | Outbound email sender identifier | `onboarding@resend.dev` |
+| `RESEND_AUDIENCE_ID` | Optional | Resend audience or segment ID for newsletter subscriptions | — |
 
 ---
 

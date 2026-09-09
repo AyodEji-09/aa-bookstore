@@ -78,9 +78,14 @@ NEXT_PUBLIC_MEDUSA_BACKEND_URL=http://localhost:9000
 NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_your_publishable_key_here
 NEXT_PUBLIC_BASE_URL=http://localhost:8000
 NEXT_PUBLIC_DEFAULT_REGION=us
+
+# Resend API for Contact Inquiries & Newsletter Audiences
+RESEND_API_KEY=re_...
+RESEND_FROM_EMAIL="Ayodeji Anifowose Bookstore <onboarding@resend.dev>"
+RESEND_AUDIENCE_ID=e8f882c7-598a-46bd-8720-ab7affbb1185
 ```
 
-> **Note**: Obtain the `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` from the Medusa Admin Dashboard (**Settings** -> **Publishable API Keys**).
+> **Note**: Obtain the `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` from the Medusa Admin Dashboard (**Settings** -> **Publishable API Keys**). Set `RESEND_AUDIENCE_ID` to your Resend segment/audience ID (e.g. `aa-bookstore`) to isolate newsletter subscribers.
 
 ---
 

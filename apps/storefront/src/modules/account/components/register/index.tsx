@@ -102,14 +102,14 @@ const Register = ({ setCurrentView }: Props) => {
         <span className="text-center text-ui-fg-base text-small-regular mt-6">
           By creating an account, you agree to Ayodeji Anifowose Bookstore&apos;s{" "}
           <LocalizedClientLink
-            href="/content/privacy-policy"
+            href="/privacy"
             className="underline"
           >
             Privacy Policy
           </LocalizedClientLink>{" "}
           and{" "}
           <LocalizedClientLink
-            href="/content/terms-of-use"
+            href="/terms"
             className="underline"
           >
             Terms of Use

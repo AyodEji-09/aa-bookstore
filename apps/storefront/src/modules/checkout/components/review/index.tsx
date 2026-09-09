@@ -5,6 +5,7 @@ import PaymentButton from "../payment-button"
 import { useSearchParams } from "next/navigation"
 import { HttpTypes } from "@medusajs/types"
 import { isDigitalCart } from "@lib/util/is-digital"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 const Review = ({ cart }: { cart: HttpTypes.StoreCart }) => {
   const searchParams = useSearchParams()
@@ -43,9 +44,19 @@ const Review = ({ cart }: { cart: HttpTypes.StoreCart }) => {
             <div className="w-full">
               <Text className="txt-medium-plus text-ui-fg-base mb-1">
                 By clicking the Place Order button, you confirm that you have
-                read, understand and accept our Terms of Use, Terms of Sale and
-                Returns Policy and acknowledge that you have read Medusa
-                Store&apos;s Privacy Policy.
+                read, understand and accept our{" "}
+                <LocalizedClientLink href="/terms" className="underline hover:text-black font-semibold">
+                  Terms of Use
+                </LocalizedClientLink>
+                , Terms of Sale and{" "}
+                <LocalizedClientLink href="/shipping-returns" className="underline hover:text-black font-semibold">
+                  Returns Policy
+                </LocalizedClientLink>{" "}
+                and acknowledge that you have read Ayodeji Anifowose Bookstore&apos;s{" "}
+                <LocalizedClientLink href="/privacy" className="underline hover:text-black font-semibold">
+                  Privacy Policy
+                </LocalizedClientLink>
+                .
               </Text>
             </div>
           </div>

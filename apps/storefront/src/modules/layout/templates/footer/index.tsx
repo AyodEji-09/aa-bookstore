@@ -43,23 +43,28 @@ export default async function Footer() {
             </h4>
             <ul className="space-y-2.5 text-xs text-white/80">
               <li>
-                <LocalizedClientLink href="/store" className="hover:text-white transition-colors">
-                  Orders & Shipping
+                <LocalizedClientLink href="/about" className="hover:text-white transition-colors">
+                  About the Author
                 </LocalizedClientLink>
               </li>
               <li>
-                <LocalizedClientLink href="/store" className="hover:text-white transition-colors">
-                  Returns & Refunds
+                <LocalizedClientLink href="/shipping-returns" className="hover:text-white transition-colors">
+                  Shipping & Returns
                 </LocalizedClientLink>
               </li>
               <li>
-                <LocalizedClientLink href="/account" className="hover:text-white transition-colors">
-                  Loyalty Rewards
+                <LocalizedClientLink href="/contact" className="hover:text-white transition-colors">
+                  Contact & Support
                 </LocalizedClientLink>
               </li>
               <li>
-                <LocalizedClientLink href="/store" className="hover:text-white transition-colors">
-                  Contact Us
+                <LocalizedClientLink href="/privacy" className="hover:text-white transition-colors">
+                  Privacy Policy
+                </LocalizedClientLink>
+              </li>
+              <li>
+                <LocalizedClientLink href="/terms" className="hover:text-white transition-colors">
+                  Terms of Use
                 </LocalizedClientLink>
               </li>
             </ul>
@@ -126,9 +131,19 @@ export default async function Footer() {
             </a>
           </div>
 
-          {/* Copyright */}
-          <div>
-            © {new Date().getFullYear()} AYODEJI ANIFOWOSE BOOKSTORE. All rights reserved.
+          {/* Copyright & Legal Links */}
+          <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+            <div>
+              © {new Date().getFullYear()} AYODEJI ANIFOWOSE BOOKSTORE. All rights reserved.
+            </div>
+            <div className="flex items-center gap-x-4 text-white/60">
+              <LocalizedClientLink href="/privacy" className="hover:text-white underline transition-colors">
+                Privacy Policy
+              </LocalizedClientLink>
+              <LocalizedClientLink href="/terms" className="hover:text-white underline transition-colors">
+                Terms of Use
+              </LocalizedClientLink>
+            </div>
           </div>
 
           {/* Payment Badges */}
