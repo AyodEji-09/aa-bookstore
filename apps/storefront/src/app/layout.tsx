@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout(props: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-mode="light" className={inter.variable}>
+    <html lang="en" data-mode="light" className={`${inter.variable} scroll-smooth`}>
       <body className={inter.className}>
         <WishlistProvider>
           <main className="relative">{props.children}</main>

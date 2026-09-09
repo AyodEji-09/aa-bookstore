@@ -86,6 +86,14 @@ Digital media is accessed directly inside the customer account area (`/account/l
   - Playback speed switcher (0.75x, 1x, 1.25x, 1.5x, 2x) and volume control.
   - Byte-range audio streaming (`Accept-Ranges: bytes`) for smooth seeking.
 
+### Book Search & Discovery Bar
+
+- **Instant Search Modal**: Global `Cmd+K` / `Ctrl+K` and header search trigger opening a fast discovery dialog.
+- **Multi-Field Matching**: Search across title, author (`metadata.author`), categories, format (audiobook, ebook, print), and description.
+- **Format Filter Tabs**: One-click quick pills (`All`, `Audiobooks`, `eBooks`, `Hardcover`, `Paperback`) to instantly narrow down titles.
+- **Live Preview Cards**: Displays cover art thumbnail, title, author, format badges, and starting price in customer's local currency.
+- **Full Keyboard Navigation**: Arrow keys (`↑` / `↓`) to navigate, `Enter` to open book, and `Escape` to close.
+
 ### Duplicate Purchase & Authentication Guards
 
 - **Guest Interception**: If a guest adds a digital book to their cart, proceeding to checkout redirects them to log in or register, then returns them directly to checkout via `return_url`.

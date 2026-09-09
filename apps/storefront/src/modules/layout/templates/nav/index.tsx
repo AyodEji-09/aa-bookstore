@@ -11,6 +11,7 @@ import WishlistButton from "@modules/layout/components/wishlist-button"
 import SideMenu from "@modules/layout/components/side-menu"
 import CountrySelectNav from "@modules/layout/components/country-select-nav"
 import NavPills from "./nav-pills"
+import SearchButton from "@modules/layout/components/search-button"
 import { ArrowUpRightIcon } from "lucide-react"
 
 export default async function Nav() {
@@ -44,10 +45,36 @@ export default async function Nav() {
 
   return (
     <>
-      {/* Top Announcement Bar (Unfixed: scrolls away naturally with page) */}
-      <div className="w-full bg-black text-white text-[13px] font-medium tracking-wide py-3 px-4 text-center flex items-center justify-center gap-x-1.5">
-        <span>Subscribe to our Newsletter For Latest Books</span>
-        <ArrowUpRightIcon size={18} />
+      {/* Top Utility & Announcement Bar */}
+      <div className="w-full bg-black text-white text-xs font-medium tracking-wide py-2.5 border-b border-white/10 relative z-[60]">
+        <div className="content-container flex items-center justify-between gap-3 sm:gap-4 px-4 sm:px-6">
+          {/* Announcement Message (Left-aligned, truncated on mobile, links to footer newsletter) */}
+          <a
+            href="#newsletter-section"
+            className="flex-1 min-w-0 flex items-center justify-start gap-x-1.5 text-left group cursor-pointer"
+            title="Subscribe to our Newsletter"
+          >
+            <span className="text-white/90 group-hover:text-white group-hover:underline underline-offset-2 truncate">
+              Subscribe to our Newsletter For Latest Books & Releases
+            </span>
+            <ArrowUpRightIcon
+              size={14}
+              className="text-white/60 group-hover:text-white flex-shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+            />
+          </a>
+
+          {/* Right Utility Actions (Wishlist & Country Selector) */}
+          <div className="flex items-center gap-x-2.5 sm:gap-x-3.5 flex-shrink-0">
+            <WishlistButton variant="topbar" />
+
+            {regions && regions.length > 0 && (
+              <>
+                <span className="text-white/20 text-xs">|</span>
+                <CountrySelectNav regions={regions} variant="topbar" />
+              </>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Sticky Navbar Header */}
@@ -73,17 +100,13 @@ export default async function Nav() {
 
           {/* Right Header Actions */}
           <div className="flex items-center gap-x-3">
-            {/* Fully Rounded Flag-Only Country Selector */}
-            {regions && regions.length > 0 && (
-              <div className="hidden sm:block">
-                <CountrySelectNav regions={regions} />
-              </div>
-            )}
+            {/* Search Trigger Button */}
+            <SearchButton />
 
-            {/* Account Icon */}
+            {/* Account Icon (Desktop) */}
             <LocalizedClientLink
               href="/account"
-              className="w-9 h-9 rounded-full bg-[#980000] text-white flex items-center justify-center hover:bg-[#7a0000] transition-colors"
+              className="hidden sm:flex w-9 h-9 rounded-full bg-[#980000] text-white items-center justify-center hover:bg-[#7a0000] transition-colors"
               title="Account"
               data-testid="nav-account-link"
             >
@@ -101,9 +124,6 @@ export default async function Nav() {
                 />
               </svg>
             </LocalizedClientLink>
-
-            {/* Wishlist Button */}
-            <WishlistButton />
 
             {/* Cart Button */}
             <Suspense

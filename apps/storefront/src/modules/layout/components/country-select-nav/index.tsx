@@ -21,9 +21,10 @@ type CountryOption = {
 
 type CountrySelectNavProps = {
   regions: HttpTypes.StoreRegion[]
+  variant?: "default" | "topbar"
 }
 
-const CountrySelectNav = ({ regions }: CountrySelectNavProps) => {
+const CountrySelectNav = ({ regions, variant = "default" }: CountrySelectNavProps) => {
   const { countryCode } = useParams()
   const currentPath = usePathname().split(`/${countryCode}`)[1] || ""
 
@@ -68,36 +69,59 @@ const CountrySelectNav = ({ regions }: CountrySelectNavProps) => {
   }
 
   return (
-    <div className="relative">
+    <div className="relative z-[70]">
       <Listbox value={current} onChange={handleChange}>
-        <ListboxButton
-          className="w-9 h-9 rounded-full border border-[#F1F1F3] bg-white flex items-center justify-center hover:border-gray-300 transition-colors focus:outline-none overflow-hidden"
-          title={`Shipping to ${current?.label || "Select Country"}`}
-        >
-          {current ? (
-            <ReactCountryFlag
-              svg
-              style={{
-                width: "20px",
-                height: "15px",
-                borderRadius: "2px",
-                objectFit: "cover",
-              }}
-              countryCode={current.country ?? ""}
-            />
-          ) : (
-            <span className="text-xs uppercase font-bold text-gray-500">
-              US
+        {variant === "topbar" ? (
+          <ListboxButton
+            className="h-6 px-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-white flex items-center gap-1.5 transition-colors focus:outline-none text-[11px]"
+            title={`Shipping to ${current?.label || "Select Country"}`}
+          >
+            {current && (
+              <ReactCountryFlag
+                svg
+                style={{
+                  width: "15px",
+                  height: "11px",
+                  borderRadius: "2px",
+                  objectFit: "cover",
+                }}
+                countryCode={current.country ?? ""}
+              />
+            )}
+            <span className="text-[10px] font-bold uppercase tracking-wider text-white/90">
+              {current?.country || "US"}
             </span>
-          )}
-        </ListboxButton>
+          </ListboxButton>
+        ) : (
+          <ListboxButton
+            className="w-9 h-9 rounded-full border border-[#F1F1F3] bg-white flex items-center justify-center hover:border-gray-300 transition-colors focus:outline-none overflow-hidden"
+            title={`Shipping to ${current?.label || "Select Country"}`}
+          >
+            {current ? (
+              <ReactCountryFlag
+                svg
+                style={{
+                  width: "20px",
+                  height: "15px",
+                  borderRadius: "2px",
+                  objectFit: "cover",
+                }}
+                countryCode={current.country ?? ""}
+              />
+            ) : (
+              <span className="text-xs uppercase font-bold text-gray-500">
+                US
+              </span>
+            )}
+          </ListboxButton>
+        )}
         <Transition
           as={Fragment}
           leave="transition ease-in duration-100"
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <ListboxOptions className="absolute right-0 mt-2 max-h-60 w-44 overflow-auto thin-scrollbar rounded-xl bg-white py-1.5 text-xs shadow-xl ring-1 ring-black/5 z-50 focus:outline-none">
+          <ListboxOptions className="absolute right-0 mt-2 max-h-60 w-44 overflow-auto thin-scrollbar rounded-xl bg-white py-1.5 text-xs shadow-xl ring-1 ring-black/5 z-[80] focus:outline-none">
             {options.map((o, index) => (
               <ListboxOption
                 key={index}

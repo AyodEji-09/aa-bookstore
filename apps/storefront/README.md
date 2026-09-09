@@ -61,6 +61,12 @@ apps/storefront/
   - Interactive reader with chapter navigation and progress tracking.
   - Renders files directly in-browser with no public download links.
 
+### 4. Book Search & Discovery Bar (`Cmd+K`)
+- **Header Trigger & Keyboard Shortcuts**: Accessible from header button or pressing `Cmd+K` / `Ctrl+K` from any page.
+- **Search Criteria**: Multi-token search matching book title, author (`metadata.author`), format, and categories.
+- **Format Filter Tabs**: Filter results by Audiobook, eBook, Hardcover, or Paperback.
+- **Live Preview Results**: Cover thumbnails, author attribution, format badges, and localized price tag.
+
 ---
 
 ## Environment Setup

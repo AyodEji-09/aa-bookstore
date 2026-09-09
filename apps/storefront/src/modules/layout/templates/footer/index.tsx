@@ -99,7 +99,7 @@ export default async function Footer() {
           </div>
 
           {/* Column 4: Newsletter */}
-          <div>
+          <div id="newsletter-section" className="scroll-mt-24">
             <h4 className="font-bold text-sm uppercase tracking-wider text-white/90 mb-4 border-b border-white/20 pb-2">
               Newsletter
             </h4>
