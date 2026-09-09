@@ -2,6 +2,7 @@ import ItemsTemplate from "./items"
 import Summary from "./summary"
 import EmptyCartMessage from "../components/empty-cart-message"
 import SignInPrompt from "../components/sign-in-prompt"
+import CartQueryCleaner from "../components/cart-query-cleaner"
 import Divider from "@modules/common/components/divider"
 import { HttpTypes } from "@medusajs/types"
 import { isDigitalItem } from "@lib/util/is-digital"
@@ -45,12 +46,12 @@ const CartTemplate = ({
     }
   }
 
-  const hasDuplicateItems =
-    ownedItemIds.size > 0 || searchParams?.error === "already_owned"
+  const hasDuplicateItems = ownedItemIds.size > 0
   const itemTitle = duplicateTitle || (searchParams?.item as string)
 
   return (
     <div className="py-12">
+      <CartQueryCleaner hasDuplicateItems={hasDuplicateItems} />
       <div className="content-container" data-testid="cart-container">
         {hasDuplicateItems && (
           <div className="mb-8 p-4 rounded-lg bg-red-50 border border-[#980000]/20 flex items-start gap-x-3 text-[#382C2C]">

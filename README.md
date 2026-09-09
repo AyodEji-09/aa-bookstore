@@ -29,6 +29,7 @@ The platform supports physical editions (Hardcover, Paperback) with real-world s
   - [6. Configure Storefront](#6-configure-storefront)
   - [7. Run Development Servers](#7-run-development-servers)
   - [8. Configure Stripe Payments](#8-configure-stripe-payments)
+  - [9. Configure Resend Email Notifications](#9-configure-resend-email-notifications)
 - [Environment Variables Reference](#environment-variables-reference)
   - [Backend (`apps/backend/.env`)](#backend-appsbackendenv)
   - [Storefront (`apps/storefront/.env.local`)](#storefront-appsstorefrontenvlocal)
@@ -318,6 +319,21 @@ To enable live or test credit card payments and digital wallets (Apple Pay, Goog
      stripe listen --forward-to localhost:9000/hooks/payment/stripe
      ```
 
+### 9. Configure Resend Email Notifications
+
+To enable branded transactional emails (Order Confirmations with direct Digital Library links, Password Reset links):
+
+1. **Add Resend API Keys**:
+   - In `apps/backend/.env`:
+     ```env
+     RESEND_API_KEY=re_...
+     RESEND_FROM_EMAIL="Ayodeji Anifowose Bookstore <onboarding@resend.dev>"
+     STOREFRONT_URL=http://localhost:8000
+     ```
+
+2. **Development Mode**:
+   - If `RESEND_API_KEY` is not provided, the notification provider safely simulates email delivery and outputs preview logs to the terminal (`[Resend Dev Mode] Simulated email to: ...`), preventing failed transactions during local testing.
+
 ---
 
 ## Environment Variables Reference
@@ -341,6 +357,9 @@ To enable live or test credit card payments and digital wallets (Apple Pay, Goog
 | `R2_REGION` | Optional | R2 region (typically `auto`) | `auto` |
 | `STRIPE_API_KEY` | Optional | Stripe secret key (`sk_test_...`) | — |
 | `STRIPE_WEBHOOK_SECRET` | Optional | Stripe webhook signing secret (`whsec_...`) | — |
+| `RESEND_API_KEY` | Optional | Resend API key (`re_...`) | — |
+| `RESEND_FROM_EMAIL` | Optional | Sender address (e.g. `Bookstore <orders@domain.com>`) | `onboarding@resend.dev` |
+| `STOREFRONT_URL` | Optional | Storefront URL for links in email templates | `http://localhost:8000` |
 
 ### Storefront (`apps/storefront/.env.local`)
 

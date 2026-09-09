@@ -386,3 +386,79 @@ export const updateCustomerAddress = async (
       return { success: false, error: err.toString() }
     })
 }
+
+export async function requestPasswordReset(email: string) {
+  try {
+    const backendUrl =
+      process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+    const publishableKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
+
+    const res = await fetch(
+      `${backendUrl}/auth/customer/emailpass/reset-password`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(publishableKey
+            ? { "x-publishable-api-key": publishableKey }
+            : {}),
+        },
+        body: JSON.stringify({
+          identifier: email,
+        }),
+      }
+    )
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      throw new Error(err.message || `Request failed with status ${res.status}`)
+    }
+
+    return { success: true, error: null }
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message || "Failed to request password reset",
+    }
+  }
+}
+
+export async function resetPassword(token: string, newPassword: string) {
+  try {
+    const backendUrl =
+      process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+    const publishableKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
+
+    const res = await fetch(`${backendUrl}/auth/customer/emailpass/update`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        ...(publishableKey
+          ? { "x-publishable-api-key": publishableKey }
+          : {}),
+      },
+      body: JSON.stringify({
+        password: newPassword,
+      }),
+    })
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      throw new Error(
+        err.message ||
+          "Failed to reset password. The link may have expired or is invalid."
+      )
+    }
+
+    return { success: true, error: null }
+  } catch (error: any) {
+    return {
+      success: false,
+      error:
+        error.message ||
+        "Failed to reset password. The link may have expired or is invalid.",
+    }
+  }
+}
+

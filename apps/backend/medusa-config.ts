@@ -1,4 +1,9 @@
+import dns from "node:dns"
 import { loadEnv, defineConfig } from "@medusajs/framework/utils"
+
+if (typeof dns.setDefaultResultOrder === "function") {
+  dns.setDefaultResultOrder("ipv4first")
+}
 
 loadEnv(process.env.NODE_ENV || "development", process.cwd())
 
@@ -15,6 +20,21 @@ const isStripeConfigured = Boolean(process.env.STRIPE_API_KEY)
 module.exports = defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
+    databaseDriverOptions: {
+      connection: {
+        ssl:
+          process.env.DATABASE_URL?.includes("sslmode=require") ||
+          process.env.NODE_ENV === "production"
+            ? { rejectUnauthorized: false }
+            : false,
+      },
+      pool: {
+        min: 0,
+        max: 10,
+        idleTimeoutMillis: 15000,
+        acquireTimeoutMillis: 30000,
+      },
+    },
     http: {
       storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,
@@ -29,6 +49,22 @@ module.exports = defineConfig({
     },
     {
       resolve: "./src/modules/wishlist",
+    },
+    {
+      resolve: "@medusajs/medusa/notification",
+      options: {
+        providers: [
+          {
+            resolve: "./src/modules/resend",
+            id: "resend",
+            options: {
+              channels: ["email"],
+              api_key: process.env.RESEND_API_KEY,
+              from: process.env.RESEND_FROM_EMAIL,
+            },
+          },
+        ],
+      },
     },
     ...(isStripeConfigured
       ? [
