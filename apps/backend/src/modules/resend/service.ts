@@ -57,10 +57,21 @@ export class ResendNotificationService extends AbstractNotificationProviderServi
       )
     }
 
+    const data = notification.data || {}
+
+    // In-app feed notifications are persisted directly to the database and do not send external emails
+    if (notification.channel === "feed") {
+      this.logger_.info(
+        `[Feed Notification] ${data.title || "New notification"}: ${
+          data.description || ""
+        }`
+      )
+      return {}
+    }
+
     const to = notification.to
     const from = notification.from?.trim() || this.config_.from!
     const template = notification.template
-    const data = notification.data || {}
 
     let subject = notification.content?.subject || "Notification from Bookstore"
     let html = notification.content?.html || ""

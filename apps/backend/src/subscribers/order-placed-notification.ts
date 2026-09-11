@@ -223,6 +223,35 @@ export default async function orderPlacedNotificationHandler({
         }
       }
     }
+
+    // Dispatch In-App Admin Notification Feed (populates the admin notification bell drawer)
+    try {
+      const orderRef = order.display_id ? `#${order.display_id}` : order.id
+      const formattedTotal = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: (order.currency_code || "usd").toUpperCase(),
+      }).format(Number(order.total) / 100)
+
+      await notificationService.createNotifications({
+        to: "", // Medusa Admin queries to: [admin_user_id, admin_user_email, ""]
+        channel: "feed",
+        template: "order-placed-feed",
+        data: {
+          title: `New Order ${orderRef}`,
+          description: `Received ${formattedTotal} from ${customerName} (${order.email}).`,
+        },
+      })
+
+      logger.info(
+        `Created in-app admin feed notification for order ${order.id}`
+      )
+    } catch (feedErr) {
+      logger.warn(
+        `Failed to create admin feed notification: ${
+          feedErr instanceof Error ? feedErr.message : "Unknown error"
+        }`
+      )
+    }
   } catch (error) {
     logger.error(
       `Failed to process order confirmation event for order ${orderId}: ${
