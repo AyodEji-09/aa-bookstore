@@ -2,22 +2,22 @@ import dns from "node:dns"
 import type { SubscriberArgs, SubscriberConfig } from "@medusajs/framework"
 import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 import { INotificationModuleService } from "@medusajs/framework/types"
-import { renderOrderDeliveredEmail } from "../modules/resend/templates"
+import { renderOrderFulfillmentCreatedEmail } from "../modules/resend/templates"
 
 if (typeof dns.setDefaultResultOrder === "function") {
   dns.setDefaultResultOrder("ipv4first")
 }
 
-export default async function orderDeliveredNotificationHandler({
+export default async function orderFulfillmentCreatedNotificationHandler({
   event: { data },
   container,
-}: SubscriberArgs<{ id: string; no_notification?: boolean }>) {
+}: SubscriberArgs<{ order_id: string; fulfillment_id: string; no_notification?: boolean }>) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER)
 
   // Respect the admin toggle if send notification was turned off
   if (data.no_notification) {
     logger.info(
-      `Delivery notification skipped for fulfillment ${data.id} (no_notification is true)`
+      `Fulfillment notification skipped for order ${data.order_id} (no_notification is true)`
     )
     return
   }
@@ -27,58 +27,29 @@ export default async function orderDeliveredNotificationHandler({
     Modules.NOTIFICATION
   )
 
-  const fulfillmentId = data.id
+  const { order_id: orderId, fulfillment_id: fulfillmentId } = data
 
   try {
-    const { data: fulfillments } = await query.graph({
-      entity: "fulfillment",
+    const { data: orders } = await query.graph({
+      entity: "order",
       fields: [
         "id",
+        "display_id",
+        "email",
+        "shipping_address.*",
+        "fulfillments.*",
+        "fulfillments.items.*",
         "items.*",
-        "order.*",
-        "order.display_id",
-        "order.email",
-        "order.shipping_address.*",
       ],
       filters: {
-        id: fulfillmentId,
+        id: orderId,
       },
     })
 
-    const fulfillment = fulfillments?.[0]
-    let order = (fulfillment as any)?.order
-
-    if (!order || !order.email) {
-      const { data: links } = await query.graph({
-        entity: "order_fulfillment",
-        fields: ["order_id"],
-        filters: {
-          fulfillment_id: fulfillmentId,
-        } as any,
-      })
-      const orderId = (links?.[0] as any)?.order_id
-      if (orderId) {
-        const { data: orders } = await query.graph({
-          entity: "order",
-          fields: [
-            "id",
-            "display_id",
-            "email",
-            "shipping_address.*",
-            "fulfillments.*",
-            "fulfillments.items.*",
-          ],
-          filters: {
-            id: orderId,
-          },
-        })
-        order = orders?.[0]
-      }
-    }
-
+    const order = orders?.[0]
     if (!order || !order.email) {
       logger.warn(
-        `Could not find linked order for delivered fulfillment ${fulfillmentId}`
+        `Could not find order ${orderId} for fulfillment notification`
       )
       return
     }
@@ -88,16 +59,30 @@ export default async function orderDeliveredNotificationHandler({
         order.shipping_address?.last_name || ""
       }`.trim() || "Reader"
 
-    const deliveryData = {
+    const targetFulfillment = (order.fulfillments || []).find(
+      (f: any) => f.id === fulfillmentId
+    )
+
+    const fulfillmentItems =
+      targetFulfillment?.items?.length
+        ? targetFulfillment.items.map((item: any) => ({
+            title: item.title,
+            quantity: item.quantity,
+            unit_price: 0,
+            total: 0,
+          }))
+        : (order.items || []).map((item: any) => ({
+            title: item.title,
+            quantity: item.quantity,
+            unit_price: Number(item.unit_price) || 0,
+            total: Number(item.total) || 0,
+          }))
+
+    const fulfillmentData = {
       order_id: order.id,
       display_id: order.display_id ?? undefined,
       customer_name: customerName,
-      items: (fulfillment.items || []).map((item: any) => ({
-        title: item.title,
-        quantity: item.quantity,
-        unit_price: 0,
-        total: 0,
-      })),
+      items: fulfillmentItems,
       shipping_address: order.shipping_address
         ? {
             first_name: order.shipping_address.first_name ?? undefined,
@@ -114,16 +99,16 @@ export default async function orderDeliveredNotificationHandler({
       await notificationService.createNotifications({
         to: order.email,
         channel: "email",
-        template: "order-delivered",
-        data: deliveryData,
+        template: "order-fulfillment-created",
+        data: fulfillmentData,
       })
 
       logger.info(
-        `Dispatched delivery confirmation notification for order ${order.id} (fulfillment ${fulfillmentId}) to ${order.email}`
+        `Dispatched fulfillment created notification for order ${order.id} to ${order.email}`
       )
     } catch (notifErr) {
       logger.warn(
-        `Notification module DB write failed for delivery (${
+        `Notification module DB write failed for fulfillment created (${
           notifErr instanceof Error ? notifErr.message : "DB error"
         }). Falling back to direct Resend email dispatch...`
       )
@@ -136,7 +121,7 @@ export default async function orderDeliveredNotificationHandler({
           process.env.RESEND_FROM_EMAIL ||
           "Ayodeji Anifowose Bookstore <onboarding@resend.dev>"
 
-        const { subject, html } = renderOrderDeliveredEmail(deliveryData)
+        const { subject, html } = renderOrderFulfillmentCreatedEmail(fulfillmentData)
 
         const res = await resend.emails.send({
           from: fromEmail,
@@ -147,18 +132,18 @@ export default async function orderDeliveredNotificationHandler({
 
         if (res.error) {
           logger.error(
-            `Direct Resend delivery notification failed for order ${order.id}: ${res.error.message}`
+            `Direct Resend fulfillment created notification failed for order ${order.id}: ${res.error.message}`
           )
         } else {
           logger.info(
-            `Direct Resend delivery notification sent successfully to ${order.email} (ID: ${res.data?.id})`
+            `Direct Resend fulfillment created notification sent successfully to ${order.email} (ID: ${res.data?.id})`
           )
         }
       }
     }
   } catch (error) {
     logger.error(
-      `Failed to process delivery notification event for fulfillment ${fulfillmentId}: ${
+      `Failed to process fulfillment created notification event for order ${orderId}: ${
         error instanceof Error ? error.message : "Unknown error"
       }`
     )
@@ -166,5 +151,5 @@ export default async function orderDeliveredNotificationHandler({
 }
 
 export const config: SubscriberConfig = {
-  event: "delivery.created",
+  event: "order.fulfillment_created",
 }

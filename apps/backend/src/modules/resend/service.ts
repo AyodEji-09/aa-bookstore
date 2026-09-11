@@ -5,6 +5,7 @@ import { Resend } from "resend"
 import {
   renderOrderPlacedEmail,
   renderAdminOrderPlacedEmail,
+  renderOrderFulfillmentCreatedEmail,
   renderShipmentCreatedEmail,
   renderOrderDeliveredEmail,
   renderPasswordResetEmail,
@@ -84,6 +85,10 @@ export class ResendNotificationService extends AbstractNotificationProviderServi
       const rendered = renderAdminOrderPlacedEmail(data)
       subject = rendered.subject
       html = rendered.html
+    } else if (template === "order-fulfillment-created") {
+      const rendered = renderOrderFulfillmentCreatedEmail(data)
+      subject = rendered.subject
+      html = rendered.html
     } else if (template === "shipment-created") {
       const rendered = renderShipmentCreatedEmail(data)
       subject = rendered.subject
@@ -115,23 +120,31 @@ export class ResendNotificationService extends AbstractNotificationProviderServi
           this.logger_.error(
             `Resend API returned error for ${to}: ${response.error.message}`
           )
-        } else {
-          this.logger_.info(
-            `Resend email sent successfully to ${to} (ID: ${response.data?.id})`
+          throw new MedusaError(
+            MedusaError.Types.UNEXPECTED_STATE,
+            `Resend API error: ${response.error.message}`
           )
         }
+
+        this.logger_.info(
+          `Resend email sent successfully to ${to} (ID: ${response.data?.id})`
+        )
+        return { id: response.data?.id }
       } catch (err: any) {
         this.logger_.error(
           `Failed to send email via Resend to ${to}: ${err.message}`
+        )
+        throw new MedusaError(
+          MedusaError.Types.UNEXPECTED_STATE,
+          `Failed to send email via Resend: ${err.message}`
         )
       }
     } else {
       this.logger_.info(
         `[Resend Dev Mode] Simulated email to: ${to} | Subject: "${subject}"`
       )
+      return {}
     }
-
-    return {}
   }
 }
 

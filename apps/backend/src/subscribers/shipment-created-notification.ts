@@ -47,7 +47,37 @@ export default async function shipmentCreatedNotificationHandler({
     })
 
     const fulfillment = fulfillments?.[0]
-    const order = (fulfillment as any)?.order
+    let order = (fulfillment as any)?.order
+
+    if (!order || !order.email) {
+      const { data: links } = await query.graph({
+        entity: "order_fulfillment",
+        fields: ["order_id"],
+        filters: {
+          fulfillment_id: fulfillmentId,
+        } as any,
+      })
+      const orderId = (links?.[0] as any)?.order_id
+      if (orderId) {
+        const { data: orders } = await query.graph({
+          entity: "order",
+          fields: [
+            "id",
+            "display_id",
+            "email",
+            "shipping_address.*",
+            "fulfillments.*",
+            "fulfillments.labels.*",
+            "fulfillments.items.*",
+          ],
+          filters: {
+            id: orderId,
+          },
+        })
+        order = orders?.[0]
+      }
+    }
+
     if (!order || !order.email) {
       logger.warn(
         `Could not find linked order for shipment fulfillment ${fulfillmentId}`
@@ -60,13 +90,18 @@ export default async function shipmentCreatedNotificationHandler({
         order.shipping_address?.last_name || ""
       }`.trim() || "Reader"
 
-    const primaryLabel = fulfillment.labels?.[0]
+    const labels =
+      fulfillment?.labels?.length
+        ? fulfillment.labels
+        : (order as any)?.fulfillments?.find((f: any) => f.id === fulfillmentId)?.labels || []
+
+    const primaryLabel = labels?.[0]
     const trackingNumber = primaryLabel?.tracking_number
     const trackingUrl =
       primaryLabel?.tracking_url && primaryLabel.tracking_url !== "#"
         ? primaryLabel.tracking_url
         : trackingNumber
-        ? `https://web.fezdelivery.co/track-delivery?trackingNumber=${trackingNumber}`
+        ? `https://fezdelivery.co/track?order=${trackingNumber}`
         : undefined
 
     const shipmentData = {

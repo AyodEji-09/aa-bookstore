@@ -64,6 +64,21 @@ interface DeliveryEmailData {
   }
 }
 
+export interface FulfillmentCreatedEmailData {
+  order_id: string
+  display_id?: string | number
+  customer_name: string
+  items: OrderEmailItem[]
+  shipping_address?: {
+    first_name?: string
+    last_name?: string
+    address_1?: string
+    city?: string
+    country_code?: string
+    postal_code?: string
+  }
+}
+
 interface PasswordResetEmailData {
   customer_name?: string
   email: string
@@ -526,6 +541,98 @@ export function renderOrderDeliveredEmail(data: DeliveryEmailData): {
                     <p style="margin:24px 0 0;font-size:13px;color:#555555;line-height:1.5;">
                       If you haven't received your package or have any questions, please reply directly to this email or contact customer support.
                     </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:20px 32px;background-color:#FAFAFA;border-top:1px solid #F0F0F0;text-align:center;font-size:11px;color:#888888;">
+                    &copy; ${new Date().getFullYear()} Ayodeji Anifowose Bookstore. All rights reserved.
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+  `
+
+  return { subject, html }
+}
+
+export function renderOrderFulfillmentCreatedEmail(
+  data: FulfillmentCreatedEmailData
+): {
+  subject: string
+  html: string
+} {
+  const orderRef = data.display_id ? `#${data.display_id}` : data.order_id
+  const subject = `Your Order ${orderRef} Is Being Prepared! - Ayodeji Anifowose Bookstore`
+
+  const itemsList = data.items
+    .map(
+      (item) => `
+      <tr>
+        <td style="padding:10px 0;border-bottom:1px solid #EEEEEE;font-size:13px;color:#333333;">
+          <strong>${item.title}</strong>
+          <div style="font-size:11px;color:#777777;">Quantity: ${item.quantity}</div>
+        </td>
+      </tr>
+    `
+    )
+    .join("")
+
+  const addressDetails = data.shipping_address
+    ? `
+      <div style="margin-top:20px;padding:14px;background-color:#F9F9F9;border-radius:8px;font-size:12px;color:#555555;line-height:1.5;">
+        <strong style="color:#222222;">Delivery Destination:</strong><br />
+        ${data.shipping_address.address_1 || ""}<br />
+        ${[
+          data.shipping_address.city,
+          data.shipping_address.postal_code,
+          data.shipping_address.country_code?.toUpperCase(),
+        ]
+          .filter(Boolean)
+          .join(", ")}
+      </div>
+    `
+    : ""
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head><meta charset="utf-8"><title>${subject}</title></head>
+      <body style="margin:0;padding:0;background-color:#F7F7F8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#F7F7F8;padding:32px 12px;">
+          <tr>
+            <td align="center">
+              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width:560px;background-color:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+                <tr>
+                  <td style="padding:28px 32px;background-color:#980000;text-align:center;">
+                    <div style="font-size:18px;font-weight:900;color:#FFFFFF;letter-spacing:0.5px;text-transform:uppercase;">
+                      Ayodeji Anifowose Bookstore
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:32px;">
+                    <h1 style="margin:0 0 12px;font-size:22px;font-weight:800;color:#1F1F1F;">Your Books Are Being Prepared!</h1>
+                    <p style="margin:0 0 16px;font-size:14px;color:#555555;line-height:1.5;">
+                      Hello ${data.customer_name || "Reader"}, good news! Our team has created the fulfillment for your order <strong>${orderRef}</strong> and is currently packing your books.
+                    </p>
+
+                    <div style="margin-top:24px;">
+                      <h3 style="margin:0 0 8px;font-size:14px;font-weight:700;color:#1F1F1F;">Items in This Fulfillment:</h3>
+                      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        ${itemsList}
+                      </table>
+                    </div>
+
+                    ${addressDetails}
+
+                    <div style="margin-top:24px;padding:16px;background-color:#FFF8F0;border-left:4px solid #E08A00;border-radius:4px;font-size:13px;color:#7A4B00;line-height:1.5;">
+                      <strong>What happens next?</strong><br />
+                      As soon as your package is dispatched with our courier partner, you will receive an automated shipment email with your tracking number and live Fez Delivery tracking link.
+                    </div>
                   </td>
                 </tr>
                 <tr>
