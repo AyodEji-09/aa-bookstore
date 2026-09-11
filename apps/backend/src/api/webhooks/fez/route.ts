@@ -31,12 +31,12 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
   )
 
   const fulfillmentService = req.scope.resolve(Modules.FULFILLMENT)
+  const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
 
   try {
     // If the status is "Delivered", check for active fulfillments matching this Fez order number
     if (body?.status?.toLowerCase() === "delivered" && body?.orderNumber) {
       const [fulfillments] = await fulfillmentService.listAndCountFulfillments({
-        // Match fulfillments created under the Fez provider
         provider_id: "fez",
       })
 
@@ -52,6 +52,29 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
         logger.info(
           `Marking fulfillment ${targetFulfillment.id} as delivered via Fez webhook`
         )
+
+        const { data: fullFulfillments } = await query.graph({
+          entity: "fulfillment",
+          fields: ["id", "order.id"],
+          filters: { id: targetFulfillment.id },
+        })
+
+        const orderId = (fullFulfillments?.[0] as any)?.order?.id
+        if (orderId) {
+          const { markOrderFulfillmentAsDeliveredWorkflow } = await import(
+            "@medusajs/core-flows"
+          )
+          await markOrderFulfillmentAsDeliveredWorkflow(req.scope).run({
+            input: {
+              orderId,
+              fulfillmentId: targetFulfillment.id,
+              no_notification: false,
+            },
+          })
+          logger.info(
+            `Successfully marked fulfillment ${targetFulfillment.id} delivered for order ${orderId}`
+          )
+        }
       }
     }
 

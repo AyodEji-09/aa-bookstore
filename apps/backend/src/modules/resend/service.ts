@@ -2,7 +2,13 @@ import dns from "node:dns"
 import { AbstractNotificationProviderService, MedusaError } from "@medusajs/framework/utils"
 import { Logger } from "@medusajs/framework/types"
 import { Resend } from "resend"
-import { renderOrderPlacedEmail, renderPasswordResetEmail } from "./templates"
+import {
+  renderOrderPlacedEmail,
+  renderAdminOrderPlacedEmail,
+  renderShipmentCreatedEmail,
+  renderOrderDeliveredEmail,
+  renderPasswordResetEmail,
+} from "./templates"
 
 if (typeof dns.setDefaultResultOrder === "function") {
   dns.setDefaultResultOrder("ipv4first")
@@ -61,6 +67,18 @@ export class ResendNotificationService extends AbstractNotificationProviderServi
 
     if (template === "order-placed") {
       const rendered = renderOrderPlacedEmail(data)
+      subject = rendered.subject
+      html = rendered.html
+    } else if (template === "order-placed-admin") {
+      const rendered = renderAdminOrderPlacedEmail(data)
+      subject = rendered.subject
+      html = rendered.html
+    } else if (template === "shipment-created") {
+      const rendered = renderShipmentCreatedEmail(data)
+      subject = rendered.subject
+      html = rendered.html
+    } else if (template === "order-delivered") {
+      const rendered = renderOrderDeliveredEmail(data)
       subject = rendered.subject
       html = rendered.html
     } else if (template === "password-reset") {

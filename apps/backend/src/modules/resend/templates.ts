@@ -11,6 +11,7 @@ interface OrderEmailData {
   order_id: string
   display_id?: string | number
   customer_name: string
+  customer_email?: string
   items: OrderEmailItem[]
   subtotal: number
   shipping_total: number
@@ -19,6 +20,40 @@ interface OrderEmailData {
   currency_code: string
   has_digital_items: boolean
   library_url: string
+  admin_order_url?: string
+  shipping_address?: {
+    first_name?: string
+    last_name?: string
+    address_1?: string
+    city?: string
+    country_code?: string
+    postal_code?: string
+  }
+}
+
+interface ShipmentEmailData {
+  order_id: string
+  display_id?: string | number
+  customer_name: string
+  items: OrderEmailItem[]
+  tracking_number?: string
+  tracking_url?: string
+  tracking_links?: Array<{ tracking_number: string; tracking_url?: string }>
+  shipping_address?: {
+    first_name?: string
+    last_name?: string
+    address_1?: string
+    city?: string
+    country_code?: string
+    postal_code?: string
+  }
+}
+
+interface DeliveryEmailData {
+  order_id: string
+  display_id?: string | number
+  customer_name: string
+  items: OrderEmailItem[]
   shipping_address?: {
     first_name?: string
     last_name?: string
@@ -254,6 +289,245 @@ export function renderPasswordResetEmail(data: PasswordResetEmailData): {
                 </tr>
 
                 <!-- Footer -->
+                <tr>
+                  <td style="padding:20px 32px;background-color:#FAFAFA;border-top:1px solid #F0F0F0;text-align:center;font-size:11px;color:#888888;">
+                    &copy; ${new Date().getFullYear()} Ayodeji Anifowose Bookstore. All rights reserved.
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+  `
+
+  return { subject, html }
+}
+
+export function renderAdminOrderPlacedEmail(data: OrderEmailData): {
+  subject: string
+  html: string
+} {
+  const orderRef = data.display_id ? `#${data.display_id}` : data.order_id
+  const subject = `[New Order Alert] Order ${orderRef} placed by ${data.customer_name}`
+
+  const itemsRows = data.items
+    .map(
+      (item) => `
+      <tr>
+        <td style="padding:10px 0;border-bottom:1px solid #EEEEEE;font-size:13px;color:#333333;">
+          <strong>${item.title}</strong> ${item.format ? `(${item.format})` : ""}
+          <div style="font-size:11px;color:#777777;">Qty: ${item.quantity}</div>
+        </td>
+        <td style="padding:10px 0;border-bottom:1px solid #EEEEEE;text-align:right;font-size:13px;font-weight:700;color:#1F1F1F;">
+          ${formatCurrency(item.total, data.currency_code)}
+        </td>
+      </tr>
+    `
+    )
+    .join("")
+
+  const adminLink = data.admin_order_url
+    ? `
+    <div style="text-align:center;margin:28px 0 10px;">
+      <a href="${data.admin_order_url}" style="display:inline-block;background-color:#980000;color:#FFFFFF;padding:12px 24px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;">
+        View Order in Admin Dashboard &rarr;
+      </a>
+    </div>
+  `
+    : ""
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head><meta charset="utf-8"><title>${subject}</title></head>
+      <body style="margin:0;padding:0;background-color:#F7F7F8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#F7F7F8;padding:32px 12px;">
+          <tr>
+            <td align="center">
+              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width:560px;background-color:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+                <tr>
+                  <td style="padding:24px 32px;background-color:#1F1F1F;text-align:center;">
+                    <div style="font-size:16px;font-weight:800;color:#FFFFFF;letter-spacing:0.5px;text-transform:uppercase;">
+                      Store Admin Notification
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:32px;">
+                    <h1 style="margin:0 0 8px;font-size:20px;font-weight:800;color:#1F1F1F;">New Customer Order Placed!</h1>
+                    <p style="margin:0 0 20px;font-size:13px;color:#666666;">
+                      A new order <strong>${orderRef}</strong> was just placed on your bookstore by <strong>${data.customer_name}</strong> (${data.customer_email || "N/A"}).
+                    </p>
+
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top:16px;">
+                      ${itemsRows}
+                    </table>
+
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top:16px;font-size:13px;color:#666666;">
+                      <tr>
+                        <td style="padding:4px 0;">Total Value</td>
+                        <td style="padding:4px 0;text-align:right;font-size:16px;font-weight:800;color:#980000;">
+                          ${formatCurrency(data.total, data.currency_code)}
+                        </td>
+                      </tr>
+                    </table>
+
+                    ${adminLink}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+  `
+
+  return { subject, html }
+}
+
+export function renderShipmentCreatedEmail(data: ShipmentEmailData): {
+  subject: string
+  html: string
+} {
+  const orderRef = data.display_id ? `#${data.display_id}` : data.order_id
+  const subject = `Your Order ${orderRef} Has Shipped! - Ayodeji Anifowose Bookstore`
+
+  const itemsList = data.items
+    .map(
+      (item) => `
+      <tr>
+        <td style="padding:10px 0;border-bottom:1px solid #EEEEEE;font-size:13px;color:#333333;">
+          <strong>${item.title}</strong>
+          <div style="font-size:11px;color:#777777;">Quantity: ${item.quantity}</div>
+        </td>
+      </tr>
+    `
+    )
+    .join("")
+
+  const trackingButton =
+    data.tracking_url && data.tracking_url !== "#"
+      ? `
+    <div style="text-align:center;margin:28px 0 16px;">
+      <a href="${data.tracking_url}" style="display:inline-block;background-color:#980000;color:#FFFFFF;padding:12px 24px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;">
+        Track Package on Fez Delivery &rarr;
+      </a>
+    </div>
+  `
+      : ""
+
+  const trackingText = data.tracking_number
+    ? `<p style="font-size:13px;color:#555555;margin:12px 0;">Tracking Number: <strong>${data.tracking_number}</strong></p>`
+    : ""
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head><meta charset="utf-8"><title>${subject}</title></head>
+      <body style="margin:0;padding:0;background-color:#F7F7F8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#F7F7F8;padding:32px 12px;">
+          <tr>
+            <td align="center">
+              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width:560px;background-color:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+                <tr>
+                  <td style="padding:28px 32px;background-color:#980000;text-align:center;">
+                    <div style="font-size:18px;font-weight:900;color:#FFFFFF;letter-spacing:0.5px;text-transform:uppercase;">
+                      Ayodeji Anifowose Bookstore
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:32px;">
+                    <h1 style="margin:0 0 12px;font-size:22px;font-weight:800;color:#1F1F1F;">Your Books Are on the Way!</h1>
+                    <p style="margin:0 0 16px;font-size:14px;color:#555555;line-height:1.5;">
+                      Hello ${data.customer_name || "Reader"}, your order <strong>${orderRef}</strong> has been shipped with our courier partner.
+                    </p>
+
+                    ${trackingText}
+                    ${trackingButton}
+
+                    <div style="margin-top:24px;">
+                      <h3 style="margin:0 0 8px;font-size:14px;font-weight:700;color:#1F1F1F;">Items in This Shipment:</h3>
+                      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        ${itemsList}
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:20px 32px;background-color:#FAFAFA;border-top:1px solid #F0F0F0;text-align:center;font-size:11px;color:#888888;">
+                    &copy; ${new Date().getFullYear()} Ayodeji Anifowose Bookstore. All rights reserved.
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+  `
+
+  return { subject, html }
+}
+
+export function renderOrderDeliveredEmail(data: DeliveryEmailData): {
+  subject: string
+  html: string
+} {
+  const orderRef = data.display_id ? `#${data.display_id}` : data.order_id
+  const subject = `Your Order ${orderRef} Has Been Delivered! - Ayodeji Anifowose Bookstore`
+
+  const itemsList = data.items
+    .map(
+      (item) => `
+      <tr>
+        <td style="padding:10px 0;border-bottom:1px solid #EEEEEE;font-size:13px;color:#333333;">
+          <strong>${item.title}</strong>
+          <div style="font-size:11px;color:#777777;">Quantity: ${item.quantity}</div>
+        </td>
+      </tr>
+    `
+    )
+    .join("")
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head><meta charset="utf-8"><title>${subject}</title></head>
+      <body style="margin:0;padding:0;background-color:#F7F7F8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#F7F7F8;padding:32px 12px;">
+          <tr>
+            <td align="center">
+              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width:560px;background-color:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+                <tr>
+                  <td style="padding:28px 32px;background-color:#980000;text-align:center;">
+                    <div style="font-size:18px;font-weight:900;color:#FFFFFF;letter-spacing:0.5px;text-transform:uppercase;">
+                      Ayodeji Anifowose Bookstore
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:32px;">
+                    <h1 style="margin:0 0 12px;font-size:22px;font-weight:800;color:#1F1F1F;">Package Delivered!</h1>
+                    <p style="margin:0 0 16px;font-size:14px;color:#555555;line-height:1.5;">
+                      Hello ${data.customer_name || "Reader"}, your order <strong>${orderRef}</strong> has been delivered. We hope you enjoy your reading!
+                    </p>
+
+                    <div style="margin-top:24px;">
+                      <h3 style="margin:0 0 8px;font-size:14px;font-weight:700;color:#1F1F1F;">Delivered Items:</h3>
+                      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        ${itemsList}
+                      </table>
+                    </div>
+
+                    <p style="margin:24px 0 0;font-size:13px;color:#555555;line-height:1.5;">
+                      If you haven't received your package or have any questions, please reply directly to this email or contact customer support.
+                    </p>
+                  </td>
+                </tr>
                 <tr>
                   <td style="padding:20px 32px;background-color:#FAFAFA;border-top:1px solid #F0F0F0;text-align:center;font-size:11px;color:#888888;">
                     &copy; ${new Date().getFullYear()} Ayodeji Anifowose Bookstore. All rights reserved.

@@ -2,7 +2,10 @@ import dns from "node:dns"
 import type { SubscriberArgs, SubscriberConfig } from "@medusajs/framework"
 import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 import { INotificationModuleService } from "@medusajs/framework/types"
-import { renderOrderPlacedEmail } from "../modules/resend/templates"
+import {
+  renderOrderPlacedEmail,
+  renderAdminOrderPlacedEmail,
+} from "../modules/resend/templates"
 
 if (typeof dns.setDefaultResultOrder === "function") {
   dns.setDefaultResultOrder("ipv4first")
@@ -122,6 +125,17 @@ export default async function orderPlacedNotificationHandler({
         : undefined,
     }
 
+    const adminNotificationEmail =
+      process.env.ADMIN_NOTIFICATION_EMAIL || process.env.ADMIN_EMAIL
+
+    const adminNotificationData = {
+      ...notificationData,
+      customer_email: order.email,
+      admin_order_url: `${
+        process.env.ADMIN_CORS?.split(",")[0] || "http://localhost:9000/app"
+      }/orders/${order.id}`,
+    }
+
     try {
       await notificationService.createNotifications({
         to: order.email,
@@ -170,6 +184,43 @@ export default async function orderPlacedNotificationHandler({
         logger.error(
           `Cannot fallback to direct Resend: RESEND_API_KEY is not configured.`
         )
+      }
+    }
+
+    // Dispatch Admin Notification if admin email is configured
+    if (adminNotificationEmail) {
+      try {
+        await notificationService.createNotifications({
+          to: adminNotificationEmail,
+          channel: "email",
+          template: "order-placed-admin",
+          data: adminNotificationData,
+        })
+
+        logger.info(
+          `Dispatched admin order notification for order ${order.id} to ${adminNotificationEmail}`
+        )
+      } catch (adminErr) {
+        const apiKey = process.env.RESEND_API_KEY
+        if (apiKey) {
+          const { Resend } = await import("resend")
+          const resend = new Resend(apiKey)
+          const fromEmail =
+            process.env.RESEND_FROM_EMAIL ||
+            "Ayodeji Anifowose Bookstore <onboarding@resend.dev>"
+
+          const { subject, html } = renderAdminOrderPlacedEmail(adminNotificationData)
+
+          await resend.emails.send({
+            from: fromEmail,
+            to: adminNotificationEmail,
+            subject,
+            html,
+          })
+          logger.info(
+            `Direct Resend admin order notification sent successfully to ${adminNotificationEmail}`
+          )
+        }
       }
     }
   } catch (error) {
