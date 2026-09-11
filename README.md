@@ -361,6 +361,27 @@ To enable transactional emails (Order Confirmations with direct Digital Library 
 4. **Development Mode**:
    - If `RESEND_API_KEY` is not set, notification providers and contact actions run in safe simulated mode and log to the terminal console, preventing blocked transactions during local development.
 
+### 10. Configure Fez Delivery Fulfillment (Nigeria & Africa)
+
+To enable live nationwide delivery rate calculations and automated parcel booking across Nigeria:
+
+1. **Add Fez Delivery Credentials**:
+   - In `apps/backend/.env`:
+     ```env
+     FEZ_BASE_URL=https://apisandbox.fezdelivery.co/v1
+     FEZ_USER_ID=your_fez_user_id
+     FEZ_PASSWORD=your_fez_password
+     FEZ_SECRET_KEY=your_fez_secret_key
+     FEZ_PICKUP_STATE=Lagos
+     FEZ_PICKUP_ADDRESS="123 Bookstore Street, Victoria Island, Lagos"
+     FEZ_SENDER_PHONE=+2348000000000
+     FEZ_SENDER_NAME="Ayodeji Anifowose Bookstore"
+     ```
+
+2. **Webhooks for Tracking & Delivery Updates**:
+   - Webhook endpoint URL: `https://<your-backend-domain>/api/webhooks/fez`
+   - In the Fez Business Portal, register the webhook callback URL. All status changes (`Pending Pick-Up`, `Picked Up`, `In-Transit`, `Delivered`) send an HMAC-SHA256 signature in `X-Signature` using your `FEZ_SECRET_KEY` to update Medusa fulfillments in real-time.
+
 ---
 
 ## Environment Variables Reference
@@ -387,6 +408,14 @@ To enable transactional emails (Order Confirmations with direct Digital Library 
 | `RESEND_API_KEY` | Optional | Resend API key (`re_...`) | — |
 | `RESEND_FROM_EMAIL` | Optional | Sender address (e.g. `Bookstore <orders@domain.com>`) | `onboarding@resend.dev` |
 | `STOREFRONT_URL` | Optional | Storefront URL for links in email templates | `http://localhost:8000` |
+| `FEZ_BASE_URL` | Optional | Fez Business API base URL | `https://apisandbox.fezdelivery.co/v1` |
+| `FEZ_USER_ID` | Optional | Fez B2B user ID for authentication | — |
+| `FEZ_PASSWORD` | Optional | Fez B2B user password | — |
+| `FEZ_SECRET_KEY` | Optional | Fez organization secret key | — |
+| `FEZ_PICKUP_STATE` | Optional | Default pickup state in Nigeria | `Lagos` |
+| `FEZ_PICKUP_ADDRESS` | Optional | Default physical warehouse/store address | — |
+| `FEZ_SENDER_PHONE` | Optional | Default contact phone number for courier | — |
+| `FEZ_SENDER_NAME` | Optional | Default sender label on package waybill | `Ayodeji Anifowose Bookstore` |
 
 ### Storefront (`apps/storefront/.env.local`)
 

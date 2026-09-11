@@ -29,7 +29,9 @@ export default async function seedStripeProvider({
 
   for (const region of regions) {
     const existingProviders =
-      region.payment_providers?.map((p: { id: string }) => p.id) || []
+      (region.payment_providers || [])
+        .map((p: any) => p?.id)
+        .filter((id): id is string => typeof id === "string")
 
     if (!existingProviders.includes("pp_stripe_stripe")) {
       const updatedProviders = [...existingProviders, "pp_stripe_stripe"]

@@ -6,6 +6,47 @@ import { mapKeys } from "lodash"
 import React, { useEffect, useMemo, useState } from "react"
 import AddressSelect from "../address-select"
 import CountrySelect from "../country-select"
+import NativeSelect from "@modules/common/components/native-select"
+
+const FALLBACK_NIGERIAN_STATES = [
+  "Abia",
+  "Adamawa",
+  "Akwa Ibom",
+  "Anambra",
+  "Bauchi",
+  "Bayelsa",
+  "Benue",
+  "Borno",
+  "Cross River",
+  "Delta",
+  "Ebonyi",
+  "Edo",
+  "Ekiti",
+  "Enugu",
+  "FCT",
+  "Gombe",
+  "Imo",
+  "Jigawa",
+  "Kaduna",
+  "Kano",
+  "Katsina",
+  "Kebbi",
+  "Kogi",
+  "Kwara",
+  "Lagos",
+  "Nasarawa",
+  "Niger",
+  "Ogun",
+  "Ondo",
+  "Osun",
+  "Oyo",
+  "Plateau",
+  "Rivers",
+  "Sokoto",
+  "Taraba",
+  "Yobe",
+  "Zamfara",
+]
 
 const ShippingAddress = ({
   customer,
@@ -13,12 +54,14 @@ const ShippingAddress = ({
   checked,
   onChange,
   isDigital = false,
+  shippingStates = [],
 }: {
   customer: HttpTypes.StoreCustomer | null
   cart: HttpTypes.StoreCart | null
   checked: boolean
   onChange: () => void
   isDigital?: boolean
+  shippingStates?: string[]
 }) => {
   const [formData, setFormData] = useState<Record<string, string>>({
     "shipping_address.first_name": cart?.shipping_address?.first_name || "",
@@ -32,6 +75,32 @@ const ShippingAddress = ({
     "shipping_address.phone": cart?.shipping_address?.phone || "",
     email: cart?.email || "",
   })
+
+  const [dynamicStates, setDynamicStates] = useState<string[]>(shippingStates)
+
+  useEffect(() => {
+    if (shippingStates && shippingStates.length > 0) {
+      setDynamicStates(shippingStates)
+      return
+    }
+
+    fetch("/store/shipping/states")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data?.states) && data.states.length > 0) {
+          setDynamicStates(data.states)
+        }
+      })
+      .catch(() => {
+        // Fallback states will be used
+      })
+  }, [shippingStates])
+
+  const statesList = useMemo(() => {
+    return dynamicStates && dynamicStates.length > 0
+      ? dynamicStates
+      : FALLBACK_NIGERIAN_STATES
+  }, [dynamicStates])
 
   const countriesInRegion = useMemo(
     () => cart?.region?.countries?.map((c) => c.iso_2),
@@ -83,7 +152,7 @@ const ShippingAddress = ({
     if (cart && !cart.email && customer?.email) {
       setFormAddress(undefined, customer.email)
     }
-  }, [cart]) // Add cart as a dependency
+  }, [cart, customer?.email])
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -100,8 +169,13 @@ const ShippingAddress = ({
     return (
       <div className="space-y-4">
         <div className="p-3.5 bg-red-50/60 border border-[#980000]/20 rounded-lg text-xs text-[#382C2C] flex items-center justify-between">
-          <span>Digital items will be delivered instantly to your account library after purchase.</span>
-          <span className="font-bold text-[#980000] uppercase text-[10px] tracking-wider px-2 py-0.5 bg-white rounded border border-[#980000]/30">Instant Access</span>
+          <span>
+            Digital items will be delivered instantly to your account library
+            after purchase.
+          </span>
+          <span className="font-bold text-[#980000] uppercase text-[10px] tracking-wider px-2 py-0.5 bg-white rounded border border-[#980000]/30">
+            Instant Access
+          </span>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -145,9 +219,17 @@ const ShippingAddress = ({
           />
 
           {/* Hidden inputs to satisfy Medusa standard address fields for digital orders */}
-          <input type="hidden" name="shipping_address.address_1" value="Digital Delivery" />
+          <input
+            type="hidden"
+            name="shipping_address.address_1"
+            value="Digital Delivery"
+          />
           <input type="hidden" name="shipping_address.city" value="Digital" />
-          <input type="hidden" name="shipping_address.postal_code" value="00000" />
+          <input
+            type="hidden"
+            name="shipping_address.postal_code"
+            value="00000"
+          />
           <input type="hidden" name="same_as_billing" value="on" />
         </div>
       </div>
@@ -235,14 +317,32 @@ const ShippingAddress = ({
           required
           data-testid="shipping-country-select"
         />
-        <Input
-          label="State / Province"
-          name="shipping_address.province"
-          autoComplete="address-level1"
-          value={formData["shipping_address.province"]}
-          onChange={handleChange}
-          data-testid="shipping-province-input"
-        />
+        {formData["shipping_address.country_code"]?.toLowerCase() === "ng" ? (
+          <NativeSelect
+            name="shipping_address.province"
+            placeholder="Select State in Nigeria..."
+            value={formData["shipping_address.province"]}
+            onChange={handleChange}
+            required
+            data-testid="shipping-province-select"
+          >
+            {statesList.map((state) => (
+              <option key={state} value={state}>
+                {state}
+              </option>
+            ))}
+          </NativeSelect>
+        ) : (
+          <Input
+            label="State / Province"
+            name="shipping_address.province"
+            autoComplete="address-level1"
+            value={formData["shipping_address.province"]}
+            onChange={handleChange}
+            required
+            data-testid="shipping-province-input"
+          />
+        )}
       </div>
       <div className="my-8">
         <Checkbox
@@ -271,6 +371,7 @@ const ShippingAddress = ({
           autoComplete="tel"
           value={formData["shipping_address.phone"]}
           onChange={handleChange}
+          required
           data-testid="shipping-phone-input"
         />
       </div>

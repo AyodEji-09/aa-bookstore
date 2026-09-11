@@ -66,3 +66,26 @@ export const calculatePriceForShippingOption = async (
       return null
     })
 }
+
+export const listShippingStates = async (): Promise<string[]> => {
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
+  const next = {
+    ...(await getCacheOptions("shipping-states")),
+  }
+
+  return sdk.client
+    .fetch<{ states: string[] }>(`/store/shipping/states`, {
+      method: "GET",
+      headers,
+      next,
+      cache: "force-cache",
+    })
+    .then(({ states }) => states)
+    .catch(() => {
+      return []
+    })
+}
+

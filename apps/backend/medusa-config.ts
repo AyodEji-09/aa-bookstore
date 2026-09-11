@@ -51,6 +51,31 @@ module.exports = defineConfig({
       resolve: "./src/modules/wishlist",
     },
     {
+      resolve: "@medusajs/medusa/fulfillment",
+      options: {
+        providers: [
+          {
+            resolve: "@medusajs/fulfillment-manual",
+            id: "manual",
+          },
+          {
+            resolve: "./src/modules/fez",
+            id: "fez",
+            options: {
+              baseUrl: process.env.FEZ_BASE_URL,
+              userId: process.env.FEZ_USER_ID,
+              password: process.env.FEZ_PASSWORD,
+              secretKey: process.env.FEZ_SECRET_KEY,
+              defaultPickupState: process.env.FEZ_PICKUP_STATE || "Lagos",
+              defaultPickupAddress: process.env.FEZ_PICKUP_ADDRESS,
+              defaultSenderPhone: process.env.FEZ_SENDER_PHONE,
+              defaultSenderName: process.env.FEZ_SENDER_NAME,
+            },
+          },
+        ],
+      },
+    },
+    {
       resolve: "@medusajs/medusa/notification",
       options: {
         providers: [

@@ -18,10 +18,12 @@ const Addresses = ({
   cart,
   customer,
   isDigital = false,
+  shippingStates = [],
 }: {
   cart: HttpTypes.StoreCart | null
   customer: HttpTypes.StoreCustomer | null
   isDigital?: boolean
+  shippingStates?: string[]
 }) => {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -86,6 +88,7 @@ const Addresses = ({
               onChange={toggleSameAsBilling}
               cart={cart}
               isDigital={isDigital}
+              shippingStates={shippingStates}
             />
 
             {!isDigital && !sameAsBilling && (

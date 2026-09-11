@@ -1,4 +1,4 @@
-import { listCartShippingMethods } from "@lib/data/fulfillment"
+import { listCartShippingMethods, listShippingStates } from "@lib/data/fulfillment"
 import { listCartPaymentMethods } from "@lib/data/payment"
 import { HttpTypes } from "@medusajs/types"
 import { isDigitalCart } from "@lib/util/is-digital"
@@ -24,6 +24,8 @@ export default async function CheckoutForm({
     ? await listCartShippingMethods(cart.id)
     : []
 
+  const shippingStates = !isDigital ? await listShippingStates() : []
+
   // Physical carts must NEVER see or select digital shipping methods
   const shippingMethods = rawShippingMethods?.filter(
     (sm) =>
@@ -39,7 +41,12 @@ export default async function CheckoutForm({
 
   return (
     <div className="w-full grid grid-cols-1 gap-y-8">
-      <Addresses cart={cart} customer={customer} isDigital={isDigital} />
+      <Addresses
+        cart={cart}
+        customer={customer}
+        isDigital={isDigital}
+        shippingStates={shippingStates}
+      />
 
       {!isDigital && (
         <Shipping cart={cart} availableShippingMethods={shippingMethods} />

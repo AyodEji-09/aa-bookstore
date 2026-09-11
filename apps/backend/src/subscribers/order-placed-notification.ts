@@ -2,6 +2,7 @@ import dns from "node:dns"
 import type { SubscriberArgs, SubscriberConfig } from "@medusajs/framework"
 import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 import { INotificationModuleService } from "@medusajs/framework/types"
+import { renderOrderPlacedEmail } from "../modules/resend/templates"
 
 if (typeof dns.setDefaultResultOrder === "function") {
   dns.setDefaultResultOrder("ipv4first")
@@ -99,7 +100,7 @@ export default async function orderPlacedNotificationHandler({
 
     const notificationData = {
       order_id: order.id,
-      display_id: order.display_id,
+      display_id: order.display_id ?? undefined,
       customer_name: customerName,
       items,
       subtotal: order.subtotal ?? order.total,
@@ -109,7 +110,16 @@ export default async function orderPlacedNotificationHandler({
       currency_code: order.currency_code,
       has_digital_items: hasDigitalItems,
       library_url: `${storefrontUrl}/account/library`,
-      shipping_address: order.shipping_address,
+      shipping_address: order.shipping_address
+        ? {
+            first_name: order.shipping_address.first_name ?? undefined,
+            last_name: order.shipping_address.last_name ?? undefined,
+            address_1: order.shipping_address.address_1 ?? undefined,
+            city: order.shipping_address.city ?? undefined,
+            country_code: order.shipping_address.country_code ?? undefined,
+            postal_code: order.shipping_address.postal_code ?? undefined,
+          }
+        : undefined,
     }
 
     try {
@@ -133,9 +143,6 @@ export default async function orderPlacedNotificationHandler({
       const apiKey = process.env.RESEND_API_KEY
       if (apiKey) {
         const { Resend } = await import("resend")
-        const { renderOrderPlacedEmail } = await import(
-          "../modules/resend/templates"
-        )
         const resend = new Resend(apiKey)
         const fromEmail =
           process.env.RESEND_FROM_EMAIL ||

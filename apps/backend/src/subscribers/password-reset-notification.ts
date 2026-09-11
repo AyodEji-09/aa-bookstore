@@ -2,6 +2,7 @@ import dns from "node:dns"
 import type { SubscriberArgs, SubscriberConfig } from "@medusajs/framework"
 import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 import { INotificationModuleService } from "@medusajs/framework/types"
+import { renderPasswordResetEmail } from "../modules/resend/templates"
 
 if (typeof dns.setDefaultResultOrder === "function") {
   dns.setDefaultResultOrder("ipv4first")
@@ -77,9 +78,6 @@ export default async function passwordResetNotificationHandler({
       const apiKey = process.env.RESEND_API_KEY
       if (apiKey) {
         const { Resend } = await import("resend")
-        const { renderPasswordResetEmail } = await import(
-          "../modules/resend/templates"
-        )
         const resend = new Resend(apiKey)
         const fromEmail =
           process.env.RESEND_FROM_EMAIL ||
