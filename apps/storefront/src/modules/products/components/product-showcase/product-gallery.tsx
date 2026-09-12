@@ -14,6 +14,7 @@ type ProductGalleryProps = {
   onSelectImage: (index: number) => void
   productTitle: string
   author: string
+  className?: string
 }
 
 export default function ProductGallery({
@@ -22,6 +23,7 @@ export default function ProductGallery({
   onSelectImage,
   productTitle,
   author,
+  className,
 }: ProductGalleryProps) {
   const currentImage = images[selectedImageIndex] || images[0]
 
@@ -38,7 +40,11 @@ export default function ProductGallery({
   }
 
   return (
-    <div className="lg:col-span-7 flex flex-col sm:flex-row gap-3 items-start w-full">
+    <div
+      className={`flex flex-col sm:flex-row gap-3 items-start w-full ${
+        className || "lg:col-span-5"
+      }`}
+    >
       {/* Vertical Thumbnails List: Hidden on mobile (< sm), visible on sm+ */}
       {images.length > 1 && (
         <div className="hidden sm:flex sm:flex-col gap-3 overflow-y-auto no-scrollbar flex-shrink-0 sm:w-20">
@@ -72,7 +78,7 @@ export default function ProductGallery({
       {/* Main Book Cover Display */}
       <div className="flex-1 w-full bg-slate-900 rounded-xl overflow-hidden shadow-xl relative min-h-[440px] sm:min-h-[520px] flex flex-col justify-between p-6 text-white border border-gray-100">
         {/* Top Overlay Pill Badge */}
-        <div className="self-start bg-white/95 text-[#382C2C] px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-x-2 shadow-md">
+        <div className="self-start bg-white/95 text-[#382C2C] px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-x-2 shadow-md z-10">
           <BookOpen className="w-4 h-4 text-[#980000]" />
           <span>Book Preview</span>
         </div>
