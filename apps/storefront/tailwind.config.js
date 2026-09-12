@@ -23,6 +23,9 @@ module.exports = {
         brand: {
           primary: "#980000",
           hover: "#7a0000",
+          pressed: "#5e0000",
+          light: "#fff5f5",
+          border: "#fecdd3",
           text: "#4D4C4C",
           heading: "#382C2C",
         },

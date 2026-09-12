@@ -331,7 +331,7 @@ export default function SearchModal({
                                   isAudio
                                     ? "bg-amber-50 text-amber-900 border border-amber-200"
                                     : fmt.isDigital
-                                    ? "bg-blue-50 text-blue-900 border border-blue-200"
+                                    ? "bg-red-50 text-brand-primary border border-red-200"
                                     : "bg-gray-100 text-gray-700 border border-gray-200"
                                 }`}
                               >

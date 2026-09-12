@@ -83,10 +83,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled || isLoading}
         className={clsx(
           "inline-flex gap-2 items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-          variant === "primary" && "bg-black text-white hover:bg-gray-800",
+          variant === "primary" &&
+            "bg-brand-primary text-white hover:bg-brand-hover active:bg-brand-pressed shadow-sm focus-visible:ring-brand-primary",
           variant === "secondary" &&
-            "bg-white text-black border border-gray-200 hover:bg-gray-50",
-          variant === "transparent" && "bg-transparent hover:bg-gray-100",
+            "bg-white text-brand-heading border border-gray-200 hover:bg-gray-50 hover:text-brand-primary hover:border-brand-border focus-visible:ring-brand-primary",
+          variant === "transparent" &&
+            "bg-transparent text-brand-heading hover:bg-brand-light hover:text-brand-primary focus-visible:ring-brand-primary",
           size === "small" && "h-8 px-3 text-sm",
           size === "medium" && "h-10 px-4",
           size === "large" && "h-12 px-6 text-lg",
@@ -132,8 +134,8 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
         className={clsx(
           "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium",
           color === "green" && "bg-green-100 text-green-700",
-          color === "red" && "bg-red-100 text-red-700",
-          color === "blue" && "bg-blue-100 text-blue-700",
+          color === "red" && "bg-brand-light text-brand-primary border border-brand-border",
+          color === "blue" && "bg-brand-light text-brand-primary border border-brand-border",
           color === "orange" && "bg-orange-100 text-orange-700",
           color === "grey" && "bg-gray-100 text-gray-700",
           color === "purple" && "bg-purple-100 text-purple-700",
@@ -221,7 +223,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           className={clsx(
-            "flex h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+            "flex h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary disabled:cursor-not-allowed disabled:opacity-50",
             className
           )}
           {...props}
@@ -384,7 +386,7 @@ const RadioGroupItem = forwardRef<HTMLInputElement, RadioGroupItemProps>(
           type="radio"
           id={id}
           className={clsx(
-            "h-4 w-4 border-gray-300 text-gray-900 focus:ring-gray-900",
+            "h-4 w-4 border-gray-300 text-brand-primary focus:ring-brand-primary",
             className
           )}
           {...props}
@@ -414,7 +416,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           type="checkbox"
           id={id}
           className={clsx(
-            "h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900",
+            "h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary",
             className
           )}
           {...props}
