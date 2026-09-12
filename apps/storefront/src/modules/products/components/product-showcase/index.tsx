@@ -110,7 +110,7 @@ export default function ProductShowcase({
               {product.title}
             </h1>
             <p className="text-base text-gray-500 font-medium">
-              {product.subtitle}
+              {author}
             </p>
           </div>
 

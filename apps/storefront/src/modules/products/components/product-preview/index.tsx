@@ -58,7 +58,9 @@ export default function ProductPreview({
             </h3>
           </LocalizedClientLink>
           <p className="text-xs text-gray-500 line-clamp-1">
-            {product.subtitle || "Eric-Emanuel Schmitt"}
+            {(product.metadata?.author as string) ||
+              product.subtitle ||
+              "Eric-Emanuel Schmitt"}
           </p>
         </div>
 
