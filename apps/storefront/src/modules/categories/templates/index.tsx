@@ -104,16 +104,14 @@ export default function CategoryTemplate({
 
       {/* Main Category Products Content with Generous Bottom Padding */}
       <div
-        className="content-container pt-6 pb-28 sm:pb-36 flex flex-col small:flex-row small:items-start gap-8"
+        className="content-container pt-4 pb-28 sm:pb-36"
         data-testid="category-container"
       >
         <RefinementList
           sortBy={sort}
           data-testid="sort-by-container"
           hideOptionsPicker
-        />
-
-        <div className="w-full flex-1">
+        >
           <Suspense
             fallback={
               <SkeletonProductGrid
@@ -129,7 +127,7 @@ export default function CategoryTemplate({
               optionValueIds={optionValueIds}
             />
           </Suspense>
-        </div>
+        </RefinementList>
       </div>
     </div>
   )

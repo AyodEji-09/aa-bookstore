@@ -4,9 +4,10 @@ import { OptionValueIds } from "@lib/util/product-option-filters"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 import RefinementList from "@modules/store/components/refinement-list"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
+import { listProductOptions } from "@lib/data/products"
 import PaginatedProducts from "./paginated-products"
 
-const StoreTemplate = ({
+const StoreTemplate = async ({
   sortBy,
   page,
   countryCode,
@@ -19,6 +20,7 @@ const StoreTemplate = ({
 }) => {
   const pageNumber = page ? parseInt(page) : 1
   const sort = sortBy || "created_at"
+  const productOptions = await listProductOptions()
 
   return (
     <div className="bg-white min-h-screen">
@@ -41,19 +43,17 @@ const StoreTemplate = ({
           </h1>
           <p className="text-sm text-[#4D4C4C] mt-2 max-w-xl">
             Explore the complete collection of award-winning novels, audiobooks,
-            plays, and memoirs by Eric-Emanuel Schmitt.
+            plays, and memoirs by Ayodeji Anifowose.
           </p>
         </div>
       </div>
 
       {/* Main Catalog Grid Content with Generous Bottom Padding */}
       <div
-        className="content-container pt-6 pb-28 sm:pb-36 flex flex-col small:flex-row small:items-start gap-8"
+        className="content-container pt-4 pb-28 sm:pb-36"
         data-testid="category-container"
       >
-        <RefinementList sortBy={sort} />
-
-        <div className="w-full flex-1">
+        <RefinementList sortBy={sort} productOptions={productOptions}>
           <Suspense fallback={<SkeletonProductGrid />}>
             <PaginatedProducts
               sortBy={sort}
@@ -62,7 +62,7 @@ const StoreTemplate = ({
               optionValueIds={optionValueIds}
             />
           </Suspense>
-        </div>
+        </RefinementList>
       </div>
     </div>
   )

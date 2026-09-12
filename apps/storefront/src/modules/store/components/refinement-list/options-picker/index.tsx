@@ -7,18 +7,30 @@ import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
 
 type OptionsPickerProps = {
+  options?: HttpTypes.StoreProductOption[]
   selectedValueIds: string[]
   setOptionValueIds: (valueIds: string[]) => void
 }
 
 const OptionsPicker = ({
+  options: initialOptions,
   selectedValueIds,
   setOptionValueIds,
 }: OptionsPickerProps) => {
-  const [options, setOptions] = useState<HttpTypes.StoreProductOption[]>([])
-  const [openItems, setOpenItems] = useState<string[]>([])
+  const [options, setOptions] = useState<HttpTypes.StoreProductOption[]>(
+    initialOptions || []
+  )
+  const [openItems, setOpenItems] = useState<string[]>(() =>
+    (initialOptions || []).map((option) => option.id)
+  )
 
   useEffect(() => {
+    if (initialOptions && initialOptions.length > 0) {
+      setOptions(initialOptions)
+      setOpenItems(initialOptions.map((option) => option.id))
+      return
+    }
+
     const fetchOptions = async () => {
       try {
         const response = await sdk.client.fetch<{
@@ -33,6 +45,7 @@ const OptionsPicker = ({
 
         if (response?.product_options) {
           setOptions(response.product_options)
+          setOpenItems(response.product_options.map((option) => option.id))
         }
       } catch (error) {
         console.error("Failed to fetch product options", error)
@@ -40,13 +53,7 @@ const OptionsPicker = ({
     }
 
     fetchOptions()
-  }, [])
-
-  useEffect(() => {
-    if (options.length) {
-      setOpenItems(options.map((option) => option.id))
-    }
-  }, [options])
+  }, [initialOptions])
 
   if (!options.length) {
     return null
@@ -57,7 +64,7 @@ const OptionsPicker = ({
       type="multiple"
       value={openItems}
       onValueChange={(values) => setOpenItems(values as string[])}
-      className="flex flex-col gap-y-5 pt-3 border-t border-gray-100"
+      className="flex flex-col gap-y-5 pt-1"
     >
       {options.map((option) => {
         const values =
@@ -112,7 +119,7 @@ const OptionsPicker = ({
                 )}
               </Accordion.Trigger>
             </Accordion.Header>
-            <Accordion.Content className="space-y-1.5 pt-1">
+            <Accordion.Content className="space-y-1 pt-1">
               {values.map((value) => {
                 const isSelected = selectedValueIds.includes(value.id)
 
@@ -121,21 +128,27 @@ const OptionsPicker = ({
                     key={value.id}
                     type="button"
                     onClick={() => toggleValue(value.id)}
-                    className={`flex items-center justify-between w-full px-3 py-2 text-xs rounded-lg text-left transition-all ${
-                      isSelected
-                        ? "bg-red-50/80 text-[#980000] font-bold"
-                        : "text-[#4D4C4C] hover:bg-gray-50 hover:text-[#382C2C] font-medium"
-                    }`}
+                    className="flex items-center justify-between w-full px-2.5 py-2 text-xs rounded-md text-left text-[#4D4C4C] hover:bg-gray-50 hover:text-[#382C2C] transition-colors group cursor-pointer"
                   >
-                    <span>{value.label}</span>
+                    <span
+                      className={
+                        isSelected
+                          ? "font-semibold text-[#382C2C]"
+                          : "font-normal"
+                      }
+                    >
+                      {value.label}
+                    </span>
                     <div
-                      className={`w-3.5 h-3.5 rounded-[3px] border flex items-center justify-center transition-colors ${
+                      className={`w-4 h-4 rounded border flex items-center justify-center transition-colors flex-shrink-0 ${
                         isSelected
                           ? "bg-[#980000] border-[#980000] text-white"
-                          : "border-gray-300 bg-white"
+                          : "border-gray-300 bg-white group-hover:border-gray-400"
                       }`}
                     >
-                      {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+                      {isSelected && (
+                        <Check className="w-2.5 h-2.5 stroke-[3]" />
+                      )}
                     </div>
                   </button>
                 )

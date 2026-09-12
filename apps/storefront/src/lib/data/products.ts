@@ -149,3 +149,30 @@ export const listProductsWithSort = async ({
     queryParams,
   }
 }
+
+export const listProductOptions = async (): Promise<
+  HttpTypes.StoreProductOption[]
+> => {
+  const headers = await getAuthHeaders()
+  const next = await getCacheOptions("product-options")
+
+  try {
+    const response = await sdk.client.fetch<{
+      product_options?: HttpTypes.StoreProductOption[]
+    }>("/store/product-options", {
+      method: "GET",
+      query: {
+        is_exclusive: false,
+        fields: "*values",
+      },
+      headers,
+      next,
+      cache: "force-cache",
+    })
+
+    return response?.product_options || []
+  } catch (error) {
+    console.error("Failed to fetch product options", error)
+    return []
+  }
+}

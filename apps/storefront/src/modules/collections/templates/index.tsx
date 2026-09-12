@@ -25,12 +25,11 @@ export default function CollectionTemplate({
 
   return (
     <div className="bg-white min-h-screen">
-      <div className="flex flex-col small:flex-row small:items-start py-6 content-container">
-        <RefinementList sortBy={sort} hideOptionsPicker />
-        <div className="w-full">
-          <div className="mb-8 text-2xl-semi">
-            <h1>{collection.title}</h1>
-          </div>
+      <div className="content-container py-6">
+        <div className="mb-6 text-2xl-semi">
+          <h1 className="text-3xl font-extrabold text-[#382C2C]">{collection.title}</h1>
+        </div>
+        <RefinementList sortBy={sort} hideOptionsPicker>
           <Suspense
             fallback={
               <SkeletonProductGrid
@@ -46,7 +45,7 @@ export default function CollectionTemplate({
               optionValueIds={optionValueIds}
             />
           </Suspense>
-        </div>
+        </RefinementList>
       </div>
     </div>
   )
