@@ -40,7 +40,7 @@ export default function CategoryTemplate({
   return (
     <div className="bg-white min-h-screen">
       {/* Category Header Banner */}
-      <div className="bg-gradient-to-b from-red-50/40 via-white to-white py-10 pb-6">
+      <div className="bg-white py-10 pb-6">
         <div className="content-container">
           {/* Breadcrumbs */}
           <nav className="flex items-center gap-x-2 text-xs text-gray-500 mb-4 font-medium">

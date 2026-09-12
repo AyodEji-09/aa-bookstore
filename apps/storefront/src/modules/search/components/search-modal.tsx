@@ -123,7 +123,7 @@ export default function SearchModal({
 
   return (
     <Transition show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-50" onClose={closeModal}>
+      <Dialog as="div" className="relative z-[100]" onClose={closeModal}>
         {/* Backdrop */}
         <TransitionChild
           as={Fragment}

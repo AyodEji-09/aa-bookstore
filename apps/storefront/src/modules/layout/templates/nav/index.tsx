@@ -46,7 +46,7 @@ export default async function Nav() {
   return (
     <>
       {/* Top Utility & Announcement Bar */}
-      <div className="w-full bg-black text-white text-xs font-medium tracking-wide py-2.5 border-b border-white/10 relative z-[60]">
+      <div className="w-full bg-black text-white text-xs font-medium tracking-wide py-2.5 border-b border-white/10 relative z-30">
         <div className="content-container flex items-center justify-between gap-3 sm:gap-4 px-4 sm:px-6">
           {/* Announcement Message (Left-aligned, truncated on mobile, links to footer newsletter) */}
           <a
@@ -78,7 +78,7 @@ export default async function Nav() {
       </div>
 
       {/* Sticky Navbar Header */}
-      <header className="sticky top-0 inset-x-0 z-50 bg-white border-b border-[#F1F1F3]">
+      <header className="sticky top-0 inset-x-0 z-40 bg-white border-b border-[#F1F1F3]">
         <nav className="content-container flex items-center justify-between h-20 px-4 sm:px-6">
           {/* Logo */}
           <LocalizedClientLink

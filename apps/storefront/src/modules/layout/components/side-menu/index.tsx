@@ -47,7 +47,7 @@ const SideMenu = ({ regions, locales, currentLocale, categories = [] }: SideMenu
 
             {open && (
               <div
-                className="fixed inset-0 z-[50] bg-black/40 backdrop-blur-sm pointer-events-auto transition-opacity"
+                className="fixed inset-0 z-[80] bg-black/40 backdrop-blur-sm pointer-events-auto transition-opacity"
                 onClick={close}
                 data-testid="side-menu-backdrop"
               />
@@ -63,8 +63,8 @@ const SideMenu = ({ regions, locales, currentLocale, categories = [] }: SideMenu
               leaveFrom="translate-x-0"
               leaveTo="-translate-x-full"
             >
-              <PopoverPanel className="fixed inset-y-0 left-0 z-[51] w-4/5 max-w-sm bg-white shadow-2xl flex flex-col justify-between overflow-y-auto">
-                <div data-testid="nav-menu-popup" className="flex flex-col h-full bg-white">
+              <PopoverPanel className="fixed inset-y-0 left-0 z-[81] w-4/5 max-w-sm bg-white shadow-2xl flex flex-col justify-between overflow-y-auto overflow-x-hidden no-scrollbar">
+                <div data-testid="nav-menu-popup" className="flex flex-col h-full bg-white w-full overflow-x-hidden overflow-y-auto no-scrollbar">
                   {/* Clean All-White Logo Header (No Wine BG) */}
                   <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-white">
                     <LocalizedClientLink href="/" onClick={close}>
@@ -165,7 +165,7 @@ const SideMenu = ({ regions, locales, currentLocale, categories = [] }: SideMenu
                   <div className="p-6 bg-white border-t border-gray-100 flex flex-col gap-y-4">
                     {!!locales?.length && (
                       <div
-                        className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-200"
+                        className="relative w-full flex justify-between items-center bg-white p-3 rounded-lg border border-gray-200"
                         onMouseEnter={languageToggleState.open}
                         onMouseLeave={languageToggleState.close}
                       >
@@ -174,17 +174,24 @@ const SideMenu = ({ regions, locales, currentLocale, categories = [] }: SideMenu
                           locales={locales}
                           currentLocale={currentLocale}
                         />
-                        <ArrowRightMini
-                          className={clx(
-                            "transition-transform duration-150 text-gray-400",
-                            languageToggleState.state ? "-rotate-90" : ""
-                          )}
-                        />
+                        <button
+                          type="button"
+                          onClick={() => languageToggleState.toggle()}
+                          className="p-0.5 text-gray-400 hover:text-black focus:outline-none"
+                          title="Toggle language options"
+                        >
+                          <ArrowRightMini
+                            className={clx(
+                              "transition-transform duration-150 text-gray-400",
+                              languageToggleState.state ? "-rotate-90" : ""
+                            )}
+                          />
+                        </button>
                       </div>
                     )}
                     {regions && (
                       <div
-                        className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-200"
+                        className="relative w-full flex justify-between items-center bg-white p-3 rounded-lg border border-gray-200"
                         onMouseEnter={countryToggleState.open}
                         onMouseLeave={countryToggleState.close}
                       >
@@ -192,12 +199,19 @@ const SideMenu = ({ regions, locales, currentLocale, categories = [] }: SideMenu
                           toggleState={countryToggleState}
                           regions={regions}
                         />
-                        <ArrowRightMini
-                          className={clx(
-                            "transition-transform duration-150 text-gray-400",
-                            countryToggleState.state ? "-rotate-90" : ""
-                          )}
-                        />
+                        <button
+                          type="button"
+                          onClick={() => countryToggleState.toggle()}
+                          className="p-0.5 text-gray-400 hover:text-black focus:outline-none"
+                          title="Toggle country options"
+                        >
+                          <ArrowRightMini
+                            className={clx(
+                              "transition-transform duration-150 text-gray-400",
+                              countryToggleState.state ? "-rotate-90" : ""
+                            )}
+                          />
+                        </button>
                       </div>
                     )}
                   </div>
