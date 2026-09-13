@@ -1,11 +1,10 @@
 "use client"
 import { createTransferRequest } from "@lib/data/orders"
 import { CheckCircleMiniSolid, XCircleSolid } from "@medusajs/icons"
+import { toast } from "@medusajs/ui"
 import { Heading, IconButton, Input, Text } from "@modules/common/components/ui"
-import { useActionState } from "react"
-// TODO: Re-add Toaster component when needed
+import { useActionState, useEffect, useState } from "react"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
-import { useEffect, useState } from "react"
 
 export default function TransferRequestForm() {
   const [showSuccess, setShowSuccess] = useState(false)
@@ -18,9 +17,13 @@ export default function TransferRequestForm() {
 
   useEffect(() => {
     if (state.success && state.order) {
+      toast.success(`Transfer request email sent to ${state.order.email}`)
       setShowSuccess(true)
     }
-  }, [state.success, state.order])
+    if (!state.success && state.error) {
+      toast.error(state.error)
+    }
+  }, [state])
 
   return (
     <div className="flex flex-col gap-y-4 w-full">
@@ -50,11 +53,6 @@ export default function TransferRequestForm() {
           </div>
         </form>
       </div>
-      {!state.success && state.error && (
-        <Text className="text-base-regular text-rose-500 text-right">
-          {state.error}
-        </Text>
-      )}
       {showSuccess && (
         <div className="flex justify-between p-4 bg-neutral-50 shadow-borders-base w-full self-stretch items-center">
           <div className="flex gap-x-2 items-center">

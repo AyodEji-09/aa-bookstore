@@ -1,13 +1,21 @@
-const ErrorMessage = ({ error, 'data-testid': dataTestid }: { error?: string | null, 'data-testid'?: string }) => {
-  if (!error) {
-    return null
-  }
+"use client"
 
-  return (
-    <div className="pt-2 text-rose-500 text-small-regular" data-testid={dataTestid}>
-      <span>{error}</span>
-    </div>
-  )
+import { useEffect } from "react"
+import { toast } from "@medusajs/ui"
+
+const ErrorMessage = ({
+  error,
+}: {
+  error?: string | null
+  "data-testid"?: string
+}) => {
+  useEffect(() => {
+    if (error) {
+      toast.error(error)
+    }
+  }, [error])
+
+  return null
 }
 
 export default ErrorMessage

@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Heart, BookOpen, Headphones } from "lucide-react"
+import { Heart } from "lucide-react"
+import { toast } from "@medusajs/ui"
 import { HttpTypes } from "@medusajs/types"
 import { addToCart } from "@lib/data/cart"
 import { isDigitalVariant } from "@lib/util/is-digital"
@@ -31,7 +32,6 @@ export default function ProductPurchase({
   const { isWishlisted, toggleWishlist } = useWishlist()
   const isFavorite = isWishlisted(product.id || "")
   const [ownedFormats, setOwnedFormats] = useState<string[]>([])
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   useEffect(() => {
     let isMounted = true
@@ -67,21 +67,21 @@ export default function ProductPurchase({
     if (!variantIdToUse) return
 
     if (isAlreadyOwned) {
-      setErrorMessage("You already own this digital book in your library.")
+      toast.error("You already own this digital book in your library.")
       return
     }
 
     setIsAdding(true)
-    setErrorMessage(null)
     try {
       await addToCart({
         variantId: variantIdToUse,
         quantity: isDigital ? 1 : quantity,
         countryCode,
       })
+      toast.success("Added to cart")
     } catch (err: unknown) {
       const error = err as Error
-      setErrorMessage(error.message || "Failed to add to cart")
+      toast.error(error.message || "Failed to add to cart")
     } finally {
       setIsAdding(false)
     }
@@ -95,9 +95,6 @@ export default function ProductPurchase({
 
         {/* Add to Cart & Favorite Action Buttons */}
         <div className="flex flex-col gap-y-2 pt-2">
-          {errorMessage && (
-            <p className="text-xs text-[#980000] font-medium">{errorMessage}</p>
-          )}
 
           <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-x-4">
             {isAlreadyOwned ? (

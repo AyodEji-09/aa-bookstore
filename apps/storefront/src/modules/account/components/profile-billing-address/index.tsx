@@ -97,6 +97,7 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({
         currentInfo={currentInfo}
         isSuccess={successState}
         isError={!!state.error}
+        errorMessage={state.error || undefined}
         clearState={clearState}
         data-testid="account-billing-address-editor"
       >

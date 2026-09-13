@@ -6,6 +6,7 @@ import { useActionState, useEffect, useState } from "react"
 
 import { addCustomerAddress } from "@lib/data/customer"
 import useToggleState from "@lib/hooks/use-toggle-state"
+import { toast } from "@medusajs/ui"
 import { HttpTypes } from "@medusajs/types"
 import CountrySelect from "@modules/checkout/components/country-select"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
@@ -40,7 +41,11 @@ const AddAddress = ({
 
   useEffect(() => {
     if (formState.success) {
+      toast.success("Address added successfully")
       setSuccessState(true)
+    }
+    if (formState.error) {
+      toast.error(formState.error)
     }
   }, [formState])
 
@@ -134,12 +139,12 @@ const AddAddress = ({
               />
             </div>
             {formState.error && (
-              <div
-                className="text-rose-500 text-small-regular py-2"
+              <span
+                className="sr-only"
                 data-testid="address-error"
               >
                 {formState.error}
-              </div>
+              </span>
             )}
           </Modal.Body>
           <Modal.Footer>

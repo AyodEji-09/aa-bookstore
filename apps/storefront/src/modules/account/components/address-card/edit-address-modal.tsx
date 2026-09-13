@@ -6,6 +6,7 @@ import {
 } from "@lib/data/customer"
 import useToggleState from "@lib/hooks/use-toggle-state"
 import { PencilSquare as Edit, Trash } from "@medusajs/icons"
+import { toast } from "@medusajs/ui"
 import { HttpTypes } from "@medusajs/types"
 import CountrySelect from "@modules/checkout/components/country-select"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
@@ -49,14 +50,25 @@ const EditAddress: React.FC<EditAddressProps> = ({
 
   useEffect(() => {
     if (formState.success) {
+      toast.success("Address updated successfully")
       setSuccessState(true)
+    }
+    if (formState.error) {
+      toast.error(formState.error)
     }
   }, [formState])
 
   const removeAddress = async () => {
     setRemoving(true)
-    await deleteCustomerAddress(address.id)
-    setRemoving(false)
+    try {
+      await deleteCustomerAddress(address.id)
+      toast.success("Address deleted successfully")
+    } catch (err: unknown) {
+      const error = err as Error
+      toast.error(error.message || "Failed to delete address")
+    } finally {
+      setRemoving(false)
+    }
   }
 
   return (
@@ -209,9 +221,9 @@ const EditAddress: React.FC<EditAddressProps> = ({
               />
             </div>
             {formState.error && (
-              <div className="text-rose-500 text-small-regular py-2">
+              <span className="sr-only">
                 {formState.error}
-              </div>
+              </span>
             )}
           </Modal.Body>
           <Modal.Footer>

@@ -1,13 +1,13 @@
 "use client"
 
 import { acceptTransferRequest, declineTransferRequest } from "@lib/data/orders"
+import { toast } from "@medusajs/ui"
 import { Button, Text } from "@modules/common/components/ui"
 import { useState } from "react"
 
 type TransferStatus = "pending" | "success" | "error"
 
 const TransferActions = ({ id, token }: { id: string; token: string }) => {
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [status, setStatus] = useState<{
     accept: TransferStatus | null
     decline: TransferStatus | null
@@ -18,21 +18,27 @@ const TransferActions = ({ id, token }: { id: string; token: string }) => {
 
   const acceptTransfer = async () => {
     setStatus({ accept: "pending", decline: null })
-    setErrorMessage(null)
 
     const { success, error } = await acceptTransferRequest(id, token)
 
-    if (error) setErrorMessage(error)
+    if (error) {
+      toast.error(error)
+    } else if (success) {
+      toast.success("Order transferred successfully!")
+    }
     setStatus({ accept: success ? "success" : "error", decline: null })
   }
 
   const declineTransfer = async () => {
     setStatus({ accept: null, decline: "pending" })
-    setErrorMessage(null)
 
     const { success, error } = await declineTransferRequest(id, token)
 
-    if (error) setErrorMessage(error)
+    if (error) {
+      toast.error(error)
+    } else if (success) {
+      toast.success("Order transfer declined successfully!")
+    }
     setStatus({ accept: null, decline: success ? "success" : "error" })
   }
 
@@ -73,7 +79,6 @@ const TransferActions = ({ id, token }: { id: string; token: string }) => {
           </Button>
         </div>
       )}
-      {errorMessage && <Text className="text-red-500">{errorMessage}</Text>}
     </div>
   )
 }

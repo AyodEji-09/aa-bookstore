@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { useSearchParams } from "next/navigation"
+import { toast } from "@medusajs/ui"
 import { Button } from "@modules/common/components/ui"
 import { confirmEmailVerification } from "@lib/data/customer"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -31,6 +32,14 @@ const VerifyAccount = () => {
       setState(success ? "success" : "error")
     )
   }, [token])
+
+  useEffect(() => {
+    if (state === "error") {
+      toast.error("This verification link is invalid or has expired.")
+    } else if (state === "success") {
+      toast.success("Your email has been verified successfully.")
+    }
+  }, [state])
 
   return (
     <div
