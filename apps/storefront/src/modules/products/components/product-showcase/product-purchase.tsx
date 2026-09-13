@@ -8,6 +8,7 @@ import { isDigitalVariant } from "@lib/util/is-digital"
 import { listLibraryItems } from "@lib/data/library"
 import { useWishlist } from "@lib/context/wishlist-context"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import ProductPrice from "@modules/products/components/product-price"
 
 type ProductPurchaseProps = {
   product: HttpTypes.StoreProduct
@@ -90,13 +91,7 @@ export default function ProductPurchase({
     <>
       {/* Price and Actions */}
       <div>
-        <div className="text-2xl font-extrabold text-[#382C2C]">
-          {selectedVariantPrice ? (
-            <span>{selectedVariantPrice.calculated_price}</span>
-          ) : (
-            <span>-</span>
-          )}
-        </div>
+        <ProductPrice product={product} variant={selectedVariant} />
 
         {/* Add to Cart & Favorite Action Buttons */}
         <div className="flex flex-col gap-y-2 pt-2">

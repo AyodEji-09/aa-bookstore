@@ -91,16 +91,16 @@ export default function ProductShowcase({
         </span>
       </nav>
 
-      {/* Main Product Showcase Section (5:6 ratio on large screens) */}
-      <div className="grid grid-cols-1 lg:grid-cols-11 gap-8 lg:gap-10 items-start">
-        {/* Left Column: Image Gallery Thumbnails & Main Showcase (5 Cols) */}
+      {/* Main Product Showcase Section (6:6 ratio on large screens) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+        {/* Left Column: Image Gallery Thumbnails & Main Showcase (6 Cols) */}
         <ProductGallery
           images={displayImages}
           selectedImageIndex={selectedImageIndex}
           onSelectImage={setSelectedImageIndex}
           productTitle={product.title}
           author={author}
-          className="lg:col-span-5"
+          className="lg:col-span-6"
         />
 
         {/* Right Column: Product Information & Purchase Actions (6 Cols) */}

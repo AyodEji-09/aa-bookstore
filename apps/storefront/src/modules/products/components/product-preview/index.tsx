@@ -60,7 +60,7 @@ export default function ProductPreview({
           <p className="text-xs text-gray-500 line-clamp-1">
             {(product.metadata?.author as string) ||
               product.subtitle ||
-              "Eric-Emanuel Schmitt"}
+              "Ayodeji Anifowose"}
           </p>
         </div>
 

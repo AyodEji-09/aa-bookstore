@@ -77,8 +77,8 @@ export default function ProductInfoAccordion({
           title="Product Information"
           value="product-info"
           headingSize="medium"
-          className="border-y !border-[#980000]"
-          titleClassName="font-bold !text-[#382C2C] text-sm tracking-wide"
+          className="border-y border-gray-200"
+          titleClassName="font-bold text-[#382C2C] text-sm tracking-wide"
         >
           <div className="pt-2 pb-4 grid grid-cols-2 gap-y-4 gap-x-6 text-xs">
             <div>
