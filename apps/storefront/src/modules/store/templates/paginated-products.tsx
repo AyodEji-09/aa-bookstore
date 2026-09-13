@@ -4,6 +4,7 @@ import { OptionValueIds } from "@lib/util/product-option-filters"
 import ProductPreview from "@modules/products/components/product-preview"
 import { Pagination } from "@modules/store/components/pagination"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
+import EmptyStoreState from "@modules/store/components/empty-store-state"
 
 const PRODUCT_LIMIT = 12
 
@@ -69,6 +70,10 @@ export default async function PaginatedProducts({
   })
 
   const totalPages = Math.ceil(count / PRODUCT_LIMIT)
+
+  if (products.length === 0) {
+    return <EmptyStoreState />
+  }
 
   return (
     <>
