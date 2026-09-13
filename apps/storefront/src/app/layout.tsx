@@ -3,6 +3,7 @@ import { getBaseURL } from "@lib/util/env"
 import { Metadata } from "next"
 import "styles/globals.css"
 import { WishlistProvider } from "@lib/context/wishlist-context"
+import { Toaster } from "@medusajs/ui"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -20,6 +21,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
       <body className={`${inter.className} bg-white`}>
         <WishlistProvider>
           <main className="relative">{props.children}</main>
+          <Toaster position="top-right" />
         </WishlistProvider>
       </body>
     </html>

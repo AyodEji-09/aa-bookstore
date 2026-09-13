@@ -1,8 +1,9 @@
 import { login } from "@lib/data/customer"
 import { LOGIN_VIEW } from "@modules/account/templates/login-template"
-import ErrorMessage from "@modules/checkout/components/error-message"
+import { toast } from "@medusajs/ui"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
 import Input from "@modules/common/components/input"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { useActionState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 
@@ -22,6 +23,9 @@ const Login = ({ setCurrentView }: Props) => {
         router.push(returnUrl)
       }
     }
+    if (message?.state === "error" && message.error) {
+      toast.error(message.error)
+    }
   }, [message, searchParams, router])
 
   return (
@@ -29,13 +33,15 @@ const Login = ({ setCurrentView }: Props) => {
       className="max-w-sm w-full flex flex-col items-center"
       data-testid="login-page"
     >
-      <h1 className="text-large-semi uppercase mb-6">Welcome back</h1>
-      <p className="text-center text-base-regular text-ui-fg-base mb-8">
-        Sign in to access an enhanced shopping experience.
+      <h1 className="text-2xl sm:text-3xl font-serif font-normal text-center text-gray-900 mb-2">
+        Welcome Back
+      </h1>
+      <p className="text-center text-sm text-gray-600 mb-8 leading-relaxed">
+        Sign in to access your digital library, orders, and bookstore benefits.
       </p>
       {message?.state === "verification_required" && (
         <div
-          className="w-full mb-6 text-center text-base-regular text-ui-fg-base bg-ui-bg-subtle border border-ui-border-base rounded-rounded p-4"
+          className="w-full mb-6 text-center text-sm text-ui-fg-base bg-ui-bg-subtle border border-ui-border-base rounded-lg p-4"
           data-testid="login-verification-message"
         >
           We sent a verification link to <strong>{message.email}</strong>.
@@ -50,9 +56,9 @@ const Login = ({ setCurrentView }: Props) => {
             value={searchParams.get("return_url") || ""}
           />
         )}
-        <div className="flex flex-col w-full gap-y-2">
+        <div className="flex flex-col w-full gap-y-3">
           <Input
-            label="Email"
+            label="Email address"
             name="email"
             type="email"
             title="Enter a valid email address."
@@ -79,25 +85,43 @@ const Login = ({ setCurrentView }: Props) => {
             </button>
           </div>
         </div>
-        <ErrorMessage
-          error={message?.state === "error" ? message.error : null}
-          data-testid="login-error-message"
-        />
-        <SubmitButton data-testid="sign-in-button" className="w-full mt-6">
+        <SubmitButton
+          data-testid="sign-in-button"
+          className="w-full mt-6 h-12 rounded-full bg-[#980000] hover:bg-[#7a0000] text-white text-sm font-semibold transition-colors shadow-sm"
+        >
           Sign in
         </SubmitButton>
+
+        <p className="text-center text-xs text-gray-500 mt-5 leading-relaxed">
+          By continuing, you agree to our{" "}
+          <LocalizedClientLink
+            href="/terms"
+            className="underline font-medium text-gray-700 hover:text-black"
+          >
+            Terms of Use
+          </LocalizedClientLink>{" "}
+          and{" "}
+          <LocalizedClientLink
+            href="/privacy"
+            className="underline font-medium text-gray-700 hover:text-black"
+          >
+            Privacy Policy
+          </LocalizedClientLink>
+          .
+        </p>
       </form>
-      <span className="text-center text-ui-fg-base text-small-regular mt-6">
+
+      <div className="text-center text-sm text-gray-600 mt-8">
         Not a member?{" "}
         <button
+          type="button"
           onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)}
-          className="underline"
+          className="underline font-semibold text-gray-900 hover:text-[#980000] transition-colors"
           data-testid="register-button"
         >
-          Join us
+          Create an account
         </button>
-        .
-      </span>
+      </div>
     </div>
   )
 }

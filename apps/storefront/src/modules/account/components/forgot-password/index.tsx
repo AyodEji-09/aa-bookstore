@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { LOGIN_VIEW } from "@modules/account/templates/login-template"
 import Input from "@modules/common/components/input"
-import ErrorMessage from "@modules/checkout/components/error-message"
+import { toast } from "@medusajs/ui"
 import { Button } from "@modules/common/components/ui"
 import { requestPasswordReset } from "@lib/data/customer"
 
@@ -14,23 +14,22 @@ type Props = {
 export default function ForgotPassword({ setCurrentView }: Props) {
   const [email, setEmail] = useState("")
   const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [submitted, setSubmitted] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email) return
 
     setSubmitting(true)
-    setError(null)
 
     const res = await requestPasswordReset(email)
     setSubmitting(false)
 
     if (res.success) {
-      setSubmitted(true)
+      toast.success(
+        `If an account exists for ${email}, a password reset email has been sent.`
+      )
     } else {
-      setError(res.error)
+      toast.error(res.error || "Failed to send reset link")
     }
   }
 
@@ -39,21 +38,18 @@ export default function ForgotPassword({ setCurrentView }: Props) {
       className="max-w-sm w-full flex flex-col items-center"
       data-testid="forgot-password-page"
     >
-      <h1 className="text-large-semi uppercase mb-2">Reset Password</h1>
-      <p className="text-center text-base-regular text-ui-fg-base mb-8">
-        Enter your email address and we will send you a secure link to reset your password.
+      <h1 className="text-2xl sm:text-3xl font-serif font-normal text-center text-gray-900 mb-3">
+        Reset Password
+      </h1>
+      <p className="text-center text-sm text-gray-600 mb-8 leading-relaxed">
+        Enter your email address and we will send you a secure link to reset
+        your password.
       </p>
 
-      {submitted && (
-        <div className="w-full mb-6 p-4 bg-green-50 text-green-800 border border-green-200 rounded-xl text-xs leading-relaxed font-medium">
-          If an account exists for <strong>{email}</strong>, a password reset email has been sent. Please check your inbox and spam folder.
-        </div>
-      )}
-
       <form onSubmit={handleSubmit} className="w-full">
-        <div className="flex flex-col w-full gap-y-2">
+        <div className="flex flex-col w-full gap-y-3">
           <Input
-            label="Email"
+            label="Email address"
             name="email"
             type="email"
             value={email}
@@ -65,25 +61,23 @@ export default function ForgotPassword({ setCurrentView }: Props) {
           />
         </div>
 
-        <ErrorMessage error={error} data-testid="forgot-password-error" />
-
         <Button
           type="submit"
           isLoading={submitting}
-          className="w-full mt-6 bg-[#980000] hover:bg-[#800000] text-white"
+          className="w-full mt-6 h-12 rounded-full bg-[#980000] hover:bg-[#7a0000] text-white text-sm font-semibold transition-colors shadow-sm"
           data-testid="send-reset-link-button"
         >
-          {submitted ? "Resend reset link" : "Send reset link"}
+          Send reset link
         </Button>
 
-        <div className="text-center mt-6">
+        <div className="text-center text-sm text-gray-600 mt-8">
+          Remember your password?{" "}
           <button
             type="button"
             onClick={() => setCurrentView(LOGIN_VIEW.SIGN_IN)}
-            className="text-small-regular text-ui-fg-subtle hover:text-[#980000] transition-colors"
+            className="underline font-semibold text-gray-900 hover:text-[#980000] transition-colors"
           >
-            Remember your password?{" "}
-            <span className="underline font-semibold">Sign in</span>
+            Sign in
           </button>
         </div>
       </form>
