@@ -1,7 +1,12 @@
 "use client"
 
 import { Fragment, useState, useEffect, useRef, useCallback } from "react"
-import { Dialog, DialogPanel, Transition, TransitionChild } from "@headlessui/react"
+import {
+  Dialog,
+  DialogPanel,
+  Transition,
+  TransitionChild,
+} from "@headlessui/react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { searchBooks, SearchResultItem, SearchFormat } from "@lib/data/search"
@@ -184,9 +189,6 @@ export default function SearchModal({
 
               {/* Format Filter Tabs */}
               <div className="flex items-center gap-1.5 px-4 sm:px-6 py-2.5 bg-[#FAF9F6] border-b border-gray-100 overflow-x-auto no-scrollbar">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mr-1 flex-shrink-0">
-                  Format:
-                </span>
                 {FORMAT_OPTIONS.map((f) => {
                   const active = selectedFormat === f.value
                   return (
@@ -207,7 +209,7 @@ export default function SearchModal({
               </div>
 
               {/* Results Container */}
-              <div className="flex-1 overflow-y-auto p-4 sm:p-6 divide-y divide-gray-100">
+              <div className="flex-1 overflow-y-auto thin-scrollbar p-4 sm:p-6 divide-y divide-gray-100">
                 {/* When Query is Empty and No Results */}
                 {!query.trim() && results.length === 0 && !loading && (
                   <div className="py-4">
@@ -261,7 +263,9 @@ export default function SearchModal({
                       No books found for &ldquo;{query}&rdquo;
                     </h3>
                     <p className="text-xs text-gray-500 max-w-sm mx-auto mb-5 leading-relaxed">
-                      We couldn&apos;t find any titles matching your query. Try searching by author, topic, format (e.g. eBook), or browse all available editions.
+                      We couldn&apos;t find any titles matching your query. Try
+                      searching by author, topic, format (e.g. eBook), or browse
+                      all available editions.
                     </p>
                     <button
                       type="button"
@@ -317,7 +321,10 @@ export default function SearchModal({
                         </div>
 
                         <p className="text-xs text-gray-500 mb-2 truncate">
-                          By <span className="font-semibold text-gray-700">{book.author}</span>
+                          By{" "}
+                          <span className="font-semibold text-gray-700">
+                            {book.author}
+                          </span>
                         </p>
 
                         {/* Format Badges */}
@@ -364,7 +371,9 @@ export default function SearchModal({
                             )}
                           </div>
                         ) : (
-                          <span className="text-xs text-gray-400 italic">Available</span>
+                          <span className="text-xs text-gray-400 italic">
+                            Available
+                          </span>
                         )}
                         <span className="inline-block mt-1 text-[11px] text-[#980000] font-bold opacity-0 group-hover:opacity-100 transition-opacity">
                           View &rarr;
@@ -401,7 +410,10 @@ export default function SearchModal({
                   </span>
                 </div>
                 <div className="text-gray-400 hidden sm:block">
-                  {results.length > 0 && `${results.length} book${results.length === 1 ? "" : "s"} found`}
+                  {results.length > 0 &&
+                    `${results.length} book${
+                      results.length === 1 ? "" : "s"
+                    } found`}
                 </div>
               </div>
             </DialogPanel>
