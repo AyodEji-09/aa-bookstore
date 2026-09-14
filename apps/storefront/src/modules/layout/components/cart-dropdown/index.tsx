@@ -76,7 +76,7 @@ const CartDropdown = ({
   return (
     <div className="h-full" onMouseEnter={openAndCancel} onMouseLeave={close}>
       <Popover className="relative h-full flex items-center">
-        <PopoverButton className="h-full flex items-center justify-center focus:outline-none">
+        <PopoverButton as="div" className="h-full flex items-center justify-center focus:outline-none">
           <LocalizedClientLink
             className="w-9 h-9 rounded-full border border-gray-200 text-[#382C2C] flex items-center justify-center relative hover:border-[#980000] hover:text-[#980000] transition-colors"
             href="/cart"
@@ -103,7 +103,7 @@ const CartDropdown = ({
         >
           <PopoverPanel
             static
-            className="hidden small:block absolute top-[calc(100%+12px)] right-0 bg-white border border-gray-100 rounded-lg shadow-sm w-[380px] sm:w-[420px] text-[#382C2C] z-30 overflow-hidden before:content-[''] before:absolute before:-top-3 before:inset-x-0 before:h-3"
+            className="hidden small:block absolute top-[calc(100%+12px)] right-0 bg-white border border-gray-100 rounded-lg shadow-sm w-[380px] sm:w-[420px] text-[#382C2C] z-30 overflow-hidden before:content-[''] before:absolute before:-top-5 before:inset-x-0 before:h-5"
             data-testid="nav-cart-dropdown"
           >
             <div className="px-4 py-3.5 border-b border-gray-100 flex items-center justify-between ">
@@ -135,7 +135,7 @@ const CartDropdown = ({
                       >
                         <LocalizedClientLink
                           href={`/products/${item.product_handle}`}
-                          className="w-18 rounded-md overflow-hidden bg-gray-50 border border-gray-100 flex-shrink-0"
+                          className="w-[72px] h-[72px] rounded-md overflow-hidden bg-gray-50 border border-gray-100 flex-shrink-0"
                         >
                           <Thumbnail
                             thumbnail={item.thumbnail}

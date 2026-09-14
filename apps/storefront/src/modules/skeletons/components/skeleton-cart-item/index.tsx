@@ -1,21 +1,34 @@
+import { Table } from "@modules/common/components/ui"
+
 const SkeletonCartItem = () => {
   return (
-    <div className="py-6 sm:py-8 flex gap-4 sm:gap-6 items-start justify-between border-b border-gray-100 last:border-b-0">
-      <div className="flex gap-4 sm:gap-6 items-start flex-1 min-w-0">
-        <div className="w-24 h-28 sm:w-28 sm:h-32 bg-gray-100 rounded-xl shrink-0 animate-pulse" />
-        <div className="flex-1 space-y-2.5 py-1">
-          <div className="w-28 h-4 bg-gray-100 rounded animate-pulse" />
-          <div className="w-48 h-4 bg-gray-100 rounded animate-pulse" />
-          <div className="w-20 h-5 bg-gray-100 rounded animate-pulse pt-1" />
-          <div className="w-24 h-3.5 bg-gray-100 rounded animate-pulse pt-1" />
-          <div className="w-32 h-3.5 bg-gray-100 rounded animate-pulse pt-2" />
+    <Table.Row className="w-full m-4">
+      <Table.Cell className="!pl-0 p-4 w-24">
+        <div className="flex w-24 h-24 p-4 bg-gray-200 rounded-large animate-pulse" />
+      </Table.Cell>
+      <Table.Cell className="text-left">
+        <div className="flex flex-col gap-y-2">
+          <div className="w-32 h-4 bg-gray-200 animate-pulse" />
+          <div className="w-24 h-4 bg-gray-200 animate-pulse" />
         </div>
-      </div>
-      <div className="flex items-center gap-3 sm:gap-4 shrink-0 pt-0.5">
-        <div className="w-16 h-10 bg-gray-100 rounded-[2px] animate-pulse" />
-        <div className="w-6 h-6 bg-gray-100 rounded animate-pulse" />
-      </div>
-    </div>
+      </Table.Cell>
+      <Table.Cell>
+        <div className="flex gap-2 items-center">
+          <div className="w-6 h-8 bg-gray-200 animate-pulse" />
+          <div className="w-14 h-10 bg-gray-200 animate-pulse" />
+        </div>
+      </Table.Cell>
+      <Table.Cell>
+        <div className="flex gap-2">
+          <div className="w-12 h-6 bg-gray-200 animate-pulse" />
+        </div>
+      </Table.Cell>
+      <Table.Cell className="!pr-0 text-right">
+        <div className="flex gap-2 justify-end">
+          <div className="w-12 h-6 bg-gray-200 animate-pulse" />
+        </div>
+      </Table.Cell>
+    </Table.Row>
   )
 }
 
