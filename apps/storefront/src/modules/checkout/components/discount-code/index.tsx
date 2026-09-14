@@ -94,7 +94,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
               />
               <SubmitButton
                 variant="secondary"
-                className="h-10 px-4 text-sm font-medium shrink-0"
+                className="h-10 w-20 shrink-0 text-sm font-medium"
                 data-testid="discount-apply-button"
               >
                 Apply

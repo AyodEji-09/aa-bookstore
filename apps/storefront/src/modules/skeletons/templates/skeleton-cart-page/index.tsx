@@ -22,7 +22,7 @@ const SkeletonCartPage = () => {
           </div>
 
           <div className="relative">
-            <div className="flex flex-col gap-y-6 sticky top-20">
+            <div className="flex flex-col gap-y-6">
               <div className="w-36 h-7 bg-gray-100 rounded animate-pulse pb-4 border-b border-gray-200" />
               <SkeletonCodeForm />
               <SkeletonOrderSummary />
