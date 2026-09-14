@@ -86,7 +86,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           variant === "primary" &&
             "bg-brand-primary text-white hover:bg-brand-hover active:bg-brand-pressed shadow-sm focus-visible:ring-brand-primary",
           variant === "secondary" &&
-            "bg-white text-brand-heading border border-gray-200 hover:bg-gray-50 hover:text-brand-primary hover:border-brand-border focus-visible:ring-brand-primary",
+            "bg-white text-brand-heading border border-gray-200 hover:bg-gray-50",
           variant === "transparent" &&
             "bg-transparent text-brand-heading hover:bg-brand-light hover:text-brand-primary focus-visible:ring-brand-primary",
           size === "small" && "h-8 px-3 text-sm",
@@ -134,8 +134,10 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
         className={clsx(
           "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium",
           color === "green" && "bg-green-100 text-green-700",
-          color === "red" && "bg-brand-light text-brand-primary border border-brand-border",
-          color === "blue" && "bg-brand-light text-brand-primary border border-brand-border",
+          color === "red" &&
+            "bg-brand-light text-brand-primary border border-brand-border",
+          color === "blue" &&
+            "bg-brand-light text-brand-primary border border-brand-border",
           color === "orange" && "bg-orange-100 text-orange-700",
           color === "grey" && "bg-gray-100 text-gray-700",
           color === "purple" && "bg-purple-100 text-purple-700",

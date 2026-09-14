@@ -43,10 +43,7 @@ const Summary = ({ cart, hasDuplicateItems = false }: SummaryProps) => {
       <Divider />
       <CartTotals totals={cart} />
       {hasDuplicateItems ? (
-        <Button
-          className="w-full h-10 opacity-60 cursor-not-allowed"
-          disabled
-        >
+        <Button className="w-full h-10 opacity-60 cursor-not-allowed" disabled>
           Remove duplicate to checkout
         </Button>
       ) : (

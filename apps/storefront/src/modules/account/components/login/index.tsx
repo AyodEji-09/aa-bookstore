@@ -91,24 +91,6 @@ const Login = ({ setCurrentView }: Props) => {
         >
           Sign in
         </SubmitButton>
-
-        <p className="text-center text-xs text-gray-500 mt-5 leading-relaxed">
-          By continuing, you agree to our{" "}
-          <LocalizedClientLink
-            href="/terms"
-            className="underline font-medium text-gray-700 hover:text-black"
-          >
-            Terms of Use
-          </LocalizedClientLink>{" "}
-          and{" "}
-          <LocalizedClientLink
-            href="/privacy"
-            className="underline font-medium text-gray-700 hover:text-black"
-          >
-            Privacy Policy
-          </LocalizedClientLink>
-          .
-        </p>
       </form>
 
       <div className="text-center text-sm text-gray-600 mt-8">

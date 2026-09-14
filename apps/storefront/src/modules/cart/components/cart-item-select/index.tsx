@@ -1,6 +1,6 @@
 "use client"
 
-import { IconBadge, clx } from "@modules/common/components/ui"
+import { clx } from "@modules/common/components/ui"
 import {
   SelectHTMLAttributes,
   forwardRef,
@@ -19,7 +19,10 @@ type NativeSelectProps = {
 } & Omit<SelectHTMLAttributes<HTMLSelectElement>, "size">
 
 const CartItemSelect = forwardRef<HTMLSelectElement, NativeSelectProps>(
-  ({ placeholder = "Select...", className, children, ...props }, ref) => {
+  (
+    { placeholder = "Select...", className, children, disabled, ...props },
+    ref
+  ) => {
     const innerRef = useRef<HTMLSelectElement>(null)
     const [isPlaceholder, setIsPlaceholder] = useState(false)
 
@@ -37,32 +40,36 @@ const CartItemSelect = forwardRef<HTMLSelectElement, NativeSelectProps>(
     }, [innerRef.current?.value])
 
     return (
-      <div>
-        <IconBadge
-          onFocus={() => innerRef.current?.focus()}
-          onBlur={() => innerRef.current?.blur()}
+      <div
+        className={clx(
+          "relative flex items-center h-10 w-14 border border-ui-border-base bg-ui-bg-subtle rounded-md transition-colors hover:bg-ui-bg-field-hover",
+          {
+            "opacity-50 pointer-events-none": disabled,
+          },
+          className
+        )}
+      >
+        <select
+          ref={innerRef}
+          disabled={disabled}
+          {...props}
           className={clx(
-            "relative flex items-center txt-compact-small border text-ui-fg-base group",
-            className,
+            "appearance-none w-full h-full bg-transparent pl-3 pr-5 text-sm font-medium text-ui-fg-base outline-none cursor-pointer disabled:cursor-not-allowed",
             {
               "text-ui-fg-subtle": isPlaceholder,
             }
           )}
         >
-          <select
-            ref={innerRef}
-            {...props}
-            className="appearance-none bg-transparent border-none px-4 transition-colors duration-150 focus:border-gray-700 outline-none w-16 h-16 items-center justify-center"
-          >
+          {isPlaceholder && placeholder && (
             <option disabled value="">
               {placeholder}
             </option>
-            {children}
-          </select>
-          <span className="absolute flex pointer-events-none justify-end w-8 group-hover:animate-pulse">
-            <ChevronDown />
-          </span>
-        </IconBadge>
+          )}
+          {children}
+        </select>
+        <span className="absolute right-2 inset-y-0 flex items-center pointer-events-none text-ui-fg-muted">
+          <ChevronDown size="12" />
+        </span>
       </div>
     )
   }
