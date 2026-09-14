@@ -1,12 +1,13 @@
 "use client"
 
-import { Badge, Heading, Input, Label, Text } from "@modules/common/components/ui"
+import { Badge, Heading, Input, Text, clx } from "@modules/common/components/ui"
 import React from "react"
 
 import { applyPromotions } from "@lib/data/cart"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
 import Trash from "@modules/common/icons/trash"
+import ChevronDown from "@modules/common/icons/chevron-down"
 import ErrorMessage from "../error-message"
 import { SubmitButton } from "../submit-button"
 
@@ -54,49 +55,57 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
   }
 
   return (
-    <div className="w-full bg-white flex flex-col">
+    <div className="w-full flex flex-col">
       <div className="txt-medium">
-        <form action={(a) => addPromotionCode(a)} className="w-full mb-5">
-          <Label className="flex gap-x-1 my-2 items-center">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              type="button"
-              className="txt-medium text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
-              data-testid="add-discount-button"
-            >
-              Add Promotion Code(s)
-            </button>
+        <form action={(a) => addPromotionCode(a)} className="w-full">
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            type="button"
+            className="flex items-center gap-x-1.5 text-sm font-medium text-gray-700 hover:text-gray-950 transition-colors py-1"
+            data-testid="add-discount-button"
+          >
+            <span>Have a promo code?</span>
+            <ChevronDown
+              size="14"
+              className={clx(
+                "transition-transform duration-200 text-gray-400",
+                isOpen && "rotate-180"
+              )}
+            />
+          </button>
 
-            {/* <Tooltip content="You can add multiple promotion codes">
-              <InformationCircleSolid color="var(--fg-muted)" />
-            </Tooltip> */}
-          </Label>
-
-          {isOpen && (
-            <>
-              <div className="flex w-full gap-x-2">
-                <Input
-                  className="size-full"
-                  id="promotion-input"
-                  name="code"
-                  type="text"
-                  autoFocus={false}
-                  data-testid="discount-input"
-                />
-                <SubmitButton
-                  variant="secondary"
-                  data-testid="discount-apply-button"
-                >
-                  Apply
-                </SubmitButton>
-              </div>
-
-              <ErrorMessage
-                error={errorMessage}
-                data-testid="discount-error-message"
+          <div
+            className={clx(
+              "overflow-hidden transition-all duration-300 ease-in-out",
+              isOpen
+                ? "max-h-24 opacity-100 translate-y-0 pt-2 pb-1"
+                : "max-h-0 opacity-0 -translate-y-2 pointer-events-none"
+            )}
+          >
+            <div className="flex w-full gap-x-2 items-center">
+              <Input
+                className="w-full h-10"
+                id="promotion-input"
+                name="code"
+                type="text"
+                placeholder="Enter promo code"
+                autoFocus={false}
+                data-testid="discount-input"
               />
-            </>
-          )}
+              <SubmitButton
+                variant="secondary"
+                className="h-10 px-4 text-sm font-medium shrink-0"
+                data-testid="discount-apply-button"
+              >
+                Apply
+              </SubmitButton>
+            </div>
+
+            <ErrorMessage
+              error={errorMessage}
+              data-testid="discount-error-message"
+            />
+          </div>
         </form>
 
         {promotions.length > 0 && (
