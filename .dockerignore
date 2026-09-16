@@ -1,0 +1,37 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build output (rebuilt inside Docker)
+apps/backend/.medusa
+apps/storefront/.next
+dist
+out
+
+# Turbo cache
+.turbo
+
+# Environment files (secrets injected at runtime)
+.env
+.env.*
+!.env.template
+
+# Git
+.git
+.gitignore
+
+# IDE / OS
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+
+# Documentation / config not needed at build time
+README.md
+CLAUDE.md
+AGENTS.md
+LICENSE
+
+# Storefront (not needed for backend image)
+apps/storefront
