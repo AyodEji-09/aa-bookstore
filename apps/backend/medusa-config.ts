@@ -161,13 +161,24 @@ module.exports = defineConfig({
           {
             resolve: "@medusajs/medusa/workflow-engine-redis",
             options: {
-              redisUrl,
+              redis: {
+                redisUrl,
+              },
             },
           },
           {
-            resolve: "@medusajs/medusa/locking-redis",
+            resolve: "@medusajs/medusa/locking",
             options: {
-              redisUrl,
+              providers: [
+                {
+                  resolve: "@medusajs/medusa/locking-redis",
+                  id: "locking-redis",
+                  is_default: true,
+                  options: {
+                    redisUrl,
+                  },
+                },
+              ],
             },
           },
         ]
