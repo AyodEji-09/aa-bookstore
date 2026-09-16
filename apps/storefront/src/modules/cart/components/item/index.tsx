@@ -1,11 +1,9 @@
 "use client"
 
-import { Table, Text } from "@modules/common/components/ui"
-import { updateLineItem } from "@lib/data/cart"
+import { Table, Text, clx } from "@modules/common/components/ui"
+import { deleteLineItem, updateLineItem } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
-import CartItemSelect from "@modules/cart/components/cart-item-select"
 import ErrorMessage from "@modules/checkout/components/error-message"
-import DeleteButton from "@modules/common/components/delete-button"
 import LineItemOptions from "@modules/common/components/line-item-options"
 import LineItemPrice from "@modules/common/components/line-item-price"
 import LineItemUnitPrice from "@modules/common/components/line-item-unit-price"
@@ -13,6 +11,9 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import Spinner from "@modules/common/icons/spinner"
 import Thumbnail from "@modules/products/components/thumbnail"
 import { isDigitalItem } from "@lib/util/is-digital"
+import { useWishlist } from "@lib/context/wishlist-context"
+import { Heart, Minus, Plus } from "lucide-react"
+import { Trash } from "@medusajs/icons"
 import { useState } from "react"
 
 type ItemProps = {
@@ -23,7 +24,11 @@ type ItemProps = {
 
 const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
   const [updating, setUpdating] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const { isWishlisted, toggleWishlist } = useWishlist()
+  const wishlisted = isWishlisted(item.product_id)
 
   const changeQuantity = async (quantity: number) => {
     setError(null)
@@ -41,9 +46,39 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
       })
   }
 
+  const handleDelete = async () => {
+    setError(null)
+    setIsDeleting(true)
+
+    await deleteLineItem(item.id)
+      .catch((err) => {
+        setError(err.message)
+        setIsDeleting(false)
+      })
+  }
+
+  const handleDecrement = () => {
+    if (item.quantity <= 1) {
+      handleDelete()
+    } else {
+      changeQuantity(item.quantity - 1)
+    }
+  }
+
+  const handleIncrement = () => {
+    if (item.quantity < maxQuantity) {
+      changeQuantity(item.quantity + 1)
+    }
+  }
+
+  const handleWishlistToggle = async () => {
+    await toggleWishlist(item.product_id, item.variant_id || undefined)
+  }
+
   // TODO: Update this to grab the actual max inventory
   const maxQtyFromInventory = 10
   const maxQuantity = item.variant?.manage_inventory ? 10 : maxQtyFromInventory
+  const isDigital = isDigitalItem(item)
 
   if (type === "preview") {
     return (
@@ -130,50 +165,64 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
         </div>
       </div>
 
-      {/* Bottom: Quantity and Remove under the image and text */}
-      <div className="flex items-center justify-between gap-4 pt-1">
-        <div className="flex items-center gap-2">
-          {isDigitalItem(item) ? (
-            <span className="h-9 px-3 flex items-center justify-center text-xs font-medium text-ui-fg-subtle border border-ui-border-base rounded-md bg-ui-bg-subtle">
-              Digital Edition &bull; Qty 1
-            </span>
-          ) : (
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-ui-fg-subtle hidden sm:inline">
-                Qty:
-              </span>
-              <CartItemSelect
-                value={item.quantity}
-                onChange={(value) =>
-                  changeQuantity(parseInt(value.target.value))
-                }
-                className="w-16 h-9"
-                disabled={updating}
-                data-testid="product-select-button"
-              >
-                {Array.from(
-                  {
-                    length: Math.min(maxQuantity, 10),
-                  },
-                  (_, i) => (
-                    <option value={i + 1} key={i}>
-                      {i + 1}
-                    </option>
-                  )
-                )}
-              </CartItemSelect>
-            </div>
+      {/* Bottom: Quantity pill and Wishlist heart under the image and text */}
+      <div className="flex items-center gap-3 pt-1">
+        {/* Pill Quantity Modifier */}
+        <div className="h-9 px-3 bg-ui-bg-subtle rounded-full flex items-center gap-x-3 select-none">
+          <button
+            type="button"
+            onClick={handleDecrement}
+            disabled={updating || isDeleting}
+            className="text-ui-fg-subtle hover:text-ui-fg-base transition-colors disabled:opacity-40 cursor-pointer p-0.5 flex items-center justify-center"
+            aria-label={item.quantity <= 1 ? "Remove item" : "Decrease quantity"}
+            data-testid="product-decrement-button"
+          >
+            {isDeleting ? (
+              <Spinner className="w-3.5 h-3.5 animate-spin" />
+            ) : item.quantity <= 1 ? (
+              <Trash className="w-4 h-4" />
+            ) : (
+              <Minus className="w-3.5 h-3.5" />
+            )}
+          </button>
+
+          <span
+            className="text-xs font-semibold text-ui-fg-base min-w-[16px] text-center"
+            data-testid="product-quantity"
+          >
+            {updating ? <Spinner className="w-3 h-3 animate-spin mx-auto" /> : item.quantity}
+          </span>
+
+          {!isDigital && (
+            <button
+              type="button"
+              onClick={handleIncrement}
+              disabled={item.quantity >= maxQuantity || updating || isDeleting}
+              className="text-ui-fg-subtle hover:text-ui-fg-base transition-colors disabled:opacity-30 cursor-pointer p-0.5 flex items-center justify-center"
+              aria-label="Increase quantity"
+              data-testid="product-increment-button"
+            >
+              <Plus className="w-3.5 h-3.5" />
+            </button>
           )}
-          {updating && <Spinner className="w-4 h-4 text-ui-fg-subtle" />}
         </div>
 
-        <DeleteButton
-          id={item.id}
-          data-testid="product-delete-button"
-          className="text-xs text-ui-fg-muted hover:text-ui-fg-danger transition-colors cursor-pointer"
+        {/* Circular Wishlist Heart Button */}
+        <button
+          type="button"
+          onClick={handleWishlistToggle}
+          className="w-9 h-9 rounded-full bg-ui-bg-subtle hover:bg-ui-bg-field-hover flex items-center justify-center transition-colors active:scale-95 cursor-pointer"
+          title={wishlisted ? "Remove from favourites" : "Save to favourites"}
+          aria-label={wishlisted ? "Remove from favourites" : "Save to favourites"}
+          data-testid="product-wishlist-button"
         >
-          <span className="text-xs">Remove</span>
-        </DeleteButton>
+          <Heart
+            className={clx("w-4 h-4 transition-colors", {
+              "fill-[#980000] text-[#980000]": wishlisted,
+              "text-ui-fg-subtle hover:text-ui-fg-base": !wishlisted,
+            })}
+          />
+        </button>
       </div>
 
       <ErrorMessage error={error} data-testid="product-error-message" />

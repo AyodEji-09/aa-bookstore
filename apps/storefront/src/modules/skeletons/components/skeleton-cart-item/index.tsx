@@ -11,10 +11,10 @@ const SkeletonCartItem = () => {
         </div>
       </div>
 
-      {/* Bottom: Quantity and Remove */}
-      <div className="flex items-center justify-between gap-4 pt-1">
-        <div className="w-16 h-9 bg-gray-200 rounded-md animate-pulse" />
-        <div className="w-14 h-4 bg-gray-200 rounded animate-pulse" />
+      {/* Bottom: Quantity pill and Heart circle */}
+      <div className="flex items-center gap-3 pt-1">
+        <div className="w-24 h-9 bg-gray-200 rounded-full animate-pulse" />
+        <div className="w-9 h-9 bg-gray-200 rounded-full animate-pulse" />
       </div>
     </div>
   )
