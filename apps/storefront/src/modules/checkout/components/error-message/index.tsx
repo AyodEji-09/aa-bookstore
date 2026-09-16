@@ -10,7 +10,7 @@ const ErrorMessage = ({
   "data-testid"?: string
 }) => {
   useEffect(() => {
-    if (error) {
+    if (error && error !== "NEXT_REDIRECT" && !error.includes("NEXT_REDIRECT")) {
       toast.error(error)
     }
   }, [error])

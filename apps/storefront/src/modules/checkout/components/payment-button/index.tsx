@@ -47,6 +47,16 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   }
 }
 
+const isRedirectError = (err: unknown) => {
+  if (!err || typeof err !== "object") return false
+  const error = err as { message?: string; digest?: string }
+  return (
+    error.message === "NEXT_REDIRECT" ||
+    Boolean(error.message?.includes("NEXT_REDIRECT")) ||
+    Boolean(error.digest?.includes("NEXT_REDIRECT"))
+  )
+}
+
 const StripePaymentButton = ({
   cart,
   notReady,
@@ -60,13 +70,15 @@ const StripePaymentButton = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const onPaymentCompleted = async () => {
-    await placeOrder()
-      .catch((err) => {
-        setErrorMessage(err.message)
-      })
-      .finally(() => {
-        setSubmitting(false)
-      })
+    try {
+      await placeOrder()
+    } catch (err: any) {
+      if (isRedirectError(err)) {
+        return
+      }
+      setErrorMessage(err?.message || "An error occurred while placing your order.")
+      setSubmitting(false)
+    }
   }
 
   const stripe = useStripe()
@@ -163,13 +175,15 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const onPaymentCompleted = async () => {
-    await placeOrder()
-      .catch((err) => {
-        setErrorMessage(err.message)
-      })
-      .finally(() => {
-        setSubmitting(false)
-      })
+    try {
+      await placeOrder()
+    } catch (err: any) {
+      if (isRedirectError(err)) {
+        return
+      }
+      setErrorMessage(err?.message || "An error occurred while placing your order.")
+      setSubmitting(false)
+    }
   }
 
   const handlePayment = () => {
