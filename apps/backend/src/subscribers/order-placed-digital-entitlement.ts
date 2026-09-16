@@ -1,5 +1,9 @@
 import type { SubscriberArgs, SubscriberConfig } from "@medusajs/framework"
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
+import {
+  createOrderFulfillmentWorkflow,
+  markOrderFulfillmentAsDeliveredWorkflow,
+} from "@medusajs/medusa/core-flows"
 import { LIBRARY_MODULE } from "../modules/library"
 import LibraryModuleService from "../modules/library/service"
 
@@ -23,6 +27,7 @@ export default async function orderPlacedDigitalEntitlementHandler({
         "items.*",
         "items.variant.*",
         "items.variant.product.*",
+        "shipping_methods.*",
       ],
       filters: {
         id: orderId,
@@ -46,12 +51,7 @@ export default async function orderPlacedDigitalEntitlementHandler({
       }
     }
 
-    if (!customerId) {
-      logger.warn(
-        `Digital items in order ${orderId} skipped: no customer account associated with email ${order.email}`
-      )
-      return
-    }
+    const digitalItems: { id: string; quantity: number }[] = []
 
     for (const item of order.items) {
       if (!item) continue
@@ -81,31 +81,108 @@ export default async function orderPlacedDigitalEntitlementHandler({
       }
 
       if (format && item.product_id) {
-        const existing = await libraryService.listCustomerLibraryItems({
-          customer_id: customerId,
-          product_id: item.product_id,
-          format,
+        digitalItems.push({
+          id: item.id,
+          quantity: Number(item.quantity) || 1,
         })
 
-        if (!existing.length) {
-          await libraryService.createCustomerLibraryItems({
+        if (customerId) {
+          const existing = await libraryService.listCustomerLibraryItems({
             customer_id: customerId,
             product_id: item.product_id,
-            variant_id: item.variant_id ?? "",
             format,
-            order_id: order.id,
-            progress: {
-              last_chapter: 1,
-              completed: false,
-              timestamp_seconds: 0,
-            },
-            media_key: (metadata.media_key as string) ?? null,
           })
 
+          if (!existing.length) {
+            await libraryService.createCustomerLibraryItems({
+              customer_id: customerId,
+              product_id: item.product_id,
+              variant_id: item.variant_id ?? "",
+              format,
+              order_id: order.id,
+              progress: {
+                last_chapter: 1,
+                completed: false,
+                timestamp_seconds: 0,
+              },
+              media_key: (metadata.media_key as string) ?? null,
+            })
+
+            logger.info(
+              `Granted ${format} entitlement for product ${item.product_id} to customer ${customerId}`
+            )
+          }
+        }
+      }
+    }
+
+    if (!customerId) {
+      logger.warn(
+        `Digital items entitlement skipped for order ${orderId}: no customer account found for ${order.email}`
+      )
+    }
+
+    // Auto-fulfill and mark delivered any digital items so order isn't stuck as "not fulfilled" in Admin
+    if (digitalItems.length > 0) {
+      try {
+        let locationId: string | undefined
+        const { data: locations } = await query.graph({
+          entity: "stock_location",
+          fields: ["id"],
+        })
+        if (locations?.length) {
+          locationId = locations[0].id
+        }
+
+        let shippingOptionId = order.shipping_methods?.[0]?.shipping_option_id
+        if (!shippingOptionId) {
+          const { data: shippingOptions } = await query.graph({
+            entity: "shipping_option",
+            fields: ["id", "name"],
+          })
+          const digitalOption =
+            shippingOptions?.find((o: any) =>
+              o.name?.toLowerCase().includes("digital")
+            ) || shippingOptions?.[0]
+          shippingOptionId = digitalOption?.id
+        }
+
+        const fulfillmentInput: any = {
+          order_id: order.id,
+          items: digitalItems,
+          no_notification: true,
+        }
+        if (locationId) {
+          fulfillmentInput.location_id = locationId
+        }
+        if (shippingOptionId) {
+          fulfillmentInput.shipping_option_id = shippingOptionId
+        }
+
+        const { result: fulfillment } = await createOrderFulfillmentWorkflow(
+          container
+        ).run({
+          input: fulfillmentInput,
+        })
+
+        if (fulfillment?.id) {
+          await markOrderFulfillmentAsDeliveredWorkflow(container).run({
+            input: {
+              orderId: order.id,
+              fulfillmentId: fulfillment.id,
+              no_notification: true,
+            },
+          })
           logger.info(
-            `Granted ${format} entitlement for product ${item.product_id} to customer ${customerId}`
+            `Auto-fulfilled and marked delivered ${digitalItems.length} digital item(s) for order ${order.id}`
           )
         }
+      } catch (fulfillError) {
+        logger.warn(
+          `Could not auto-fulfill digital items for order ${order.id}: ${
+            fulfillError instanceof Error ? fulfillError.message : "Unknown error"
+          }`
+        )
       }
     }
   } catch (error) {
