@@ -9,18 +9,16 @@ const SkeletonCartPage = () => {
       <div className="content-container">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] xl:grid-cols-[1fr_380px] gap-10 lg:gap-14 xl:gap-20 items-start">
           <div className="flex flex-col bg-white p-6 gap-y-6">
-            <div className="bg-white flex items-start justify-between">
-              <div className="flex flex-col gap-y-2">
-                <div className="w-60 h-8 bg-gray-200 animate-pulse" />
-                <div className="w-48 h-6 bg-gray-200 animate-pulse" />
+            <div className="bg-gray-50/60 rounded-xl p-4 sm:p-5 flex items-center justify-between gap-4 border border-gray-100">
+              <div className="space-y-1.5 flex-1">
+                <div className="w-40 h-4 bg-gray-200 rounded animate-pulse" />
+                <div className="w-48 h-3 bg-gray-200 rounded animate-pulse" />
               </div>
-              <div>
-                <div className="w-14 h-8 bg-gray-200 animate-pulse" />
-              </div>
+              <div className="w-16 h-8 bg-gray-200 rounded animate-pulse shrink-0" />
             </div>
             <div>
-              <div className="pb-3 flex items-center">
-                <div className="w-20 h-12 bg-gray-200 animate-pulse" />
+              <div className="pb-2 flex items-center">
+                <div className="w-24 h-8 bg-gray-200 rounded animate-pulse" />
               </div>
               <div className="flex flex-col divide-y divide-ui-border-base">
                 {repeat(3).map((index) => (

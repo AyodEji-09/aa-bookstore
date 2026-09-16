@@ -128,16 +128,6 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
               style="tight"
               currencyCode={currencyCode}
             />
-            {item.quantity > 1 && (
-              <span className="text-xs text-ui-fg-muted block mt-0.5 sm:text-right">
-                <LineItemUnitPrice
-                  item={item}
-                  style="tight"
-                  currencyCode={currencyCode}
-                />{" "}
-                each
-              </span>
-            )}
           </div>
         </div>
 

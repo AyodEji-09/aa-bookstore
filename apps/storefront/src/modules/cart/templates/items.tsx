@@ -14,7 +14,7 @@ const ItemsTemplate = ({ cart }: ItemsTemplateProps) => {
 
   return (
     <div className="w-full">
-      <div className="pb-4 border-b border-ui-border-base flex items-baseline justify-between">
+      <div className="pb-2 flex items-baseline justify-between">
         <div className="flex items-baseline gap-x-2.5">
           <Heading level="h2" className="text-2xl sm:text-[2rem] sm:leading-[2.75rem] font-bold text-ui-fg-base">
             Cart

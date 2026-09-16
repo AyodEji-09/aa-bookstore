@@ -3,7 +3,6 @@ import Summary from "./summary"
 import EmptyCartMessage from "../components/empty-cart-message"
 import SignInPrompt from "../components/sign-in-prompt"
 import CartQueryCleaner from "../components/cart-query-cleaner"
-import Divider from "@modules/common/components/divider"
 import { HttpTypes } from "@medusajs/types"
 import { isDigitalItem } from "@lib/util/is-digital"
 import { ExclamationCircle } from "@medusajs/icons"
@@ -70,12 +69,7 @@ const CartTemplate = ({
         {cart?.items?.length ? (
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] xl:grid-cols-[1fr_380px] gap-10 lg:gap-14 xl:gap-20 items-start">
             <div className="flex flex-col bg-white py-6 gap-y-6">
-              {!customer && (
-                <>
-                  <SignInPrompt />
-                  <Divider />
-                </>
-              )}
+              {!customer && <SignInPrompt />}
               <ItemsTemplate cart={cart} />
             </div>
             <div className="relative">
