@@ -99,7 +99,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       >
         <span
           className={clsx(
-            "inline-flex items-center justify-center gap-2",
+            "inline-flex items-center justify-center gap-2 w-full",
             isLoading && "invisible"
           )}
         >
