@@ -294,7 +294,7 @@ export default function SearchModal({
                       }`}
                     >
                       {/* Book Cover Thumbnail */}
-                      <div className="relative w-11 h-15 sm:w-12 sm:h-16 bg-gray-100 rounded-md overflow-hidden flex-shrink-0 shadow-xs border border-gray-200/60">
+                      <div className="relative w-11 h-16 sm:w-12 sm:h-16 bg-gray-100 rounded-md overflow-hidden flex-shrink-0 shadow-sm border border-gray-200/60">
                         {book.thumbnail ? (
                           <Image
                             src={book.thumbnail}
