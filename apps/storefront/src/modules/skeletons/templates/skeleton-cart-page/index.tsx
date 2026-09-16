@@ -5,28 +5,33 @@ import SkeletonOrderSummary from "@modules/skeletons/components/skeleton-order-s
 
 const SkeletonCartPage = () => {
   return (
-    <div className="py-8 sm:py-12">
+    <div className="py-12">
       <div className="content-container">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] xl:grid-cols-[1fr_380px] gap-10 lg:gap-14 xl:gap-20 items-start">
-          <div className="flex flex-col gap-y-6">
-            <div className="pb-4 sm:pb-5 border-b border-gray-100 flex items-baseline justify-between">
-              <div className="w-28 h-7 bg-gray-100 rounded animate-pulse" />
-              <div className="w-14 h-4 bg-gray-100 rounded animate-pulse" />
+          <div className="flex flex-col bg-white p-6 gap-y-6">
+            <div className="bg-white flex items-start justify-between">
+              <div className="flex flex-col gap-y-2">
+                <div className="w-60 h-8 bg-gray-200 animate-pulse" />
+                <div className="w-48 h-6 bg-gray-200 animate-pulse" />
+              </div>
+              <div>
+                <div className="w-14 h-8 bg-gray-200 animate-pulse" />
+              </div>
             </div>
-
-            <div className="divide-y divide-gray-100">
-              {repeat(3).map((index) => (
-                <SkeletonCartItem key={index} />
-              ))}
+            <div>
+              <div className="pb-3 flex items-center">
+                <div className="w-20 h-12 bg-gray-200 animate-pulse" />
+              </div>
+              <div className="flex flex-col">
+                {repeat(3).map((index) => (
+                  <SkeletonCartItem key={index} />
+                ))}
+              </div>
             </div>
           </div>
-
-          <div className="relative">
-            <div className="flex flex-col gap-y-8">
-              <div className="w-32 h-7 bg-gray-100 rounded animate-pulse pb-4 border-b border-gray-100" />
-              <SkeletonCodeForm />
-              <SkeletonOrderSummary />
-            </div>
+          <div className="flex flex-col gap-y-8">
+            <SkeletonOrderSummary />
+            <SkeletonCodeForm />
           </div>
         </div>
       </div>
