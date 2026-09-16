@@ -2,7 +2,7 @@ import { Truck, Star, BookOpen } from "lucide-react"
 
 const FeatureBar = () => {
   return (
-    <div className="w-full bg-white py-10 border-t border-b border-gray-100">
+    <div className="w-full bg-white py-10">
       <div className="content-container grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-red-200">
         {/* Item 1 */}
         <div className="flex items-center justify-center gap-x-3 py-4 md:py-0 md:px-6">

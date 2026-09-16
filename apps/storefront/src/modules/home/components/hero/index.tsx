@@ -117,9 +117,9 @@ const Hero = () => {
     >
       <div className="content-container flex flex-col lg:flex-row items-center justify-between gap-10">
         {/* Left Column: 1px Line Indicators & Text Content */}
-        <div className="flex items-stretch gap-x-5 flex-1 max-w-2xl">
-          {/* Vertical 1px Line Segments with Gaps */}
-          <div className="flex flex-col justify-between py-1 gap-y-3 flex-shrink-0">
+        <div className="flex items-stretch gap-x-0 sm:gap-x-5 flex-1 max-w-2xl">
+          {/* Vertical 1px Line Segments with Gaps (hidden on mobile) */}
+          <div className="hidden sm:flex flex-col justify-between py-1 gap-y-3 flex-shrink-0">
             {HERO_SLIDES.map((_, i) => {
               const isActive = i === activeSlide
               const isPassed = i < activeSlide
