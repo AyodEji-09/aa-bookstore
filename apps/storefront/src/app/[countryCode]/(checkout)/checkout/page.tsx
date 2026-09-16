@@ -1,10 +1,6 @@
-import {
-  retrieveCart,
-  setShippingMethod,
-} from "@lib/data/cart"
+import { retrieveCart } from "@lib/data/cart"
 import { retrieveCustomer } from "@lib/data/customer"
 import { listLibraryItems } from "@lib/data/library"
-import { listCartShippingMethods } from "@lib/data/fulfillment"
 import { isDigitalCart, isDigitalItem } from "@lib/util/is-digital"
 import PaymentWrapper from "@modules/checkout/components/payment-wrapper"
 import CheckoutForm from "@modules/checkout/templates/checkout-form"
@@ -60,29 +56,6 @@ export default async function Checkout({
           duplicateItem.title || "digital book"
         )}`
       )
-    }
-  }
-
-  // 3. For purely digital carts: automatically attach the free Digital Delivery shipping option if not selected
-  if (
-    isDigital &&
-    cart?.id &&
-    (!cart.shipping_methods || cart.shipping_methods.length === 0)
-  ) {
-    try {
-      const shippingOptions = await listCartShippingMethods(cart.id)
-      const digitalOption =
-        shippingOptions?.find((o) => o.name?.toLowerCase().includes("digital")) ||
-        shippingOptions?.find((o) => o.amount === 0)
-      if (digitalOption) {
-        await setShippingMethod({
-          cartId: cart.id,
-          shippingMethodId: digitalOption.id,
-        })
-        cart = await retrieveCart()
-      }
-    } catch (err) {
-      console.error("Auto digital shipping error in checkout page:", err)
     }
   }
 
