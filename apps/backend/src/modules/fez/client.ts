@@ -255,7 +255,7 @@ export function getFezClient(logger: Logger): FezClient {
         defaultPickupState: process.env.FEZ_PICKUP_STATE || "Lagos",
         defaultPickupAddress: process.env.FEZ_PICKUP_ADDRESS || "Lagos Warehouse",
         defaultSenderPhone: process.env.FEZ_SENDER_PHONE || "08000000000",
-        defaultSenderName: process.env.FEZ_SENDER_NAME || "Ayollc Bookstore",
+        defaultSenderName: process.env.FEZ_SENDER_NAME || "Ayodeji Anifowose Store",
       },
       logger
     )

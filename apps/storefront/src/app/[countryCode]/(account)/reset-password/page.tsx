@@ -57,7 +57,7 @@ export default function ResetPasswordPage() {
         <LocalizedClientLink href="/" className="inline-block">
           <Image
             src="/images/logo.png"
-            alt="Ayodeji Anifowose Bookstore"
+            alt="Ayodeji Anifowose Store"
             width={200}
             height={55}
             className="h-9 sm:h-11 w-auto object-contain"

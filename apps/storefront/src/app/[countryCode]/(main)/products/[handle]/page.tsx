@@ -87,13 +87,29 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     notFound()
   }
 
+  const author =
+    (product.metadata?.author as string) || "Ayodeji Anifowose"
+  const title = `${product.title} | Ayodeji Anifowose Store`
+  const description =
+    product.description ||
+    `Purchase ${product.title} by ${author} at the official Ayodeji Anifowose Store.`
+
   return {
-    title: `${product.title} | Ayodeji Anifowose Bookstore`,
-    description: `${product.title}`,
+    title,
+    description,
     openGraph: {
-      title: `${product.title} | Ayodeji Anifowose Bookstore`,
-      description: `${product.title}`,
+      title,
+      description,
       images: product.thumbnail ? [product.thumbnail] : [],
+      siteName: "Ayodeji Anifowose Store",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: product.thumbnail ? [product.thumbnail] : [],
+      site: "@GFatherGHusband",
+      creator: "@GFatherGHusband",
     },
   }
 }
@@ -119,13 +135,47 @@ export default async function ProductPage(props: Props) {
   }
 
   const images = getImagesForVariant(pricedProduct, selectedVariantId)
+  const authorName =
+    (pricedProduct.metadata?.author as string) || "Ayodeji Anifowose"
+
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: pricedProduct.title,
+    description: pricedProduct.description || pricedProduct.title,
+    image: pricedProduct.thumbnail ? [pricedProduct.thumbnail] : [],
+    brand: {
+      "@type": "Brand",
+      name: "Ayodeji Anifowose Store",
+    },
+    author: {
+      "@type": "Person",
+      name: authorName,
+    },
+    offers: pricedProduct.variants?.map((v) => ({
+      "@type": "Offer",
+      price: v.calculated_price?.calculated_amount || undefined,
+      priceCurrency: region.currency_code?.toUpperCase(),
+      availability:
+        v.inventory_quantity && v.inventory_quantity > 0
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock",
+      url: `https://ayodejianifowose.com/${params.countryCode}/products/${pricedProduct.handle}`,
+    })),
+  }
 
   return (
-    <ProductTemplate
-      product={pricedProduct}
-      region={region}
-      countryCode={params.countryCode}
-      images={images ?? []}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      <ProductTemplate
+        product={pricedProduct}
+        region={region}
+        countryCode={params.countryCode}
+        images={images ?? []}
+      />
+    </>
   )
 }

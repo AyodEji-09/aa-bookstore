@@ -134,7 +134,7 @@ export default async function orderDeliveredNotificationHandler({
         const resend = new Resend(apiKey)
         const fromEmail =
           process.env.RESEND_FROM_EMAIL ||
-          "Ayodeji Anifowose Bookstore <onboarding@resend.dev>"
+          "Ayodeji Anifowose Store <onboarding@resend.dev>"
 
         const { subject, html } = renderOrderDeliveredEmail(deliveryData)
 

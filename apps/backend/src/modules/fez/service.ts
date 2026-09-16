@@ -42,7 +42,7 @@ export class FezFulfillmentService extends AbstractFulfillmentProviderService {
       defaultSenderName:
         options?.defaultSenderName ||
         process.env.FEZ_SENDER_NAME ||
-        "Ayodeji Anifowose Bookstore",
+        "Ayodeji Anifowose Store",
     }
 
     this.client_ = new FezClient(this.options_, this.logger_)

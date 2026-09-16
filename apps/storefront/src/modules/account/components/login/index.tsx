@@ -37,7 +37,7 @@ const Login = ({ setCurrentView }: Props) => {
         Welcome Back
       </h1>
       <p className="text-center text-sm text-gray-600 mb-8 leading-relaxed">
-        Sign in to access your digital library, orders, and bookstore benefits.
+        Sign in to access your digital library, orders, and store benefits.
       </p>
       {message?.state === "verification_required" && (
         <div

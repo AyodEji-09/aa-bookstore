@@ -81,7 +81,7 @@ export default async function passwordResetNotificationHandler({
         const resend = new Resend(apiKey)
         const fromEmail =
           process.env.RESEND_FROM_EMAIL ||
-          "Ayodeji Anifowose Bookstore <onboarding@resend.dev>"
+          "Ayodeji Anifowose Store <onboarding@resend.dev>"
 
         const { subject, html } = renderPasswordResetEmail({
           email,

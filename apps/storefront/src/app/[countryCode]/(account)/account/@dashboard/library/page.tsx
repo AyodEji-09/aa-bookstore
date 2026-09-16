@@ -3,7 +3,7 @@ import { listLibraryItems } from "@lib/data/library"
 import LibraryView from "@modules/account/components/library-view"
 
 export const metadata: Metadata = {
-  title: "My Digital Library | Ayodeji Anifowose Bookstore",
+  title: "My Digital Library | Ayodeji Anifowose Store",
   description: "Access and stream your purchased eBooks and Audiobooks online.",
 }
 

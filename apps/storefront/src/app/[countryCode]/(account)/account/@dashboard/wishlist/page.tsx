@@ -3,8 +3,8 @@ import { listWishlistItems } from "@lib/data/wishlist"
 import WishlistView from "@modules/account/components/wishlist-view"
 
 export const metadata: Metadata = {
-  title: "My Wishlist | Ayodeji Anifowose Bookstore",
-  description: "View and manage your saved books and audiobooks.",
+  title: "My Wishlist | Ayodeji Anifowose Store",
+  description: "View and manage your saved items.",
 }
 
 export default async function WishlistPage({

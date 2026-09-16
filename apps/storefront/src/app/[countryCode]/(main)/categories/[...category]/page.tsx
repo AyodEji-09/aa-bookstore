@@ -60,13 +60,20 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   try {
     const productCategory = await getCategoryByHandle(params.category)
 
-    const title = productCategory.name + " | Ayodeji Anifowose Bookstore"
+    const title = `${productCategory.name} | Ayodeji Anifowose Store`
 
-    const description = productCategory.description ?? `${title} category.`
+    const description =
+      productCategory.description ??
+      `Browse ${productCategory.name} at the official Ayodeji Anifowose Store.`
 
     return {
-      title: `${title} | Ayodeji Anifowose Bookstore`,
+      title,
       description,
+      openGraph: {
+        title,
+        description,
+        siteName: "Ayodeji Anifowose Store",
+      },
       alternates: {
         canonical: `${params.category.join("/")}`,
       },

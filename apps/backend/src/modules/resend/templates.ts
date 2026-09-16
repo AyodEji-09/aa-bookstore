@@ -99,7 +99,7 @@ export function renderOrderPlacedEmail(data: OrderEmailData): {
   html: string
 } {
   const orderRef = data.display_id ? `#${data.display_id}` : data.order_id
-  const subject = `Order Confirmed: ${orderRef} - Ayodeji Anifowose Bookstore`
+  const subject = `Order Confirmed: ${orderRef} - Ayodeji Anifowose Store`
 
   const itemsHtml = data.items
     .map((item) => {
@@ -109,7 +109,7 @@ export function renderOrderPlacedEmail(data: OrderEmailData): {
 
       const coverHtml = item.thumbnail
         ? `<img src="${item.thumbnail}" alt="${item.title}" style="width:52px;height:72px;object-fit:cover;border-radius:6px;border:1px solid #EEEEEE;" />`
-        : `<div style="width:52px;height:72px;background-color:#F5F5F5;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#999999;font-size:11px;font-weight:600;">Book</div>`
+        : `<div style="width:52px;height:72px;background-color:#F5F5F5;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#999999;font-size:11px;font-weight:600;">Item</div>`
 
       return `
         <tr>
@@ -132,9 +132,9 @@ export function renderOrderPlacedEmail(data: OrderEmailData): {
   const digitalActionBanner = data.has_digital_items
     ? `
       <div style="background-color:#FDF2F2;border:1px solid #F9D6D6;border-radius:12px;padding:20px;margin:28px 0;text-align:center;">
-        <div style="font-size:16px;font-weight:800;color:#980000;margin-bottom:6px;">Your Digital Books are Ready!</div>
+        <div style="font-size:16px;font-weight:800;color:#980000;margin-bottom:6px;">Your Digital Items are Ready!</div>
         <div style="font-size:13px;color:#4A3B32;line-height:1.5;margin-bottom:16px;">
-          You can stream your audiobooks or read your ebooks immediately in your digital library.
+          You can access your digital purchases immediately in your digital library.
         </div>
         <a href="${data.library_url}" style="display:inline-block;background-color:#980000;color:#FFFFFF;padding:12px 24px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;letter-spacing:0.2px;">
           Open My Digital Library &rarr;
@@ -170,7 +170,7 @@ export function renderOrderPlacedEmail(data: OrderEmailData): {
                 <tr>
                   <td style="padding:28px 32px;background-color:#980000;text-align:center;">
                     <div style="font-size:18px;font-weight:900;color:#FFFFFF;letter-spacing:0.5px;text-transform:uppercase;">
-                      Ayodeji Anifowose Bookstore
+                      Ayodeji Anifowose Store
                     </div>
                   </td>
                 </tr>
@@ -180,7 +180,7 @@ export function renderOrderPlacedEmail(data: OrderEmailData): {
                   <td style="padding:32px;">
                     <h1 style="margin:0 0 12px;font-size:22px;font-weight:800;color:#1F1F1F;">Thank You for Your Order!</h1>
                     <p style="margin:0 0 20px;font-size:14px;color:#555555;line-height:1.5;">
-                      Hello ${data.customer_name || "Reader"}, your order has been confirmed. Below are your purchase details.
+                      Hello ${data.customer_name || "Customer"}, your order has been confirmed. Below are your purchase details.
                     </p>
 
                     ${digitalActionBanner}
@@ -225,7 +225,7 @@ export function renderOrderPlacedEmail(data: OrderEmailData): {
                 <!-- Footer -->
                 <tr>
                   <td style="padding:24px 32px;background-color:#FAFAFA;border-top:1px solid #F0F0F0;text-align:center;font-size:11px;color:#888888;line-height:1.5;">
-                    &copy; ${new Date().getFullYear()} Ayodeji Anifowose Bookstore. All rights reserved.<br />
+                    &copy; ${new Date().getFullYear()} Ayodeji Anifowose Store. All rights reserved.<br />
                     Questions? Reply to this email or visit our store support.
                   </td>
                 </tr>
@@ -246,16 +246,16 @@ export function renderPasswordResetEmail(data: PasswordResetEmailData): {
 } {
   const isAdmin = data.actor_type === "user"
   const subject = isAdmin
-    ? "Reset Your Admin Password - Ayodeji Anifowose Bookstore"
-    : "Reset Your Password - Ayodeji Anifowose Bookstore"
+    ? "Reset Your Admin Password - Ayodeji Anifowose Store"
+    : "Reset Your Password - Ayodeji Anifowose Store"
 
   const title = isAdmin
     ? "Admin Password Reset Request"
     : "Password Reset Request"
 
   const greeting = isAdmin
-    ? `Hello Administrator, we received a request to reset your password for your bookstore management account (${data.email}).`
-    : `Hello ${data.customer_name || "Reader"}, we received a request to reset your password for your bookstore account (${data.email}).`
+    ? `Hello Administrator, we received a request to reset your password for your store management account (${data.email}).`
+    : `Hello ${data.customer_name || "Customer"}, we received a request to reset your password for your store account (${data.email}).`
 
   const buttonText = isAdmin ? "Reset Admin Password" : "Reset Password"
 
@@ -275,7 +275,7 @@ export function renderPasswordResetEmail(data: PasswordResetEmailData): {
                 <tr>
                   <td style="padding:28px 32px;background-color:#980000;text-align:center;">
                     <div style="font-size:18px;font-weight:900;color:#FFFFFF;letter-spacing:0.5px;text-transform:uppercase;">
-                      Ayodeji Anifowose Bookstore
+                      Ayodeji Anifowose Store
                     </div>
                   </td>
                 </tr>
@@ -306,7 +306,7 @@ export function renderPasswordResetEmail(data: PasswordResetEmailData): {
                 <!-- Footer -->
                 <tr>
                   <td style="padding:20px 32px;background-color:#FAFAFA;border-top:1px solid #F0F0F0;text-align:center;font-size:11px;color:#888888;">
-                    &copy; ${new Date().getFullYear()} Ayodeji Anifowose Bookstore. All rights reserved.
+                    &copy; ${new Date().getFullYear()} Ayodeji Anifowose Store. All rights reserved.
                   </td>
                 </tr>
               </table>
@@ -373,7 +373,7 @@ export function renderAdminOrderPlacedEmail(data: OrderEmailData): {
                   <td style="padding:32px;">
                     <h1 style="margin:0 0 8px;font-size:20px;font-weight:800;color:#1F1F1F;">New Customer Order Placed!</h1>
                     <p style="margin:0 0 20px;font-size:13px;color:#666666;">
-                      A new order <strong>${orderRef}</strong> was just placed on your bookstore by <strong>${data.customer_name}</strong> (${data.customer_email || "N/A"}).
+                      A new order <strong>${orderRef}</strong> was just placed on your store by <strong>${data.customer_name}</strong> (${data.customer_email || "N/A"}).
                     </p>
 
                     <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top:16px;">
@@ -408,7 +408,7 @@ export function renderShipmentCreatedEmail(data: ShipmentEmailData): {
   html: string
 } {
   const orderRef = data.display_id ? `#${data.display_id}` : data.order_id
-  const subject = `Your Order ${orderRef} Has Shipped! - Ayodeji Anifowose Bookstore`
+  const subject = `Your Order ${orderRef} Has Shipped! - Ayodeji Anifowose Store`
 
   const itemsList = data.items
     .map(
@@ -450,15 +450,15 @@ export function renderShipmentCreatedEmail(data: ShipmentEmailData): {
                 <tr>
                   <td style="padding:28px 32px;background-color:#980000;text-align:center;">
                     <div style="font-size:18px;font-weight:900;color:#FFFFFF;letter-spacing:0.5px;text-transform:uppercase;">
-                      Ayodeji Anifowose Bookstore
+                      Ayodeji Anifowose Store
                     </div>
                   </td>
                 </tr>
                 <tr>
                   <td style="padding:32px;">
-                    <h1 style="margin:0 0 12px;font-size:22px;font-weight:800;color:#1F1F1F;">Your Books Are on the Way!</h1>
+                    <h1 style="margin:0 0 12px;font-size:22px;font-weight:800;color:#1F1F1F;">Your Order Is on the Way!</h1>
                     <p style="margin:0 0 16px;font-size:14px;color:#555555;line-height:1.5;">
-                      Hello ${data.customer_name || "Reader"}, your order <strong>${orderRef}</strong> has been shipped with our courier partner.
+                      Hello ${data.customer_name || "Customer"}, your order <strong>${orderRef}</strong> has been shipped with our courier partner.
                     </p>
 
                     ${trackingText}
@@ -474,7 +474,7 @@ export function renderShipmentCreatedEmail(data: ShipmentEmailData): {
                 </tr>
                 <tr>
                   <td style="padding:20px 32px;background-color:#FAFAFA;border-top:1px solid #F0F0F0;text-align:center;font-size:11px;color:#888888;">
-                    &copy; ${new Date().getFullYear()} Ayodeji Anifowose Bookstore. All rights reserved.
+                    &copy; ${new Date().getFullYear()} Ayodeji Anifowose Store. All rights reserved.
                   </td>
                 </tr>
               </table>
@@ -493,7 +493,7 @@ export function renderOrderDeliveredEmail(data: DeliveryEmailData): {
   html: string
 } {
   const orderRef = data.display_id ? `#${data.display_id}` : data.order_id
-  const subject = `Your Order ${orderRef} Has Been Delivered! - Ayodeji Anifowose Bookstore`
+  const subject = `Your Order ${orderRef} Has Been Delivered! - Ayodeji Anifowose Store`
 
   const itemsList = data.items
     .map(
@@ -520,7 +520,7 @@ export function renderOrderDeliveredEmail(data: DeliveryEmailData): {
                 <tr>
                   <td style="padding:28px 32px;background-color:#980000;text-align:center;">
                     <div style="font-size:18px;font-weight:900;color:#FFFFFF;letter-spacing:0.5px;text-transform:uppercase;">
-                      Ayodeji Anifowose Bookstore
+                      Ayodeji Anifowose Store
                     </div>
                   </td>
                 </tr>
@@ -528,7 +528,7 @@ export function renderOrderDeliveredEmail(data: DeliveryEmailData): {
                   <td style="padding:32px;">
                     <h1 style="margin:0 0 12px;font-size:22px;font-weight:800;color:#1F1F1F;">Package Delivered!</h1>
                     <p style="margin:0 0 16px;font-size:14px;color:#555555;line-height:1.5;">
-                      Hello ${data.customer_name || "Reader"}, your order <strong>${orderRef}</strong> has been delivered. We hope you enjoy your reading!
+                      Hello ${data.customer_name || "Customer"}, your order <strong>${orderRef}</strong> has been delivered. We hope you enjoy your items!
                     </p>
 
                     <div style="margin-top:24px;">
@@ -545,7 +545,7 @@ export function renderOrderDeliveredEmail(data: DeliveryEmailData): {
                 </tr>
                 <tr>
                   <td style="padding:20px 32px;background-color:#FAFAFA;border-top:1px solid #F0F0F0;text-align:center;font-size:11px;color:#888888;">
-                    &copy; ${new Date().getFullYear()} Ayodeji Anifowose Bookstore. All rights reserved.
+                    &copy; ${new Date().getFullYear()} Ayodeji Anifowose Store. All rights reserved.
                   </td>
                 </tr>
               </table>
@@ -566,7 +566,7 @@ export function renderOrderFulfillmentCreatedEmail(
   html: string
 } {
   const orderRef = data.display_id ? `#${data.display_id}` : data.order_id
-  const subject = `Your Order ${orderRef} Is Being Prepared! - Ayodeji Anifowose Bookstore`
+  const subject = `Your Order ${orderRef} Is Being Prepared! - Ayodeji Anifowose Store`
 
   const itemsList = data.items
     .map(
@@ -609,15 +609,15 @@ export function renderOrderFulfillmentCreatedEmail(
                 <tr>
                   <td style="padding:28px 32px;background-color:#980000;text-align:center;">
                     <div style="font-size:18px;font-weight:900;color:#FFFFFF;letter-spacing:0.5px;text-transform:uppercase;">
-                      Ayodeji Anifowose Bookstore
+                      Ayodeji Anifowose Store
                     </div>
                   </td>
                 </tr>
                 <tr>
                   <td style="padding:32px;">
-                    <h1 style="margin:0 0 12px;font-size:22px;font-weight:800;color:#1F1F1F;">Your Books Are Being Prepared!</h1>
+                    <h1 style="margin:0 0 12px;font-size:22px;font-weight:800;color:#1F1F1F;">Your Order Is Being Prepared!</h1>
                     <p style="margin:0 0 16px;font-size:14px;color:#555555;line-height:1.5;">
-                      Hello ${data.customer_name || "Reader"}, good news! Our team has created the fulfillment for your order <strong>${orderRef}</strong> and is currently packing your books.
+                      Hello ${data.customer_name || "Customer"}, good news! Our team has created the fulfillment for your order <strong>${orderRef}</strong> and is currently packing your items.
                     </p>
 
                     <div style="margin-top:24px;">
@@ -637,7 +637,7 @@ export function renderOrderFulfillmentCreatedEmail(
                 </tr>
                 <tr>
                   <td style="padding:20px 32px;background-color:#FAFAFA;border-top:1px solid #F0F0F0;text-align:center;font-size:11px;color:#888888;">
-                    &copy; ${new Date().getFullYear()} Ayodeji Anifowose Bookstore. All rights reserved.
+                    &copy; ${new Date().getFullYear()} Ayodeji Anifowose Store. All rights reserved.
                   </td>
                 </tr>
               </table>

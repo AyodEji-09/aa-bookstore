@@ -31,7 +31,7 @@ export default function CheckoutLayout({
           >
             <Image
               src="/images/logo.png"
-              alt="Ayodeji Anifowose Bookstore"
+              alt="Ayodeji Anifowose Store"
               width={160}
               height={44}
               className="h-8 sm:h-9 w-auto object-contain"

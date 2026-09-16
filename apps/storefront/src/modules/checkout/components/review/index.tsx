@@ -52,7 +52,7 @@ const Review = ({ cart }: { cart: HttpTypes.StoreCart }) => {
                 <LocalizedClientLink href="/shipping-returns" className="underline hover:text-black font-semibold">
                   Returns Policy
                 </LocalizedClientLink>{" "}
-                and acknowledge that you have read Ayodeji Anifowose Bookstore&apos;s{" "}
+                and acknowledge that you have read Ayodeji Anifowose Store&apos;s{" "}
                 <LocalizedClientLink href="/privacy" className="underline hover:text-black font-semibold">
                   Privacy Policy
                 </LocalizedClientLink>

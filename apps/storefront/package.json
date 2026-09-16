@@ -2,7 +2,7 @@
   "name": "@ayollc-bookstore/storefront",
   "version": "1.0.3",
   "private": true,
-  "description": "Storefront for Ayodeji Anifowose Bookstore built with Next.js and Medusa.",
+  "description": "Storefront for Ayodeji Anifowose Store built with Next.js and Medusa.",
   "keywords": [
     "medusa-storefront"
   ],

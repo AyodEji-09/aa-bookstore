@@ -4,8 +4,9 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { Mail, MapPin, Phone, Clock, BookOpen, HelpCircle } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Contact Us | Ayodeji Anifowose Bookstore",
-  description: "Get in touch with the Ayodeji Anifowose Bookstore team for order assistance, digital library support, author events, or general inquiries.",
+  title: "Contact Us | Ayodeji Anifowose Store",
+  description:
+    "Get in touch with the Ayodeji Anifowose Store team for order assistance, digital library support, or general inquiries.",
 }
 
 export default async function ContactPage() {

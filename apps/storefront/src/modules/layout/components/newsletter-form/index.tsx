@@ -22,7 +22,7 @@ export default function NewsletterForm() {
     <div className="space-y-3">
       {subscribed && (
         <div className="p-3 bg-white/10 border border-white/20 rounded text-xs text-white text-center font-medium">
-          Thank you for subscribing! You are now on the reader list.
+          Thank you for subscribing! You are now on our mailing list.
         </div>
       )}
       <form onSubmit={handleSubmit} className="space-y-2">
@@ -33,7 +33,7 @@ export default function NewsletterForm() {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Your email address"
           disabled={submitting}
-          className="w-full px-3.5 py-2.5 rounded text-xs text-[#980000] bg-white placeholder:text-[#980000]/50 focus:outline-none focus:ring-2 focus:ring-[#980000]/20 disabled:opacity-60"
+          className="w-full px-3.5 py-2.5 rounded text-xs text-[#980000] bg-white placeholder:text-[#980000] focus:outline-none focus:ring-2 focus:ring-[#980000]/20 disabled:opacity-60"
         />
         <button
           type="submit"

@@ -1,6 +1,6 @@
-# Ayodeji Anifowose Bookstore — Storefront
+# Ayodeji Anifowose Store — Storefront
 
-The official customer-facing storefront for the Ayodeji Anifowose Bookstore, built with **Next.js 15 (App Router)**, **Tailwind CSS**, and the **Medusa JS SDK**.
+The official customer-facing storefront for the Ayodeji Anifowose Store, built with **Next.js 15 (App Router)**, **Tailwind CSS**, and the **Medusa JS SDK**.
 
 ---
 

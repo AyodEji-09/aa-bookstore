@@ -8,9 +8,9 @@ import { listCollections } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
 
 export const metadata: Metadata = {
-  title: "Ayodeji Anifowose Bookstore",
+  title: "Ayodeji Anifowose Store",
   description:
-    "Ayodeji Anifowose Bookstore e-commerce storefront powered by Next.js and Medusa.",
+    "Official store of author Ayodeji Anifowose. Discover books, digital editions, audiobooks, and exclusive releases.",
 }
 
 export default async function Home(props: {

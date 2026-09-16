@@ -37,7 +37,7 @@ export class ResendNotificationService extends AbstractNotificationProviderServi
       from:
         options?.from ||
         process.env.RESEND_FROM_EMAIL ||
-        "Ayodeji Anifowose Bookstore <onboarding@resend.dev>",
+        "Ayodeji Anifowose Store <onboarding@resend.dev>",
     }
     this.logger_ = logger
 
@@ -74,7 +74,7 @@ export class ResendNotificationService extends AbstractNotificationProviderServi
     const from = notification.from?.trim() || this.config_.from!
     const template = notification.template
 
-    let subject = notification.content?.subject || "Notification from Bookstore"
+    let subject = notification.content?.subject || "Notification from Store"
     let html = notification.content?.html || ""
 
     if (template === "order-placed") {

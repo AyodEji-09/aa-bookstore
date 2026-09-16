@@ -3,8 +3,9 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { Truck, Zap } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Shipping & Returns Policy | Ayodeji Anifowose Bookstore",
-  description: "Learn about our shipping options for physical editions, instant digital delivery for eBooks and audiobooks, and our 30-day replacement policy.",
+  title: "Shipping & Returns Policy | Ayodeji Anifowose Store",
+  description:
+    "Learn about our shipping options for physical orders, instant digital delivery for eBooks and audiobooks, and our guarantee policy.",
 }
 
 export default async function ShippingReturnsPage() {

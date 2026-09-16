@@ -1,6 +1,6 @@
-# Ayodeji Anifowose Bookstore — Backend
+# Ayodeji Anifowose Store — Backend
 
-The backend commerce application for the Ayodeji Anifowose Bookstore, powered by **Medusa v2** (`@medusajs/medusa`).
+The backend commerce application for the Ayodeji Anifowose Store, powered by **Medusa v2** (`@medusajs/medusa`).
 
 ---
 

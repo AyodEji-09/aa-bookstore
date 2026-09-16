@@ -2,8 +2,9 @@ import { Metadata } from "next"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Ayodeji Anifowose Bookstore",
-  description: "Read the privacy policy of Ayodeji Anifowose Bookstore, detailing how we protect your personal data, payments, and digital library information.",
+  title: "Privacy Policy | Ayodeji Anifowose Store",
+  description:
+    "Read the privacy policy of Ayodeji Anifowose Store, detailing how we protect your personal data, payments, and account information.",
 }
 
 export default async function PrivacyPolicyPage() {
@@ -26,7 +27,7 @@ export default async function PrivacyPolicyPage() {
           <section className="space-y-3">
             <h2 className="text-base sm:text-lg font-bold text-[#382C2C]">1. Overview</h2>
             <p>
-              Ayodeji Anifowose Bookstore (“we,” “our,” or “us”) respects your privacy and is dedicated to safeguarding your personal data. This Privacy Policy describes the types of information we collect when you visit our website, purchase physical or digital titles, or interact with our digital reader and audiobook streaming player.
+              Ayodeji Anifowose Store (“we,” “our,” or “us”) respects your privacy and is dedicated to safeguarding your personal data. This Privacy Policy describes the types of information we collect when you visit our website, purchase physical products or digital titles, or interact with our digital reader and audiobook streaming player.
             </p>
           </section>
 

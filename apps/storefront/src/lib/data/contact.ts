@@ -21,7 +21,7 @@ export async function submitContactInquiry(data: ContactFormData): Promise<{ suc
   }
 
   const apiKey = process.env.RESEND_API_KEY
-  const fromEmail = process.env.RESEND_FROM_EMAIL || "Ayodeji Anifowose Bookstore <onboarding@resend.dev>"
+  const fromEmail = process.env.RESEND_FROM_EMAIL || "Ayodeji Anifowose Store <onboarding@resend.dev>"
   const targetEmail = "akandefortunatus2021@gmail.com"
 
   if (!apiKey) {
@@ -36,7 +36,7 @@ export async function submitContactInquiry(data: ContactFormData): Promise<{ suc
     from: fromEmail,
     to: targetEmail,
     reply_to: `${name} <${email}>`,
-    subject: `[Bookstore Inquiry] ${subject || "General Support"} - ${name}`,
+    subject: `[Store Inquiry] ${subject || "General Support"} - ${name}`,
     html: `
       <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;border:1px solid #EEEEEE;border-radius:12px;">
         <div style="background-color:#980000;color:#FFFFFF;padding:16px 20px;border-radius:8px;font-weight:bold;font-size:16px;text-transform:uppercase;letter-spacing:0.5px;">
@@ -53,7 +53,7 @@ export async function submitContactInquiry(data: ContactFormData): Promise<{ suc
           </div>
         </div>
         <div style="border-top:1px solid #EEEEEE;padding-top:16px;font-size:11px;color:#888888;">
-          Submitted via Ayodeji Anifowose Bookstore Contact Form at ${new Date().toLocaleString()}
+          Submitted via Ayodeji Anifowose Store Contact Form at ${new Date().toLocaleString()}
         </div>
       </div>
     `,

@@ -1,7 +1,7 @@
 {
   "name": "@ayollc-bookstore/backend",
   "version": "0.0.1",
-  "description": "Backend for Ayodeji Anifowose Bookstore built with Medusa.",
+  "description": "Backend for Ayodeji Anifowose Store built with Medusa.",
   "author": "Medusa (https://medusajs.com)",
   "license": "MIT",
   "keywords": [
