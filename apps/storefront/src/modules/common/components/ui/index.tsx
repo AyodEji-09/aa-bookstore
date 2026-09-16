@@ -83,7 +83,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || isLoading}
         className={clsx(
-          "inline-flex gap-2 items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+          "relative inline-flex gap-2 items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
           variant === "primary" &&
             "bg-brand-primary text-white hover:bg-brand-hover active:bg-brand-pressed shadow-sm focus-visible:ring-brand-primary",
           variant === "secondary" &&
@@ -97,7 +97,19 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         )}
         {...props}
       >
-        {isLoading ? <Spinner className="animate-spin w-4 h-4" /> : children}
+        <span
+          className={clsx(
+            "inline-flex items-center justify-center gap-2",
+            isLoading && "invisible"
+          )}
+        >
+          {children}
+        </span>
+        {isLoading && (
+          <span className="absolute inset-0 flex items-center justify-center">
+            <Spinner className="animate-spin w-4 h-4" />
+          </span>
+        )}
       </button>
     )
   }

@@ -187,7 +187,7 @@ const Shipping: React.FC<ShippingProps> = ({
             <Text>
               <button
                 onClick={handleEdit}
-                className="text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
+                className="text-gray-900 hover:text-gray-600 font-medium transition-colors"
                 data-testid="edit-delivery-button"
               >
                 Edit
