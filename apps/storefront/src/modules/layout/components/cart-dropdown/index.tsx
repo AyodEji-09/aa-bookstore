@@ -103,10 +103,10 @@ const CartDropdown = ({
         >
           <PopoverPanel
             static
-            className="hidden small:block absolute top-[calc(100%+12px)] right-0 bg-white border border-gray-100 rounded-lg shadow-sm w-[380px] sm:w-[420px] text-[#382C2C] z-30 overflow-hidden before:content-[''] before:absolute before:-top-5 before:inset-x-0 before:h-5"
+            className="hidden small:block absolute top-[calc(100%+12px)] right-0 bg-white border border-gray-100 rounded-lg shadow-lg w-[380px] sm:w-[420px] text-[#382C2C] z-30 flex flex-col max-h-[min(540px,calc(100vh-100px))] overflow-hidden before:content-[''] before:absolute before:-top-5 before:inset-x-0 before:h-5"
             data-testid="nav-cart-dropdown"
           >
-            <div className="px-4 py-3.5 border-b border-gray-100 flex items-center justify-between ">
+            <div className="px-4 py-3.5 border-b border-gray-100 flex items-center justify-between shrink-0 bg-white sticky top-0 z-10">
               <div className="flex items-center gap-2">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-[#382C2C]">
                   Shopping Cart
@@ -120,7 +120,7 @@ const CartDropdown = ({
             </div>
             {cartState && cartState.items?.length ? (
               <>
-                <div className="overflow-y-auto max-h-[360px] px-4 py-2 divide-y divide-gray-100 no-scrollbar">
+                <div className="overflow-y-auto flex-1 min-h-0 max-h-[360px] px-4 py-2 divide-y divide-gray-100 no-scrollbar [scrollbar-width:none] [&::-webkit-scrollbar]:hidden overscroll-contain">
                   {cartState.items
                     .sort((a, b) => {
                       return (a.created_at ?? "") > (b.created_at ?? "")
@@ -191,7 +191,7 @@ const CartDropdown = ({
                       </div>
                     ))}
                 </div>
-                <div className="px-4 py-4 border-t border-gray-100 flex flex-col gap-y-3.5 text-xs">
+                <div className="px-4 py-4 border-t border-gray-100 flex flex-col gap-y-3.5 text-xs shrink-0 bg-white sticky bottom-0 z-10">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-gray-500 font-medium">
                       Subtotal{" "}
