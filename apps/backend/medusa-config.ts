@@ -7,6 +7,10 @@ if (typeof dns.setDefaultResultOrder === "function") {
 
 loadEnv(process.env.NODE_ENV || "development", process.cwd())
 
+const isProduction = process.env.NODE_ENV === "production"
+const redisUrl = process.env.REDIS_URL
+const isRedisConfigured = isProduction && Boolean(redisUrl)
+
 const isR2Configured = Boolean(
   process.env.R2_ACCESS_KEY_ID &&
   process.env.R2_SECRET_ACCESS_KEY &&
@@ -20,11 +24,12 @@ const isStripeConfigured = Boolean(process.env.STRIPE_API_KEY)
 module.exports = defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
+    redisUrl: isRedisConfigured ? redisUrl : undefined,
     databaseDriverOptions: {
       connection: {
         ssl:
           process.env.DATABASE_URL?.includes("sslmode=require") ||
-          process.env.NODE_ENV === "production"
+          isProduction
             ? { rejectUnauthorized: false }
             : false,
       },
@@ -135,6 +140,34 @@ module.exports = defineConfig({
                   },
                 },
               ],
+            },
+          },
+        ]
+      : []),
+    ...(isRedisConfigured
+      ? [
+          {
+            resolve: "@medusajs/medusa/cache-redis",
+            options: {
+              redisUrl,
+            },
+          },
+          {
+            resolve: "@medusajs/medusa/event-bus-redis",
+            options: {
+              redisUrl,
+            },
+          },
+          {
+            resolve: "@medusajs/medusa/workflow-engine-redis",
+            options: {
+              redisUrl,
+            },
+          },
+          {
+            resolve: "@medusajs/medusa/locking-redis",
+            options: {
+              redisUrl,
             },
           },
         ]
