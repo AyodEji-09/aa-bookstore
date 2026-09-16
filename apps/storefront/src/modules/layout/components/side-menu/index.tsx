@@ -1,6 +1,6 @@
 "use client"
 
-import { Popover, PopoverPanel, Transition } from "@headlessui/react"
+import { Popover, PopoverPanel, Transition, Portal } from "@headlessui/react"
 import Image from "next/image"
 import useToggleState from "@lib/hooks/use-toggle-state"
 import { ArrowRightMini, XMark } from "@medusajs/icons"
@@ -44,7 +44,7 @@ const SideMenu = ({ regions, locales, currentLocale, categories = [] }: SideMenu
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </Popover.Button>
-
+            <Portal>
             {open && (
               <div
                 className="fixed inset-0 z-[80] bg-black/40 backdrop-blur-sm pointer-events-auto transition-opacity"
@@ -218,6 +218,7 @@ const SideMenu = ({ regions, locales, currentLocale, categories = [] }: SideMenu
                 </div>
               </PopoverPanel>
             </Transition>
+            </Portal>
           </>
         )}
       </Popover>

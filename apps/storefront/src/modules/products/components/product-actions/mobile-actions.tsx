@@ -134,7 +134,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
         </Transition>
       </div>
       <Transition appear show={state} as={Fragment}>
-        <Dialog as="div" className="relative z-[75]" onClose={close}>
+        <Dialog as="div" className="relative z-[90]" onClose={close}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
