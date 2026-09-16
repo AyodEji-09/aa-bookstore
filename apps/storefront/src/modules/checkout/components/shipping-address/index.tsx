@@ -168,15 +168,15 @@ const ShippingAddress = ({
   if (isDigital) {
     return (
       <div className="space-y-4">
-        <div className="p-3.5 bg-red-50/60 border border-[#980000]/20 rounded-lg text-xs text-[#382C2C] flex items-center justify-between">
-          <span>
-            Digital items will be delivered instantly to your account library
-            after purchase.
-          </span>
-          <span className="font-bold text-[#980000] uppercase text-[10px] tracking-wider px-2 py-0.5 bg-white rounded border border-[#980000]/30">
-            Instant Access
-          </span>
-        </div>
+        {/* <div className="p-3.5 bg-red-50/60 border border-[#980000]/20 rounded-lg text-xs text-[#382C2C] flex items-center justify-between"> */}
+        {/*   <span> */}
+        {/*     Digital items will be delivered instantly to your account library */}
+        {/*     after purchase. */}
+        {/*   </span> */}
+        {/*   <span className="font-bold text-[#980000] uppercase text-[10px] tracking-wider px-2 py-0.5 bg-white rounded border border-[#980000]/30"> */}
+        {/*     Instant Access */}
+        {/*   </span> */}
+        {/* </div> */}
 
         <div className="grid grid-cols-2 gap-4">
           <Input
