@@ -109,7 +109,7 @@ const Body: React.FC<{ children: React.ReactNode; className?: string }> = ({
   return (
     <div
       className={clx(
-        "flex-1 min-h-0 overflow-y-auto w-full px-1 py-1",
+        "flex-1 min-h-0 overflow-y-auto thin-scrollbar w-full px-1 py-1",
         className
       )}
     >

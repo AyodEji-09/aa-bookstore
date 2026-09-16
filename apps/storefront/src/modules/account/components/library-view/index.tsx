@@ -5,9 +5,9 @@ import Image from "next/image"
 import {
   BookOpen,
   Headphones,
-  Sparkles,
   ArrowRight,
 } from "lucide-react"
+import { clx } from "@modules/common/components/ui"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import {
   LibraryItem,
@@ -49,64 +49,62 @@ export default function LibraryView({ items }: LibraryViewProps) {
   }
 
   return (
-    <div className="w-full space-y-8" data-testid="digital-library-view">
-      {/* Library Title & Tab Navigation */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-gray-100">
-        <div>
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-[#980000]" />
-            <h1 className="text-2xl font-extrabold text-[#382C2C] tracking-tight">
-              My Digital Library
-            </h1>
-          </div>
-          <p className="text-xs text-[#4D4C4C] mt-1">
-            Read your eBooks and stream your audiobooks directly in your browser.
-          </p>
-        </div>
+    <div className="w-full" data-testid="digital-library-view">
+      {/* Page Header matching other dashboard pages */}
+      <div className="mb-8 flex flex-col gap-y-4">
+        <h1 className="text-2xl-semi">Digital Library</h1>
+        <p className="text-base-regular">
+          Access and enjoy your purchased eBooks and audiobooks online. Read chapters or stream audiobooks anytime directly from your account.
+        </p>
+      </div>
 
-        {/* Format Filter Tabs */}
-        <div className="flex items-center gap-1.5 p-1 bg-gray-100/80 rounded-xl self-start sm:self-center">
+      {/* Format Filter Tabs */}
+      {items.length > 0 && (
+        <div className="flex items-center gap-2 mb-6">
           <button
             type="button"
             onClick={() => setActiveTab("all")}
-            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
+            className={clx(
+              "px-3 py-1.5 text-xs font-semibold rounded-md transition-colors",
               activeTab === "all"
-                ? "bg-white text-[#382C2C] shadow-sm"
-                : "text-gray-500 hover:text-[#382C2C]"
-            }`}
+                ? "bg-[#980000] text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            )}
           >
             All ({items.length})
           </button>
           <button
             type="button"
             onClick={() => setActiveTab("ebook")}
-            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
+            className={clx(
+              "px-3 py-1.5 text-xs font-semibold rounded-md transition-colors inline-flex items-center gap-1.5",
               activeTab === "ebook"
-                ? "bg-white text-[#382C2C] shadow-sm"
-                : "text-gray-500 hover:text-[#382C2C]"
-            }`}
+                ? "bg-[#980000] text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            )}
           >
-            <BookOpen className="w-3.5 h-3.5 text-[#980000]" />
+            <BookOpen className="w-3.5 h-3.5" />
             <span>eBooks ({ebookCount})</span>
           </button>
           <button
             type="button"
             onClick={() => setActiveTab("audiobook")}
-            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
+            className={clx(
+              "px-3 py-1.5 text-xs font-semibold rounded-md transition-colors inline-flex items-center gap-1.5",
               activeTab === "audiobook"
-                ? "bg-white text-[#382C2C] shadow-sm"
-                : "text-gray-500 hover:text-[#382C2C]"
-            }`}
+                ? "bg-[#980000] text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            )}
           >
-            <Headphones className="w-3.5 h-3.5 text-[#980000]" />
+            <Headphones className="w-3.5 h-3.5" />
             <span>Audiobooks ({audiobookCount})</span>
           </button>
         </div>
-      </div>
+      )}
 
       {/* Book Grid */}
       {filteredItems.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-x-4 gap-y-8 sm:gap-x-6">
           {filteredItems.map((item) => {
             const isAudio = item.format === "audiobook"
             const isLoading = loadingItemId === item.id
@@ -115,85 +113,91 @@ export default function LibraryView({ items }: LibraryViewProps) {
             return (
               <div
                 key={item.id}
-                className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow p-4 flex flex-col justify-between group"
+                className="group flex flex-col justify-between h-full bg-white"
               >
                 <div>
-                  {/* Book Cover and Format Badge */}
-                  <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-gray-100 mb-4">
-                    {item.product?.thumbnail ? (
-                      <Image
-                        src={item.product.thumbnail}
-                        alt={item.product.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300 pointer-events-none"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
+                  {/* Book Cover Image */}
+                  <div
+                    onClick={() => handleOpenBook(item)}
+                    className="block relative overflow-hidden rounded-lg mb-2.5 sm:mb-3 cursor-pointer"
+                  >
+                    <div className="aspect-[3/4] w-full relative overflow-hidden rounded-lg bg-gray-100 flex items-center justify-center">
+                      {item.product?.thumbnail ? (
+                        <Image
+                          src={item.product.thumbnail}
+                          alt={item.product.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300 pointer-events-none"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
+                          {isAudio ? (
+                            <Headphones className="w-10 h-10 stroke-[1.5]" />
+                          ) : (
+                            <BookOpen className="w-10 h-10 stroke-[1.5]" />
+                          )}
+                        </div>
+                      )}
+
+                      {/* Format Pill Badge */}
+                      <div className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md bg-white/95 backdrop-blur-sm text-[10px] font-bold text-[#382C2C] flex items-center gap-1 shadow-sm">
                         {isAudio ? (
-                          <Headphones className="w-12 h-12 stroke-[1.5]" />
+                          <>
+                            <Headphones className="w-3 h-3 text-[#980000]" />
+                            <span>Audiobook</span>
+                          </>
                         ) : (
-                          <BookOpen className="w-12 h-12 stroke-[1.5]" />
+                          <>
+                            <BookOpen className="w-3 h-3 text-[#980000]" />
+                            <span>eBook</span>
+                          </>
                         )}
                       </div>
-                    )}
-
-                    {/* Format Pill Badge */}
-                    <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/95 backdrop-blur-sm shadow-sm flex items-center gap-1.5 text-[11px] font-bold text-[#382C2C]">
-                      {isAudio ? (
-                        <>
-                          <Headphones className="w-3 h-3 text-[#980000]" />
-                          <span>Audiobook</span>
-                        </>
-                      ) : (
-                        <>
-                          <BookOpen className="w-3 h-3 text-[#980000]" />
-                          <span>eBook</span>
-                        </>
-                      )}
                     </div>
                   </div>
 
-                  {/* Metadata */}
-                  <div className="space-y-1">
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-[#980000]">
-                      {item.product?.category || "Literature"}
-                    </p>
-                    <h3 className="text-sm font-bold text-[#382C2C] line-clamp-1 group-hover:text-[#980000] transition-colors">
+                  {/* Title & Author */}
+                  <div className="space-y-0.5 mb-2">
+                    <h3
+                      onClick={() => handleOpenBook(item)}
+                      className="font-bold text-sm sm:text-base text-[#382C2C] group-hover:text-[#980000] transition-colors line-clamp-1 cursor-pointer"
+                    >
                       {item.product?.title || "Digital Edition"}
                     </h3>
-                    <p className="text-xs text-[#4D4C4C] font-medium line-clamp-1">
-                      {item.product?.author || "Eric-Emmanuel Schmitt"}
+                    <p className="text-xs text-gray-500 line-clamp-1">
+                      {item.product?.author || "Ayodeji Anifowose"}
                     </p>
                   </div>
-                </div>
 
-                {/* Progress and Action Button */}
-                <div className="mt-4 pt-3 border-t border-gray-100 space-y-3">
-                  <div className="flex items-center justify-between text-[11px] text-[#4D4C4C]">
+                  {/* Progress Status */}
+                  <div className="flex items-center justify-between text-[11px] text-gray-500 my-1.5">
                     <span>
                       {isAudio ? "Track" : "Chapter"} {lastChapter}
                     </span>
-                    <span className="font-semibold text-gray-500">
+                    <span className="font-semibold text-gray-600">
                       {item.progress?.completed ? "Completed" : "In Progress"}
                     </span>
                   </div>
+                </div>
 
+                {/* Button - rounded like the others */}
+                <div className="mt-2">
                   <button
                     type="button"
                     onClick={() => handleOpenBook(item)}
                     disabled={isLoading}
-                    className="w-full py-2.5 px-4 rounded-xl bg-[#980000] hover:bg-[#800000] text-white text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95 disabled:opacity-50"
+                    className="w-full py-2.5 px-3 bg-[#980000] hover:bg-[#7a0000] active:scale-[0.99] text-white text-xs font-bold rounded-md flex items-center justify-center gap-x-1.5 transition-all disabled:opacity-50"
                   >
                     {isLoading ? (
                       <span>Loading...</span>
                     ) : isAudio ? (
                       <>
-                        <Headphones className="w-4 h-4" />
+                        <Headphones className="w-3.5 h-3.5 shrink-0" />
                         <span>Listen Now</span>
                       </>
                     ) : (
                       <>
-                        <BookOpen className="w-4 h-4" />
+                        <BookOpen className="w-3.5 h-3.5 shrink-0" />
                         <span>Read Now</span>
                       </>
                     )}
@@ -205,19 +209,19 @@ export default function LibraryView({ items }: LibraryViewProps) {
         </div>
       ) : (
         /* Empty State */
-        <div className="bg-gray-50/70 border border-dashed border-gray-200 rounded-3xl p-12 text-center flex flex-col items-center max-w-lg mx-auto">
-          <div className="w-16 h-16 rounded-2xl bg-red-50 text-[#980000] flex items-center justify-center mb-4">
-            <BookOpen className="w-8 h-8 stroke-[1.75]" />
+        <div className="border border-dashed border-gray-200 rounded-lg p-12 text-center flex flex-col items-center max-w-lg mx-auto">
+          <div className="w-12 h-12 rounded-full bg-red-50 text-[#980000] flex items-center justify-center mb-4">
+            <BookOpen className="w-6 h-6 stroke-[1.75]" />
           </div>
-          <h3 className="text-base font-bold text-[#382C2C]">
+          <h3 className="text-base-semi text-[#382C2C]">
             Your digital library is currently empty
           </h3>
-          <p className="text-xs text-[#4D4C4C] mt-2 max-w-sm leading-relaxed">
+          <p className="text-small-regular text-gray-500 mt-2 max-w-sm leading-relaxed">
             When you purchase an eBook or Audiobook from our catalog, it will appear here permanently for instant online reading and listening.
           </p>
           <LocalizedClientLink
             href="/store"
-            className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#980000] hover:bg-[#800000] text-white text-xs font-bold transition-all shadow-sm"
+            className="mt-6 inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-[#980000] hover:bg-[#7a0000] text-white text-xs font-bold transition-colors"
           >
             <span>Explore Book Catalog</span>
             <ArrowRight className="w-4 h-4" />
