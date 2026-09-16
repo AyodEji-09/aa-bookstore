@@ -172,7 +172,7 @@ export default function LibraryView({ items }: LibraryViewProps) {
                   {/* Progress Status */}
                   <div className="flex items-center justify-between text-[11px] text-gray-500 my-1.5">
                     <span>
-                      {isAudio ? "Track" : "Chapter"} {lastChapter}
+                      {isAudio ? "Track" : "Page"} {lastChapter}
                     </span>
                     <span className="font-semibold text-gray-600">
                       {item.progress?.completed ? "Completed" : "In Progress"}
