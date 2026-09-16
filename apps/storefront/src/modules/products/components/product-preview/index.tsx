@@ -19,8 +19,6 @@ export default function ProductPreview({
     product,
   })
 
-  const firstVariantId = product.variants?.[0]?.id
-
   return (
     <div className="group flex flex-col justify-between h-full bg-white">
       <div>
@@ -82,7 +80,7 @@ export default function ProductPreview({
       {/* Add To Cart Button */}
       <div className="mt-2">
         <AddToCartButton
-          variantId={firstVariantId}
+          variants={product.variants}
           countryCode={region?.countries?.[0]?.iso_2 || "us"}
         />
       </div>
