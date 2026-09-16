@@ -2,7 +2,14 @@
 
 import { useState, useRef, useEffect } from "react"
 import { addToCart } from "@lib/data/cart"
-import { ShoppingCart, Check, X, BookOpen, Headphones, ChevronDown } from "lucide-react"
+import {
+  ShoppingCart,
+  Check,
+  X,
+  BookOpen,
+  Headphones,
+  ChevronDown,
+} from "lucide-react"
 import { HttpTypes } from "@medusajs/types"
 import { getPricesForVariant } from "@lib/util/get-product-price"
 import { isDigitalVariant } from "@lib/util/is-digital"
@@ -96,16 +103,16 @@ export default function AddToCartButton({
           {isAddingId && !hasMultipleVariants
             ? "Adding..."
             : hasMultipleVariants
-            ? "Choose format"
+            ? "Add to cart"
             : "Add to cart"}
         </span>
-        {hasMultipleVariants && (
-          <ChevronDown
-            className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${
-              isOpen ? "rotate-180" : ""
-            }`}
-          />
-        )}
+        {/* {hasMultipleVariants && ( */}
+        {/*   <ChevronDown */}
+        {/*     className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${ */}
+        {/*       isOpen ? "rotate-180" : "" */}
+        {/*     }`} */}
+        {/*   /> */}
+        {/* )} */}
       </button>
 
       {/* In-Card Format Selector Overlay */}
