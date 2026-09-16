@@ -103,7 +103,7 @@ const CartDropdown = ({
         >
           <PopoverPanel
             static
-            className="hidden small:block absolute top-[calc(100%+12px)] right-0 bg-white border border-gray-100 rounded-lg shadow-lg w-[380px] sm:w-[420px] text-[#382C2C] z-30 flex flex-col max-h-[min(540px,calc(100vh-100px))] overflow-hidden before:content-[''] before:absolute before:-top-5 before:inset-x-0 before:h-5"
+            className="hidden small:flex small:flex-col absolute top-[calc(100%+12px)] right-0 bg-white border border-gray-100 rounded-lg shadow-lg w-[380px] sm:w-[420px] text-[#382C2C] z-30 max-h-[min(540px,calc(100vh-100px))] overflow-hidden before:content-[''] before:absolute before:-top-5 before:inset-x-0 before:h-5"
             data-testid="nav-cart-dropdown"
           >
             <div className="px-4 py-3.5 border-b border-gray-100 flex items-center justify-between shrink-0 bg-white sticky top-0 z-10">
@@ -120,7 +120,7 @@ const CartDropdown = ({
             </div>
             {cartState && cartState.items?.length ? (
               <>
-                <div className="overflow-y-auto flex-1 min-h-0 max-h-[360px] px-4 py-2 divide-y divide-gray-100 no-scrollbar [scrollbar-width:none] [&::-webkit-scrollbar]:hidden overscroll-contain">
+                <div className="overflow-y-auto flex-1 min-h-0 max-h-[220px] px-4 py-2 divide-y divide-gray-100 no-scrollbar [scrollbar-width:none] [&::-webkit-scrollbar]:hidden overscroll-contain">
                   {cartState.items
                     .sort((a, b) => {
                       return (a.created_at ?? "") > (b.created_at ?? "")
