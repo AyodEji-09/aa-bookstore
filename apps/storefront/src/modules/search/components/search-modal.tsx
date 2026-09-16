@@ -163,7 +163,7 @@ export default function SearchModal({
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search books, authors, categories..."
+                  placeholder="Search books, categories..."
                   className="w-full bg-transparent px-3.5 py-1 text-sm text-[#382C2C] placeholder-gray-400 focus:outline-none focus:ring-0 font-medium"
                 />
                 {loading ? (
@@ -263,7 +263,7 @@ export default function SearchModal({
                     </h3>
                     <p className="text-xs text-gray-500 max-w-sm mx-auto mb-5 leading-relaxed">
                       We couldn&apos;t find any titles matching your query. Try
-                      searching by author, topic, or browse all available titles.
+                      searching by topic, or browse all available titles.
                     </p>
                     <button
                       type="button"
@@ -271,7 +271,7 @@ export default function SearchModal({
                         closeModal()
                         router.push(`/${countryCode}/store`)
                       }}
-                      className="px-4 py-2 bg-[#980000] text-white text-xs font-bold rounded-xl hover:bg-[#800000] transition-colors"
+                      className="px-4 py-2 bg-[#980000] text-white text-xs font-bold rounded-md hover:bg-[#800000] transition-colors"
                     >
                       View All Books in Catalog
                     </button>
@@ -287,7 +287,7 @@ export default function SearchModal({
                       key={book.id}
                       onClick={() => handleSelectBook(book.handle)}
                       onMouseEnter={() => setSelectedIndex(index)}
-                      className={`group flex items-center gap-3 sm:gap-4 p-2 sm:p-2.5 rounded-xl cursor-pointer transition-all ${
+                      className={`group flex items-center gap-3 sm:gap-4 p-2 sm:p-2.5 rounded-md cursor-pointer transition-all ${
                         isHighlighted
                           ? "bg-[#FAF9F6] ring-1 ring-[#980000]/20"
                           : "hover:bg-gray-50/90 active:bg-gray-100"
@@ -384,7 +384,7 @@ export default function SearchModal({
                     ? `${results.length} book${
                         results.length === 1 ? "" : "s"
                       } found`
-                    : "Search Ayollc Bookstore"}
+                    : "Search Bookstore"}
                 </div>
               </div>
             </DialogPanel>
