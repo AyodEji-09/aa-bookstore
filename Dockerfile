@@ -1,9 +1,14 @@
 ###############################################################################
 # Stage 1 — Build the Medusa backend
+#
+# Uses Debian-based image (not Alpine) because @swc/core and other native
+# modules ship pre-built binaries for glibc, not musl.
 ###############################################################################
-FROM node:20-alpine AS builder
+FROM node:20-slim AS builder
 
-RUN apk add --no-cache python3 make g++
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 make g++ \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -12,7 +17,8 @@ COPY package.json package-lock.json turbo.json ./
 
 # Create a minimal storefront stub so the "apps/**" workspace glob resolves
 # without copying the real storefront code into the build.
-RUN mkdir -p apps/storefront && echo '{"name":"@ayollc-bookstore/storefront","version":"0.0.0","private":true}' > apps/storefront/package.json
+RUN mkdir -p apps/storefront && \
+    echo '{"name":"@ayollc-bookstore/storefront","version":"0.0.0","private":true}' > apps/storefront/package.json
 
 # Copy backend package.json for dependency resolution
 COPY apps/backend/package.json apps/backend/
@@ -27,7 +33,7 @@ COPY apps/backend/ apps/backend/
 RUN cd apps/backend && npx medusa build
 
 ###############################################################################
-# Stage 2 — Production runtime (no build tooling, no source code)
+# Stage 2 — Production runtime (lean image, no build tooling)
 ###############################################################################
 FROM node:20-alpine AS runner
 
@@ -37,11 +43,11 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Copy the compiled server output
+# Copy the compiled server output (already plain JS, no native build needed)
 COPY --from=builder /app/apps/backend/.medusa/server ./
 
 # Install only production dependencies for the compiled server
-RUN npm ci --omit=dev 2>/dev/null || npm install --omit=dev
+RUN npm install --omit=dev
 
 EXPOSE 9000
 
