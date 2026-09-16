@@ -94,7 +94,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
 
   return (
     <div
-      className="py-5 sm:py-6 flex gap-4 sm:gap-6 items-start"
+      className="py-4 sm:py-6 flex gap-3 sm:gap-6 items-start"
       data-testid="product-row"
     >
       <LocalizedClientLink
@@ -108,9 +108,9 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
         />
       </LocalizedClientLink>
 
-      <div className="flex-1 min-w-0 flex flex-col justify-between self-stretch min-h-[90px] sm:min-h-[105px]">
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-4">
-          <div className="min-w-0 flex-1 space-y-1">
+      <div className="flex-1 min-w-0 flex flex-col justify-between self-stretch gap-y-3 sm:gap-y-4">
+        <div className="flex items-start justify-between gap-x-3">
+          <div className="min-w-0 flex-1 space-y-0.5">
             <LocalizedClientLink href={`/products/${item.product_handle}`}>
               <Text
                 className="txt-medium-plus sm:text-base font-semibold text-ui-fg-base hover:text-ui-fg-interactive transition-colors line-clamp-2"
@@ -122,7 +122,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
             <LineItemOptions variant={item.variant} data-testid="product-variant" />
           </div>
 
-          <div className="sm:text-right shrink-0 sm:min-w-[110px]">
+          <div className="shrink-0 text-right pt-0.5">
             <LineItemPrice
               item={item}
               style="tight"
@@ -131,7 +131,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-4 mt-3 sm:mt-0 pt-2 sm:pt-0">
+        <div className="flex items-center justify-between gap-4 pt-1 sm:pt-2">
           <div className="flex items-center gap-3">
             {isDigitalItem(item) ? (
               <span className="h-9 px-3 flex items-center justify-center text-xs font-medium text-ui-fg-subtle border border-ui-border-base rounded-md bg-ui-bg-subtle">
