@@ -94,35 +94,33 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
 
   return (
     <div
-      className="py-4 sm:py-6 flex gap-3 sm:gap-6 items-start"
+      className="py-4 sm:py-5 flex flex-col gap-y-3 sm:gap-y-4"
       data-testid="product-row"
     >
-      <LocalizedClientLink
-        href={`/products/${item.product_handle}`}
-        className="w-20 sm:w-24 shrink-0 rounded-md overflow-hidden bg-ui-bg-subtle hover:opacity-90 transition-opacity border border-ui-border-base/50"
-      >
-        <Thumbnail
-          thumbnail={item.thumbnail}
-          images={item.variant?.product?.images}
-          size="square"
-        />
-      </LocalizedClientLink>
+      {/* Top: Image and Details (Title, Variant, Price) */}
+      <div className="flex gap-3.5 sm:gap-5 items-start">
+        <LocalizedClientLink
+          href={`/products/${item.product_handle}`}
+          className="w-20 sm:w-24 shrink-0 rounded-md overflow-hidden bg-ui-bg-subtle hover:opacity-90 transition-opacity border border-ui-border-base/50"
+        >
+          <Thumbnail
+            thumbnail={item.thumbnail}
+            images={item.variant?.product?.images}
+            size="square"
+          />
+        </LocalizedClientLink>
 
-      <div className="flex-1 min-w-0 flex flex-col justify-between self-stretch gap-y-3 sm:gap-y-4">
-        <div className="flex items-start justify-between gap-x-3">
-          <div className="min-w-0 flex-1 space-y-0.5">
-            <LocalizedClientLink href={`/products/${item.product_handle}`}>
-              <Text
-                className="txt-medium-plus sm:text-base font-semibold text-ui-fg-base hover:text-ui-fg-interactive transition-colors line-clamp-2"
-                data-testid="product-title"
-              >
-                {item.product_title}
-              </Text>
-            </LocalizedClientLink>
-            <LineItemOptions variant={item.variant} data-testid="product-variant" />
-          </div>
-
-          <div className="shrink-0 text-right pt-0.5">
+        <div className="min-w-0 flex-1 space-y-1">
+          <LocalizedClientLink href={`/products/${item.product_handle}`}>
+            <Text
+              className="txt-medium-plus sm:text-base font-semibold text-ui-fg-base hover:text-ui-fg-interactive transition-colors line-clamp-2"
+              data-testid="product-title"
+            >
+              {item.product_title}
+            </Text>
+          </LocalizedClientLink>
+          <LineItemOptions variant={item.variant} data-testid="product-variant" />
+          <div className="pt-0.5 w-fit [&>div]:items-start">
             <LineItemPrice
               item={item}
               style="tight"
@@ -130,54 +128,55 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
             />
           </div>
         </div>
+      </div>
 
-        <div className="flex items-center justify-between gap-4 pt-1 sm:pt-2">
-          <div className="flex items-center gap-3">
-            {isDigitalItem(item) ? (
-              <span className="h-9 px-3 flex items-center justify-center text-xs font-medium text-ui-fg-subtle border border-ui-border-base rounded-md bg-ui-bg-subtle">
-                Digital Edition &bull; Qty 1
+      {/* Bottom: Quantity and Remove under the image and text */}
+      <div className="flex items-center justify-between gap-4 pt-1">
+        <div className="flex items-center gap-2">
+          {isDigitalItem(item) ? (
+            <span className="h-9 px-3 flex items-center justify-center text-xs font-medium text-ui-fg-subtle border border-ui-border-base rounded-md bg-ui-bg-subtle">
+              Digital Edition &bull; Qty 1
+            </span>
+          ) : (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-ui-fg-subtle hidden sm:inline">
+                Qty:
               </span>
-            ) : (
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-ui-fg-subtle hidden sm:inline">
-                  Qty:
-                </span>
-                <CartItemSelect
-                  value={item.quantity}
-                  onChange={(value) =>
-                    changeQuantity(parseInt(value.target.value))
-                  }
-                  className="w-14 h-9"
-                  disabled={updating}
-                  data-testid="product-select-button"
-                >
-                  {Array.from(
-                    {
-                      length: Math.min(maxQuantity, 10),
-                    },
-                    (_, i) => (
-                      <option value={i + 1} key={i}>
-                        {i + 1}
-                      </option>
-                    )
-                  )}
-                </CartItemSelect>
-              </div>
-            )}
-            {updating && <Spinner className="w-4 h-4 text-ui-fg-subtle" />}
-          </div>
-
-          <DeleteButton
-            id={item.id}
-            data-testid="product-delete-button"
-            className="text-xs text-ui-fg-muted hover:text-ui-fg-danger transition-colors cursor-pointer"
-          >
-            <span className="text-xs">Remove</span>
-          </DeleteButton>
+              <CartItemSelect
+                value={item.quantity}
+                onChange={(value) =>
+                  changeQuantity(parseInt(value.target.value))
+                }
+                className="w-16 h-9"
+                disabled={updating}
+                data-testid="product-select-button"
+              >
+                {Array.from(
+                  {
+                    length: Math.min(maxQuantity, 10),
+                  },
+                  (_, i) => (
+                    <option value={i + 1} key={i}>
+                      {i + 1}
+                    </option>
+                  )
+                )}
+              </CartItemSelect>
+            </div>
+          )}
+          {updating && <Spinner className="w-4 h-4 text-ui-fg-subtle" />}
         </div>
 
-        <ErrorMessage error={error} data-testid="product-error-message" />
+        <DeleteButton
+          id={item.id}
+          data-testid="product-delete-button"
+          className="text-xs text-ui-fg-muted hover:text-ui-fg-danger transition-colors cursor-pointer"
+        >
+          <span className="text-xs">Remove</span>
+        </DeleteButton>
       </div>
+
+      <ErrorMessage error={error} data-testid="product-error-message" />
     </div>
   )
 }
