@@ -297,7 +297,8 @@ const TableRow = forwardRef<HTMLTableRowElement, TableRowProps>(
       <tr
         ref={ref}
         className={clsx(
-          "border-b transition-colors hover:bg-gray-50",
+          "border-b transition-colors",
+          !className?.includes("hover:bg-") && !className?.includes("hover:!bg-") && "hover:bg-gray-50",
           className
         )}
         {...props}
@@ -419,7 +420,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           type="checkbox"
           id={id}
           className={clsx(
-            "h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary",
+            "h-4 w-4 rounded border-gray-300 accent-[#980000] text-[#980000] focus:ring-[#980000] cursor-pointer",
             className
           )}
           {...props}

@@ -13,26 +13,27 @@ type ItemProps = {
 
 const Item = ({ item, currencyCode }: ItemProps) => {
   return (
-    <Table.Row className="w-full" data-testid="product-row">
-      <Table.Cell className="!pl-0 p-4 w-24">
-        <div className="flex w-16">
-          <Thumbnail thumbnail={item.thumbnail} size="square" />
+    <Table.Row className="w-full hover:bg-transparent" data-testid="product-row">
+      <Table.Cell className="!pl-0 py-3.5">
+        <div className="flex items-center gap-x-3 sm:gap-x-3.5">
+          <div className="w-14 sm:w-16 shrink-0 rounded-md overflow-hidden bg-ui-bg-subtle border border-ui-border-base/50">
+            <Thumbnail thumbnail={item.thumbnail} size="square" />
+          </div>
+          <div className="flex flex-col min-w-0">
+            <Text
+              className="txt-medium-plus text-ui-fg-base line-clamp-2"
+              data-testid="product-name"
+            >
+              {item.product_title}
+            </Text>
+            <LineItemOptions variant={item.variant} data-testid="product-variant" />
+          </div>
         </div>
       </Table.Cell>
 
-      <Table.Cell className="text-left">
-        <Text
-          className="txt-medium-plus text-ui-fg-base"
-          data-testid="product-name"
-        >
-          {item.product_title}
-        </Text>
-        <LineItemOptions variant={item.variant} data-testid="product-variant" />
-      </Table.Cell>
-
-      <Table.Cell className="!pr-0">
+      <Table.Cell className="!pr-0 text-right align-middle">
         <span className="!pr-0 flex flex-col items-end h-full justify-center">
-          <span className="flex gap-x-1 ">
+          <span className="flex gap-x-1">
             <Text className="text-ui-fg-muted">
               <span data-testid="product-quantity">{item.quantity}</span>x{" "}
             </Text>
