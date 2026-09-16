@@ -94,12 +94,12 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
 
   return (
     <div
-      className="py-4 sm:py-6 flex gap-4 sm:gap-6 items-start border-b border-ui-border-base last:border-b-0"
+      className="py-5 sm:py-6 flex gap-4 sm:gap-6 items-start"
       data-testid="product-row"
     >
       <LocalizedClientLink
         href={`/products/${item.product_handle}`}
-        className="w-16 sm:w-24 shrink-0"
+        className="w-20 sm:w-24 shrink-0 rounded-md overflow-hidden bg-ui-bg-subtle hover:opacity-90 transition-opacity border border-ui-border-base/50"
       >
         <Thumbnail
           thumbnail={item.thumbnail}
@@ -108,12 +108,12 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
         />
       </LocalizedClientLink>
 
-      <div className="flex-1 min-w-0 flex flex-col justify-between self-stretch gap-y-3">
-        <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-6">
-          <div className="flex flex-col gap-y-1 min-w-0 flex-1">
+      <div className="flex-1 min-w-0 flex flex-col justify-between self-stretch min-h-[90px] sm:min-h-[105px]">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-4">
+          <div className="min-w-0 flex-1 space-y-1">
             <LocalizedClientLink href={`/products/${item.product_handle}`}>
               <Text
-                className="txt-medium-plus text-ui-fg-base hover:text-ui-fg-subtle transition-colors"
+                className="txt-medium-plus sm:text-base font-semibold text-ui-fg-base hover:text-ui-fg-interactive transition-colors line-clamp-2"
                 data-testid="product-title"
               >
                 {item.product_title}
@@ -122,20 +122,42 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
             <LineItemOptions variant={item.variant} data-testid="product-variant" />
           </div>
 
-          <div className="flex items-center justify-between sm:justify-end gap-x-4 sm:gap-x-6">
-            <div className="flex items-center gap-2">
-              <DeleteButton id={item.id} data-testid="product-delete-button" />
-              {isDigitalItem(item) ? (
-                <span className="w-14 h-10 flex items-center justify-center text-sm font-medium text-ui-fg-subtle border border-ui-border-base rounded-md bg-ui-bg-subtle">
-                  1
+          <div className="sm:text-right shrink-0 sm:min-w-[110px]">
+            <LineItemPrice
+              item={item}
+              style="tight"
+              currencyCode={currencyCode}
+            />
+            {item.quantity > 1 && (
+              <span className="text-xs text-ui-fg-muted block mt-0.5 sm:text-right">
+                <LineItemUnitPrice
+                  item={item}
+                  style="tight"
+                  currencyCode={currencyCode}
+                />{" "}
+                each
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between gap-4 mt-3 sm:mt-0 pt-2 sm:pt-0">
+          <div className="flex items-center gap-3">
+            {isDigitalItem(item) ? (
+              <span className="h-9 px-3 flex items-center justify-center text-xs font-medium text-ui-fg-subtle border border-ui-border-base rounded-md bg-ui-bg-subtle">
+                Digital Edition &bull; Qty 1
+              </span>
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-ui-fg-subtle hidden sm:inline">
+                  Qty:
                 </span>
-              ) : (
                 <CartItemSelect
                   value={item.quantity}
                   onChange={(value) =>
                     changeQuantity(parseInt(value.target.value))
                   }
-                  className="w-14 h-10"
+                  className="w-14 h-9"
                   disabled={updating}
                   data-testid="product-select-button"
                 >
@@ -150,18 +172,18 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
                     )
                   )}
                 </CartItemSelect>
-              )}
-              {updating && <Spinner />}
-            </div>
-
-            <div className="text-right sm:min-w-[100px]">
-              <LineItemPrice
-                item={item}
-                style="tight"
-                currencyCode={currencyCode}
-              />
-            </div>
+              </div>
+            )}
+            {updating && <Spinner className="w-4 h-4 text-ui-fg-subtle" />}
           </div>
+
+          <DeleteButton
+            id={item.id}
+            data-testid="product-delete-button"
+            className="text-xs text-ui-fg-muted hover:text-ui-fg-danger transition-colors cursor-pointer"
+          >
+            <span className="text-xs">Remove</span>
+          </DeleteButton>
         </div>
 
         <ErrorMessage error={error} data-testid="product-error-message" />

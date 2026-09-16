@@ -22,7 +22,7 @@ const SkeletonCartPage = () => {
               <div className="pb-3 flex items-center">
                 <div className="w-20 h-12 bg-gray-200 animate-pulse" />
               </div>
-              <div className="flex flex-col">
+              <div className="flex flex-col divide-y divide-ui-border-base">
                 {repeat(3).map((index) => (
                   <SkeletonCartItem key={index} />
                 ))}

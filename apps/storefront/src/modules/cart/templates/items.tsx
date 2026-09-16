@@ -10,13 +10,24 @@ type ItemsTemplateProps = {
 
 const ItemsTemplate = ({ cart }: ItemsTemplateProps) => {
   const items = cart?.items
+  const totalCount = items?.reduce((acc, item) => acc + item.quantity, 0) ?? 0
 
   return (
-    <div>
-      <div className="pb-3 flex items-center">
-        <Heading className="text-[2rem] leading-[2.75rem]">Cart</Heading>
+    <div className="w-full">
+      <div className="pb-4 border-b border-ui-border-base flex items-baseline justify-between">
+        <div className="flex items-baseline gap-x-2.5">
+          <Heading level="h2" className="text-2xl sm:text-[2rem] sm:leading-[2.75rem] font-bold text-ui-fg-base">
+            Cart
+          </Heading>
+          {items && items.length > 0 && (
+            <span className="text-xs sm:text-sm text-ui-fg-muted font-medium">
+              ({totalCount} {totalCount === 1 ? "item" : "items"})
+            </span>
+          )}
+        </div>
       </div>
-      <div className="flex flex-col" data-testid="cart-items-container">
+
+      <div className="flex flex-col divide-y divide-ui-border-base" data-testid="cart-items-container">
         {items
           ? items
               .sort((a, b) => {
