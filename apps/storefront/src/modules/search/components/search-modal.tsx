@@ -15,11 +15,10 @@ import {
   X,
   Loader2,
   BookOpen,
-  Headphones,
-  Book,
   ArrowRight,
   TrendingUp,
   Sparkles,
+  ChevronRight,
 } from "lucide-react"
 
 type SearchModalProps = {
@@ -142,7 +141,7 @@ export default function SearchModal({
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" />
         </TransitionChild>
 
-        <div className="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-14">
+        <div className="fixed inset-0 z-10 overflow-y-auto p-2.5 sm:p-6 md:p-14">
           <TransitionChild
             as={Fragment}
             enter="ease-out duration-200"
@@ -157,14 +156,14 @@ export default function SearchModal({
               onKeyDown={handleKeyDown}
             >
               {/* Top Search Input Bar */}
-              <div className="relative flex items-center border-b border-gray-100 px-4 py-3.5 sm:px-6">
+              <div className="relative flex items-center border-b border-gray-100 px-4 py-3 sm:px-6">
                 <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
                 <input
                   ref={inputRef}
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search by title, author, format (audiobook, ebook...), or category..."
+                  placeholder="Search books, authors, categories..."
                   className="w-full bg-transparent px-3.5 py-1 text-sm text-[#382C2C] placeholder-gray-400 focus:outline-none focus:ring-0 font-medium"
                 />
                 {loading ? (
@@ -209,10 +208,10 @@ export default function SearchModal({
               </div>
 
               {/* Results Container */}
-              <div className="flex-1 overflow-y-auto thin-scrollbar p-4 sm:p-6 divide-y divide-gray-100">
+              <div className="flex-1 overflow-y-auto thin-scrollbar p-2 sm:p-3 space-y-1">
                 {/* When Query is Empty and No Results */}
                 {!query.trim() && results.length === 0 && !loading && (
-                  <div className="py-4">
+                  <div className="py-4 px-2">
                     <div className="flex items-center gap-2 mb-3 text-xs font-bold text-gray-400 uppercase tracking-wider">
                       <TrendingUp className="w-4 h-4 text-[#980000]" />
                       <span>Popular Searches</span>
@@ -234,9 +233,9 @@ export default function SearchModal({
                       ))}
                     </div>
 
-                    <div className="rounded-xl p-4 bg-[#FAF9F6] border border-gray-100 flex items-center justify-between text-xs">
+                    <div className="rounded-xl p-4 bg-[#FAF9F6] border border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
                       <div className="flex items-center gap-2 text-gray-600 font-medium">
-                        <Sparkles className="w-4 h-4 text-amber-500" />
+                        <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
                         <span>Looking to explore the complete catalog?</span>
                       </div>
                       <button
@@ -245,7 +244,7 @@ export default function SearchModal({
                           closeModal()
                           router.push(`/${countryCode}/store`)
                         }}
-                        className="font-bold text-[#980000] hover:underline flex items-center gap-1"
+                        className="font-bold text-[#980000] hover:underline flex items-center gap-1 shrink-0"
                       >
                         Browse All Books <ArrowRight className="w-3.5 h-3.5" />
                       </button>
@@ -255,7 +254,7 @@ export default function SearchModal({
 
                 {/* No Matches Found State */}
                 {query.trim() && results.length === 0 && !loading && (
-                  <div className="py-12 text-center">
+                  <div className="py-12 text-center px-4">
                     <div className="w-12 h-12 rounded-full bg-gray-100 text-gray-400 mx-auto flex items-center justify-center mb-3">
                       <Search className="w-6 h-6" />
                     </div>
@@ -264,8 +263,7 @@ export default function SearchModal({
                     </h3>
                     <p className="text-xs text-gray-500 max-w-sm mx-auto mb-5 leading-relaxed">
                       We couldn&apos;t find any titles matching your query. Try
-                      searching by author, topic, format (e.g. eBook), or browse
-                      all available editions.
+                      searching by author, topic, or browse all available titles.
                     </p>
                     <button
                       type="button"
@@ -289,14 +287,14 @@ export default function SearchModal({
                       key={book.id}
                       onClick={() => handleSelectBook(book.handle)}
                       onMouseEnter={() => setSelectedIndex(index)}
-                      className={`group flex items-center gap-4 py-3 px-3 rounded-xl cursor-pointer transition-colors ${
+                      className={`group flex items-center gap-3 sm:gap-4 p-2 sm:p-2.5 rounded-xl cursor-pointer transition-all ${
                         isHighlighted
-                          ? "bg-[#FAF9F6] border border-[#980000]/20"
-                          : "hover:bg-gray-50 border border-transparent"
+                          ? "bg-[#FAF9F6] ring-1 ring-[#980000]/20"
+                          : "hover:bg-gray-50/90 active:bg-gray-100"
                       }`}
                     >
-                      {/* Book Thumbnail */}
-                      <div className="relative w-12 h-16 sm:w-14 sm:h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 shadow-sm border border-gray-200/50">
+                      {/* Book Cover Thumbnail */}
+                      <div className="relative w-11 h-15 sm:w-12 sm:h-16 bg-gray-100 rounded-md overflow-hidden flex-shrink-0 shadow-xs border border-gray-200/60">
                         {book.thumbnail ? (
                           <Image
                             src={book.thumbnail}
@@ -314,71 +312,43 @@ export default function SearchModal({
 
                       {/* Book Info */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h4 className="text-sm font-bold text-[#382C2C] truncate group-hover:text-[#980000] transition-colors">
+                        <div className="flex items-center justify-between gap-2">
+                          <h4 className="text-sm font-semibold text-gray-900 truncate group-hover:text-[#980000] transition-colors">
                             {book.title}
                           </h4>
-                        </div>
-
-                        <p className="text-xs text-gray-500 mb-2 truncate">
-                          By{" "}
-                          <span className="font-semibold text-gray-700">
-                            {book.author}
-                          </span>
-                        </p>
-
-                        {/* Format Badges */}
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          {book.formats.map((fmt) => {
-                            const isAudio = fmt.format === "audiobook"
-                            return (
-                              <span
-                                key={fmt.name}
-                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                                  isAudio
-                                    ? "bg-amber-50 text-amber-900 border border-amber-200"
-                                    : fmt.isDigital
-                                    ? "bg-red-50 text-brand-primary border border-red-200"
-                                    : "bg-gray-100 text-gray-700 border border-gray-200"
-                                }`}
-                              >
-                                {isAudio ? (
-                                  <Headphones className="w-2.5 h-2.5" />
-                                ) : (
-                                  <Book className="w-2.5 h-2.5" />
-                                )}
-                                <span>{fmt.name}</span>
-                              </span>
-                            )
-                          })}
-                        </div>
-                      </div>
-
-                      {/* Price & Action */}
-                      <div className="text-right flex-shrink-0 pl-2">
-                        {book.price ? (
-                          <div className="space-y-0.5">
-                            <span className="text-[10px] text-gray-400 block font-medium">
-                              From
-                            </span>
-                            <span className="text-xs sm:text-sm font-black text-[#980000]">
+                          {book.price ? (
+                            <span className="text-xs sm:text-sm font-bold text-gray-900 shrink-0 group-hover:text-[#980000] transition-colors">
                               {book.price.calculatedPrice}
                             </span>
-                            {book.price.originalPrice && (
-                              <span className="text-[10px] text-gray-400 line-through block">
-                                {book.price.originalPrice}
+                          ) : (
+                            <span className="text-xs text-gray-400 shrink-0">
+                              Available
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex items-center justify-between gap-2 mt-0.5">
+                          <p className="text-xs text-gray-500 truncate">
+                            By{" "}
+                            <span className="text-gray-700 font-medium">
+                              {book.author}
+                            </span>
+                            {book.categories?.[0] && (
+                              <span className="text-gray-400">
+                                {" "}
+                                &bull; {book.categories[0]}
                               </span>
                             )}
-                          </div>
-                        ) : (
-                          <span className="text-xs text-gray-400 italic">
-                            Available
-                          </span>
-                        )}
-                        <span className="inline-block mt-1 text-[11px] text-[#980000] font-bold opacity-0 group-hover:opacity-100 transition-opacity">
-                          View &rarr;
-                        </span>
+                          </p>
+                          {book.price?.originalPrice && (
+                            <span className="text-[11px] text-gray-400 line-through shrink-0">
+                              {book.price.originalPrice}
+                            </span>
+                          )}
+                        </div>
                       </div>
+
+                      <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-[#980000] group-hover:translate-x-0.5 transition-all flex-shrink-0 hidden sm:block" />
                     </div>
                   )
                 })}
@@ -386,7 +356,7 @@ export default function SearchModal({
 
               {/* Modal Footer with Keyboard Shortcuts */}
               <div className="px-4 py-2.5 bg-[#FAF9F6] border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-500">
-                <div className="flex items-center gap-3">
+                <div className="hidden sm:flex items-center gap-3">
                   <span className="flex items-center gap-1">
                     <kbd className="px-1.5 py-0.5 bg-white rounded border border-gray-200 font-mono text-[10px]">
                       ↑
@@ -409,11 +379,12 @@ export default function SearchModal({
                     <span>close</span>
                   </span>
                 </div>
-                <div className="text-gray-400 hidden sm:block">
-                  {results.length > 0 &&
-                    `${results.length} book${
-                      results.length === 1 ? "" : "s"
-                    } found`}
+                <div className="text-gray-400 text-xs w-full sm:w-auto text-center sm:text-right">
+                  {results.length > 0
+                    ? `${results.length} book${
+                        results.length === 1 ? "" : "s"
+                      } found`
+                    : "Search Ayollc Bookstore"}
                 </div>
               </div>
             </DialogPanel>
