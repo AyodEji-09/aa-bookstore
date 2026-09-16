@@ -1,6 +1,12 @@
 "use client"
 
-import React, { useActionState, useEffect, useMemo } from "react"
+import React, {
+  useActionState,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
 import Input from "@modules/common/components/input"
 import NativeSelect from "@modules/common/components/native-select"
 import { Button } from "@modules/common/components/ui"
@@ -36,6 +42,57 @@ export default function ProfileForm({ customer, regions }: ProfileFormProps) {
         .flat() || []
     )
   }, [regions])
+
+  const initialValues = useMemo(
+    () => ({
+      first_name: customer.first_name || "",
+      last_name: customer.last_name || "",
+      phone: customer.phone || "",
+      company: billingAddress?.company || "",
+      address_1: billingAddress?.address_1 || "",
+      address_2: billingAddress?.address_2 || "",
+      postal_code: billingAddress?.postal_code || "",
+      city: billingAddress?.city || "",
+      province: billingAddress?.province || "",
+      country_code: billingAddress?.country_code || "",
+    }),
+    [customer, billingAddress]
+  )
+
+  const [formDataState, setFormDataState] = useState(initialValues)
+  const [savedValues, setSavedValues] = useState(initialValues)
+  const formDataRef = useRef(formDataState)
+  formDataRef.current = formDataState
+
+  useEffect(() => {
+    setFormDataState(initialValues)
+    setSavedValues(initialValues)
+  }, [initialValues])
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target
+    setFormDataState((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  const hasChanges = useMemo(() => {
+    return (
+      (formDataState.first_name || "").trim() !== (savedValues.first_name || "").trim() ||
+      (formDataState.last_name || "").trim() !== (savedValues.last_name || "").trim() ||
+      (formDataState.phone || "").trim() !== (savedValues.phone || "").trim() ||
+      (formDataState.company || "").trim() !== (savedValues.company || "").trim() ||
+      (formDataState.address_1 || "").trim() !== (savedValues.address_1 || "").trim() ||
+      (formDataState.address_2 || "").trim() !== (savedValues.address_2 || "").trim() ||
+      (formDataState.postal_code || "").trim() !== (savedValues.postal_code || "").trim() ||
+      (formDataState.city || "").trim() !== (savedValues.city || "").trim() ||
+      (formDataState.province || "").trim() !== (savedValues.province || "").trim() ||
+      (formDataState.country_code || "") !== (savedValues.country_code || "")
+    )
+  }, [formDataState, savedValues])
 
   const updateAllProfileInfo = async (
     _currentState: { success: boolean; error: string | null },
@@ -79,8 +136,9 @@ export default function ProfileForm({ customer, regions }: ProfileFormProps) {
       }
 
       return { success: true, error: null }
-    } catch (err: any) {
-      return { success: false, error: err?.message || String(err) }
+    } catch (err: unknown) {
+      const error = err as Error
+      return { success: false, error: error?.message || String(err) }
     }
   }
 
@@ -92,6 +150,7 @@ export default function ProfileForm({ customer, regions }: ProfileFormProps) {
   useEffect(() => {
     if (state.success) {
       toast.success("Profile updated successfully")
+      setSavedValues(formDataRef.current)
     }
     if (state.error) {
       toast.error(state.error)
@@ -112,14 +171,16 @@ export default function ProfileForm({ customer, regions }: ProfileFormProps) {
             label="First name"
             name="first_name"
             required
-            defaultValue={customer.first_name ?? ""}
+            value={formDataState.first_name}
+            onChange={handleChange}
             data-testid="first-name-input"
           />
           <Input
             label="Last name"
             name="last_name"
             required
-            defaultValue={customer.last_name ?? ""}
+            value={formDataState.last_name}
+            onChange={handleChange}
             data-testid="last-name-input"
           />
         </div>
@@ -137,7 +198,8 @@ export default function ProfileForm({ customer, regions }: ProfileFormProps) {
             label="Phone"
             name="phone"
             type="phone"
-            defaultValue={customer.phone ?? ""}
+            value={formDataState.phone}
+            onChange={handleChange}
             data-testid="phone-input"
           />
         </div>
@@ -152,32 +214,37 @@ export default function ProfileForm({ customer, regions }: ProfileFormProps) {
           <Input
             label="Company"
             name="company"
-            defaultValue={billingAddress?.company || undefined}
+            value={formDataState.company}
+            onChange={handleChange}
             data-testid="billing-company-input"
           />
           <Input
             label="Address"
             name="address_1"
-            defaultValue={billingAddress?.address_1 || undefined}
+            value={formDataState.address_1}
+            onChange={handleChange}
             data-testid="billing-address-1-input"
           />
           <Input
             label="Apartment, suite, etc."
             name="address_2"
-            defaultValue={billingAddress?.address_2 || undefined}
+            value={formDataState.address_2}
+            onChange={handleChange}
             data-testid="billing-address-2-input"
           />
           <div className="grid grid-cols-1 sm:grid-cols-[144px_1fr] gap-4">
             <Input
               label="Postal code"
               name="postal_code"
-              defaultValue={billingAddress?.postal_code || undefined}
+              value={formDataState.postal_code}
+              onChange={handleChange}
               data-testid="billing-postcal-code-input"
             />
             <Input
               label="City"
               name="city"
-              defaultValue={billingAddress?.city || undefined}
+              value={formDataState.city}
+              onChange={handleChange}
               data-testid="billing-city-input"
             />
           </div>
@@ -185,15 +252,17 @@ export default function ProfileForm({ customer, regions }: ProfileFormProps) {
             <Input
               label="Province"
               name="province"
-              defaultValue={billingAddress?.province || undefined}
+              value={formDataState.province}
+              onChange={handleChange}
               data-testid="billing-province-input"
             />
             <NativeSelect
               name="country_code"
-              defaultValue={billingAddress?.country_code || undefined}
+              value={formDataState.country_code}
+              onChange={handleChange}
+              placeholder="Select country"
               data-testid="billing-country-code-select"
             >
-              <option value="">Select country</option>
               {regionOptions.map((option, i) => (
                 <option key={i} value={option?.value}>
                   {option?.label}
@@ -210,6 +279,7 @@ export default function ProfileForm({ customer, regions }: ProfileFormProps) {
       <div className="flex justify-end pt-2">
         <Button
           isLoading={isPending}
+          disabled={!hasChanges || isPending}
           className="w-full small:max-w-[160px]"
           type="submit"
           data-testid="save-profile-button"

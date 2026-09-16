@@ -135,7 +135,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
         <Modal.Title>
           <Heading className="mb-2">Edit address</Heading>
         </Modal.Title>
-        <form action={formAction}>
+        <form action={formAction} className="flex flex-col flex-1 min-h-0 overflow-hidden">
           <input type="hidden" name="addressId" value={address.id} />
           <Modal.Body>
             <div className="grid grid-cols-1 gap-y-2">
@@ -227,18 +227,16 @@ const EditAddress: React.FC<EditAddressProps> = ({
             )}
           </Modal.Body>
           <Modal.Footer>
-            <div className="flex gap-3 mt-6">
-              <Button
-                type="reset"
-                variant="secondary"
-                onClick={close}
-                className="h-10"
-                data-testid="cancel-button"
-              >
-                Cancel
-              </Button>
-              <SubmitButton data-testid="save-button">Save</SubmitButton>
-            </div>
+            <Button
+              type="reset"
+              variant="secondary"
+              onClick={close}
+              className="h-10"
+              data-testid="cancel-button"
+            >
+              Cancel
+            </Button>
+            <SubmitButton data-testid="save-button">Save</SubmitButton>
           </Modal.Footer>
         </form>
       </Modal>
