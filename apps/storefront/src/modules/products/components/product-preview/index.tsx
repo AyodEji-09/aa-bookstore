@@ -27,7 +27,7 @@ export default function ProductPreview({
         {/* Book Cover Image */}
         <LocalizedClientLink
           href={`/products/${product.handle}`}
-          className="block relative overflow-hidden rounded-lg mb-4"
+          className="block relative overflow-hidden rounded-lg mb-2.5 sm:mb-4"
         >
           <div className="aspect-[3/4] w-full relative overflow-hidden rounded-lg bg-slate-900 shadow-md flex items-center justify-center">
             {product.thumbnail || product.images?.length ? (
@@ -51,7 +51,7 @@ export default function ProductPreview({
         </LocalizedClientLink>
 
         {/* Title & Author */}
-        <div className="space-y-0.5 mb-2">
+        <div className="space-y-0.5 mb-1.5 sm:mb-2">
           <LocalizedClientLink href={`/products/${product.handle}`}>
             <h3 className="font-bold text-base text-[#382C2C] group-hover:text-[#980000] transition-colors line-clamp-1">
               {product.title}
@@ -65,15 +65,17 @@ export default function ProductPreview({
         </div>
 
         {/* Price & Wishlist Heart */}
-        <div className="flex items-center justify-between my-2">
-          <div className="text-base font-extrabold text-[#382C2C]">
+        <div className="flex items-center justify-between gap-x-1.5 my-2">
+          <div className="flex-1 min-w-0 text-base font-extrabold text-[#382C2C]">
             {cheapestPrice ? (
               <PreviewPrice price={cheapestPrice} />
             ) : (
-              <span>$19.99</span>
+              <span className="whitespace-nowrap">$19.99</span>
             )}
           </div>
-          <WishlistHeartButton productId={product.id || ""} />
+          <div className="shrink-0">
+            <WishlistHeartButton productId={product.id || ""} />
+          </div>
         </div>
       </div>
 

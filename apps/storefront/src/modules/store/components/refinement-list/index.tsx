@@ -177,7 +177,7 @@ const RefinementList = ({
         <button
           type="button"
           onClick={() => setIsMobileOpen(true)}
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-gray-200 text-xs font-semibold text-[#4D4C4C] hover:border-[#980000] hover:text-[#980000] bg-white transition-all shadow-sm group"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md border border-gray-200 text-xs font-semibold text-[#4D4C4C] hover:border-[#980000] hover:text-[#980000] bg-white transition-all group"
         >
           <SlidersHorizontal className="w-3.5 h-3.5 text-[#980000]" />
           <span>Filter & Sort</span>

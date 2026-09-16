@@ -3,10 +3,10 @@ const SkeletonProductPreview = () => {
     <div className="flex flex-col justify-between h-full bg-white animate-pulse">
       <div>
         {/* Book Cover Image Skeleton (3:4 aspect ratio matching product card) */}
-        <div className="aspect-[3/4] w-full rounded-lg bg-gray-100 shadow-sm mb-4" />
+        <div className="aspect-[3/4] w-full rounded-lg bg-gray-100 shadow-sm mb-2.5 sm:mb-4" />
 
         {/* Title & Author Skeleton */}
-        <div className="space-y-1.5 mb-2">
+        <div className="space-y-1.5 mb-1.5 sm:mb-2">
           <div className="w-3/4 h-5 rounded bg-gray-100" />
           <div className="w-1/2 h-3.5 rounded bg-gray-100" />
         </div>
