@@ -76,7 +76,10 @@ const CartDropdown = ({
   return (
     <div className="h-full" onMouseEnter={openAndCancel} onMouseLeave={close}>
       <Popover className="relative h-full flex items-center">
-        <PopoverButton as="div" className="h-full flex items-center justify-center focus:outline-none">
+        <PopoverButton
+          as="div"
+          className="h-full flex items-center justify-center focus:outline-none"
+        >
           <LocalizedClientLink
             className="w-9 h-9 rounded-full border border-gray-200 text-[#382C2C] flex items-center justify-center relative hover:border-[#980000] hover:text-[#980000] transition-colors"
             href="/cart"
@@ -120,7 +123,7 @@ const CartDropdown = ({
             </div>
             {cartState && cartState.items?.length ? (
               <>
-                <div className="overflow-y-auto flex-1 min-h-0 max-h-[220px] px-4 py-2 divide-y divide-gray-100 no-scrollbar [scrollbar-width:none] [&::-webkit-scrollbar]:hidden overscroll-contain">
+                <div className="overflow-y-auto flex-1 min-h-0 max-h-[220px] px-4 py-2 divide-y divide-gray-100 thin-scrollbar">
                   {cartState.items
                     .sort((a, b) => {
                       return (a.created_at ?? "") > (b.created_at ?? "")

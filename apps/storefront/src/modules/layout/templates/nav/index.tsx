@@ -46,7 +46,7 @@ export default async function Nav() {
   return (
     <>
       {/* Top Utility & Announcement Bar */}
-      <div className="w-full bg-black text-white text-xs font-medium tracking-wide py-2.5 border-b border-white/10 relative z-30">
+      <div className="w-full bg-black text-white text-xs font-medium tracking-wide py-2.5 border-b border-white/10 relative z-50">
         <div className="content-container flex items-center justify-between gap-3 sm:gap-4 px-4 sm:px-6">
           {/* Announcement Message (Left-aligned, truncated on mobile, links to footer newsletter) */}
           <a
