@@ -63,7 +63,7 @@ export async function getOrSetCart(countryCode: string) {
     throw new Error(`Region not found for country code: ${countryCode}`)
   }
 
-  let cart = await retrieveCart(undefined, "id,region_id")
+  let cart = await retrieveCart(undefined, "id,region_id,*items,*items.metadata")
 
   const headers = {
     ...(await getAuthHeaders()),
@@ -86,7 +86,8 @@ export async function getOrSetCart(countryCode: string) {
 
   if (cart && cart?.region_id !== region.id) {
     try {
-      await sdk.store.cart.update(cart.id, { region_id: region.id }, {}, headers)
+      const updateResp = await sdk.store.cart.update(cart.id, { region_id: region.id }, {}, headers)
+      cart = updateResp.cart
       const cartCacheTag = await getCacheTag("carts")
       revalidateTag(cartCacheTag)
     } catch {
@@ -135,15 +136,17 @@ export async function addToCart({
     throw new Error("Missing variant ID when adding to cart")
   }
 
-  const cart = await getOrSetCart(countryCode)
+  const [cart, variant] = await Promise.all([
+    getOrSetCart(countryCode),
+    retrieveVariant(variantId),
+  ])
 
   if (!cart) {
     throw new Error("Error retrieving or creating cart")
   }
 
   // Check if item is already in cart
-  const fullCart = await retrieveCart(cart.id)
-  const existingItem = fullCart?.items?.find((item) => item.variant_id === variantId)
+  const existingItem = cart.items?.find((item) => item.variant_id === variantId)
 
   if (existingItem && isDigitalItem(existingItem)) {
     // Digital items are limited to a quantity of 1 per order
@@ -151,7 +154,6 @@ export async function addToCart({
   }
 
   let finalQuantity = quantity
-  const variant = await retrieveVariant(variantId)
   if (variant && isDigitalVariant(variant)) {
     finalQuantity = 1
 

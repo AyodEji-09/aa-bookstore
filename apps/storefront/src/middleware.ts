@@ -1,9 +1,11 @@
 import { HttpTypes } from "@medusajs/types"
 import { NextRequest, NextResponse } from "next/server"
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
+const BACKEND_URL = (
+  process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+).replace(/\/+$/, "")
 const PUBLISHABLE_API_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
-const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || "dk"
+const DEFAULT_REGION = (process.env.NEXT_PUBLIC_DEFAULT_REGION || "ng").toLowerCase()
 
 const regionMapCache = {
   regionMap: new Map<string, HttpTypes.StoreRegion>(),
@@ -18,52 +20,54 @@ async function getRegionMap(cacheId: string) {
   const { regionMap, regionMapUpdated } = regionMapCache
 
   if (!BACKEND_URL) {
-    throw new Error(
-      "Middleware.ts: Error fetching regions. Did you set up regions in your Medusa Admin and define a NEXT_PUBLIC_MEDUSA_BACKEND_URL environment variable."
-    )
+    return regionMapCache.regionMap
   }
 
   if (
     !regionMap.keys().next().value ||
     regionMapUpdated < Date.now() - REGION_CACHE_TIME * 1000
   ) {
-    // Fetch regions from Medusa. We can't use the JS client here because middleware is running on Edge and the client needs a Node environment.
-    const response = await fetch(`${BACKEND_URL}/store/regions`, {
-      method: "GET",
-      headers: {
-        "x-publishable-api-key": PUBLISHABLE_API_KEY!,
-      },
-      next: {
-        revalidate: REGION_CACHE_TIME,
-        tags: [`regions-${cacheId}`],
-      },
-      cache: "force-cache",
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => "")
-      console.error(
-        `Middleware.ts: Error fetching regions (${response.status}): ${errorText}`
-      )
-      throw new Error(`Backend returned ${response.status}: ${errorText}`)
-    }
-
-    const json = await response.json()
-
-    const { regions } = json
-
-    if (!regions?.length) {
-      return new Map<string, HttpTypes.StoreRegion>()
-    }
-
-    // Create a map of country codes to regions.
-    regions.forEach((region: HttpTypes.StoreRegion) => {
-      region.countries?.forEach((c) => {
-        regionMapCache.regionMap.set(c.iso_2 ?? "", region)
+    try {
+      // Fetch regions from Medusa. We can't use the JS client here because middleware is running on Edge and the client needs a Node environment.
+      const response = await fetch(`${BACKEND_URL}/store/regions`, {
+        method: "GET",
+        headers: {
+          "x-publishable-api-key": PUBLISHABLE_API_KEY!,
+        },
+        next: {
+          revalidate: REGION_CACHE_TIME,
+          tags: [`regions-${cacheId}`],
+        },
+        cache: "force-cache",
       })
-    })
 
-    regionMapCache.regionMapUpdated = Date.now()
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => "")
+        console.error(
+          `Middleware.ts: Error fetching regions (${response.status}): ${errorText}`
+        )
+        return regionMapCache.regionMap
+      }
+
+      const json = await response.json()
+      const { regions } = json
+
+      if (regions?.length) {
+        regionMapCache.regionMap.clear()
+        // Create a map of country codes to regions.
+        regions.forEach((region: HttpTypes.StoreRegion) => {
+          region.countries?.forEach((c) => {
+            if (c.iso_2) {
+              regionMapCache.regionMap.set(c.iso_2.toLowerCase(), region)
+            }
+          })
+        })
+        regionMapCache.regionMapUpdated = Date.now()
+      }
+    } catch (error) {
+      console.error("Middleware.ts: Failed to fetch regions from Medusa:", error)
+      return regionMapCache.regionMap
+    }
   }
 
   return regionMapCache.regionMap
@@ -82,20 +86,23 @@ async function getCountryCode(
 
   const urlCountryCode = request.nextUrl.pathname.split("/")[1]?.toLowerCase()
 
-  // Cloudflare Workers provides country via request.cf.country
-  const cloudflareCountryCode = (request as { cf?: { country?: string } }).cf?.country?.toLowerCase()
+  // Cloudflare Workers provides country via request.cf.country or cf-ipcountry header
+  const cfCountry =
+    (request as { cf?: { country?: string } }).cf?.country?.toLowerCase() ||
+    request.headers.get("cf-ipcountry")?.toLowerCase()
 
-  // Vercel provides x-vercel-ip-country header
-  const vercelCountryCode = request.headers
-    .get("x-vercel-ip-country")
-    ?.toLowerCase()
+  // Common CDN/proxy geo headers: Vercel, Cloudflare, Railway, Fly.io, etc.
+  const geoCountry =
+    cfCountry ||
+    request.headers.get("x-vercel-ip-country")?.toLowerCase() ||
+    request.headers.get("x-country-code")?.toLowerCase() ||
+    request.headers.get("x-country")?.toLowerCase() ||
+    request.headers.get("x-geo-country")?.toLowerCase()
 
   if (urlCountryCode && regionMap.has(urlCountryCode)) {
     countryCode = urlCountryCode
-  } else if (cloudflareCountryCode && regionMap.has(cloudflareCountryCode)) {
-    countryCode = cloudflareCountryCode
-  } else if (vercelCountryCode && regionMap.has(vercelCountryCode)) {
-    countryCode = vercelCountryCode
+  } else if (geoCountry && regionMap.has(geoCountry)) {
+    countryCode = geoCountry
   } else if (regionMap.has(DEFAULT_REGION)) {
     countryCode = DEFAULT_REGION
   } else if (regionMap.keys().next().value) {

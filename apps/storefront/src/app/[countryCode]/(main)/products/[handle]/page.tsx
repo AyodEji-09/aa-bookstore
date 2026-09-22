@@ -157,7 +157,9 @@ export default async function ProductPage(props: Props) {
       price: v.calculated_price?.calculated_amount || undefined,
       priceCurrency: region.currency_code?.toUpperCase(),
       availability:
-        v.inventory_quantity && v.inventory_quantity > 0
+        !v.manage_inventory ||
+        (v.inventory_quantity && v.inventory_quantity > 0) ||
+        v.allow_backorder
           ? "https://schema.org/InStock"
           : "https://schema.org/OutOfStock",
       url: `https://ayodejianifowose.com/${params.countryCode}/products/${pricedProduct.handle}`,

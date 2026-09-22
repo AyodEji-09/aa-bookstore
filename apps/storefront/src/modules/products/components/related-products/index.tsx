@@ -39,11 +39,13 @@ export default async function RelatedProducts({
       limit: 10,
     },
     countryCode,
-  }).then(({ response }) => {
-    return response.products
-      .filter((responseProduct) => responseProduct.id !== product.id)
-      .slice(0, 4)
   })
+    .then(({ response }) => {
+      return (response?.products || [])
+        .filter((responseProduct) => responseProduct.id !== product.id)
+        .slice(0, 4)
+    })
+    .catch(() => [])
 
   if (!products.length) {
     return null

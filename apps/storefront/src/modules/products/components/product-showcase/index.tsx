@@ -18,7 +18,7 @@ type ProductShowcaseProps = {
 
 export default function ProductShowcase({
   product,
-  region,
+  region: _region,
   countryCode,
   images,
 }: ProductShowcaseProps) {

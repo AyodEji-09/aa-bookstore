@@ -25,7 +25,7 @@ export default function ProductPurchase({
   product,
   selectedVariantId,
   countryCode,
-  selectedVariantPrice,
+  selectedVariantPrice: _selectedVariantPrice,
 }: ProductPurchaseProps) {
   const [quantity] = useState(1)
   const [isAdding, setIsAdding] = useState(false)
