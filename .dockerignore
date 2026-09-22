@@ -2,7 +2,7 @@
 node_modules
 **/node_modules
 
-# Build output (rebuilt inside Docker)
+# Build output
 apps/backend/.medusa
 apps/storefront/.next
 dist
@@ -11,7 +11,7 @@ out
 # Turbo cache
 .turbo
 
-# Environment files (secrets injected at runtime)
+# Environment files
 .env
 .env.*
 !.env.template
@@ -26,12 +26,3 @@ out
 *.swp
 *.swo
 .DS_Store
-
-# Documentation / config not needed at build time
-README.md
-CLAUDE.md
-AGENTS.md
-LICENSE
-
-# Storefront (not needed for backend image)
-apps/storefront
