@@ -48,6 +48,10 @@ module.exports = defineConfig({
       cookieSecret: process.env.COOKIE_SECRET,
     },
   },
+  admin: {
+    path: "/app",
+    disable: process.env.MEDUSA_ADMIN_DISABLED === "true",
+  },
   modules: [
     {
       resolve: "./src/modules/library",
