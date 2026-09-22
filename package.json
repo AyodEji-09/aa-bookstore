@@ -13,7 +13,11 @@
     "test": "turbo test",
     "backend:seed": "turbo seed --filter=@ayollc-bookstore/backend",
     "backend:dev": "turbo dev --filter=@ayollc-bookstore/backend",
-    "storefront:dev": "turbo dev --filter=@ayollc-bookstore/storefront"
+    "backend:build": "turbo build --filter=@ayollc-bookstore/backend",
+    "backend:start": "turbo start --filter=@ayollc-bookstore/backend",
+    "storefront:dev": "turbo dev --filter=@ayollc-bookstore/storefront",
+    "storefront:build": "turbo build --filter=@ayollc-bookstore/storefront",
+    "storefront:start": "turbo start --filter=@ayollc-bookstore/storefront"
   },
   "devDependencies": {
     "@medusajs/eslint-plugin": "2.19.0",
