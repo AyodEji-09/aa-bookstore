@@ -8,22 +8,25 @@ import {
   X,
   BookOpen,
   Headphones,
-  ChevronDown,
 } from "lucide-react"
 import { HttpTypes } from "@medusajs/types"
 import { getPricesForVariant } from "@lib/util/get-product-price"
 import { isDigitalVariant } from "@lib/util/is-digital"
+import MobileFormatDrawer from "./mobile-format-drawer"
 
 type AddToCartButtonProps = {
+  product?: HttpTypes.StoreProduct
   variants?: HttpTypes.StoreProductVariant[]
   countryCode: string
 }
 
 export default function AddToCartButton({
+  product,
   variants = [],
   countryCode,
 }: AddToCartButtonProps) {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false)
+  const [isDesktopPopupOpen, setIsDesktopPopupOpen] = useState(false)
   const [isAddingId, setIsAddingId] = useState<string | null>(null)
   const [successId, setSuccessId] = useState<string | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -31,16 +34,16 @@ export default function AddToCartButton({
   const hasMultipleVariants = variants.length > 1
   const singleVariant = variants[0]
 
-  // Close overlay on click outside
+  // Close desktop overlay on click outside
   useEffect(() => {
-    if (!isOpen) return
+    if (!isDesktopPopupOpen) return
 
     const handleClickOutside = (e: MouseEvent) => {
       if (
         containerRef.current &&
         !containerRef.current.contains(e.target as Node)
       ) {
-        setIsOpen(false)
+        setIsDesktopPopupOpen(false)
       }
     }
 
@@ -48,7 +51,7 @@ export default function AddToCartButton({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
-  }, [isOpen])
+  }, [isDesktopPopupOpen])
 
   const handleAddVariant = async (variantId: string, e?: React.MouseEvent) => {
     if (e) {
@@ -68,7 +71,8 @@ export default function AddToCartButton({
       setSuccessId(variantId)
       setTimeout(() => {
         setSuccessId(null)
-        setIsOpen(false)
+        setIsDesktopPopupOpen(false)
+        setIsMobileDrawerOpen(false)
       }, 700)
     } catch (err) {
       console.error("Failed to add item to cart:", err)
@@ -82,7 +86,11 @@ export default function AddToCartButton({
     e.stopPropagation()
 
     if (hasMultipleVariants) {
-      setIsOpen((prev) => !prev)
+      if (typeof window !== "undefined" && window.innerWidth < 768) {
+        setIsMobileDrawerOpen(true)
+      } else {
+        setIsDesktopPopupOpen((prev) => !prev)
+      }
     } else if (singleVariant?.id) {
       handleAddVariant(singleVariant.id)
     }
@@ -96,33 +104,22 @@ export default function AddToCartButton({
         disabled={!!isAddingId || (!hasMultipleVariants && !singleVariant?.id)}
         type="button"
         className="w-full py-2.5 px-3 bg-[#980000] hover:bg-[#7a0000] active:scale-[0.99] text-white text-xs font-bold rounded-md flex items-center justify-center gap-x-1.5 transition-all disabled:opacity-50 shadow-sm"
-        aria-expanded={isOpen}
+        aria-expanded={isDesktopPopupOpen || isMobileDrawerOpen}
       >
         <ShoppingCart className="w-3.5 h-3.5 shrink-0" />
         <span className="truncate">
-          {isAddingId && !hasMultipleVariants
-            ? "Adding..."
-            : hasMultipleVariants
-            ? "Add to cart"
-            : "Add to cart"}
+          {isAddingId && !hasMultipleVariants ? "Adding..." : "Add to cart"}
         </span>
-        {/* {hasMultipleVariants && ( */}
-        {/*   <ChevronDown */}
-        {/*     className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${ */}
-        {/*       isOpen ? "rotate-180" : "" */}
-        {/*     }`} */}
-        {/*   /> */}
-        {/* )} */}
       </button>
 
-      {/* In-Card Format Selector Overlay */}
-      {hasMultipleVariants && isOpen && (
+      {/* Desktop In-Card Format Selector Overlay (Hidden on Mobile) */}
+      {hasMultipleVariants && isDesktopPopupOpen && (
         <div
           onClick={(e) => {
             e.preventDefault()
             e.stopPropagation()
           }}
-          className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-lg shadow-xl border border-gray-200/90 p-2.5 z-30 animate-in fade-in zoom-in-95 duration-150"
+          className="hidden md:block absolute bottom-full left-0 right-0 mb-2 bg-white rounded-lg shadow-xl border border-gray-200/90 p-2.5 z-30 animate-in fade-in zoom-in-95 duration-150"
         >
           {/* Header */}
           <div className="flex items-center justify-between pb-2 mb-2 border-b border-gray-100">
@@ -133,7 +130,7 @@ export default function AddToCartButton({
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
-                setIsOpen(false)
+                setIsDesktopPopupOpen(false)
               }}
               type="button"
               className="text-gray-400 hover:text-gray-700 p-0.5 rounded transition-colors"
@@ -147,7 +144,9 @@ export default function AddToCartButton({
           {/* List of Variants / Formats */}
           <div className="space-y-1.5 max-h-48 overflow-y-auto no-scrollbar">
             {variants.map((v) => {
-              const priceData = getPricesForVariant(v as any)
+              const priceData = getPricesForVariant(
+                v as unknown as Parameters<typeof getPricesForVariant>[0]
+              )
               const isDigital = isDigitalVariant(v)
               const isAudio =
                 v.title?.toLowerCase().includes("audio") ||
@@ -193,6 +192,20 @@ export default function AddToCartButton({
             })}
           </div>
         </div>
+      )}
+
+      {/* Mobile Bottom Sheet Drawer */}
+      {hasMultipleVariants && (
+        <MobileFormatDrawer
+          isOpen={isMobileDrawerOpen}
+          onClose={() => setIsMobileDrawerOpen(false)}
+          product={product}
+          variants={variants}
+          countryCode={countryCode}
+          onAddToCart={handleAddVariant}
+          isAddingId={isAddingId}
+          successId={successId}
+        />
       )}
     </div>
   )

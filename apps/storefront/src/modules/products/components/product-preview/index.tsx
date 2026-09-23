@@ -80,8 +80,9 @@ export default function ProductPreview({
       {/* Add To Cart Button */}
       <div className="mt-2">
         <AddToCartButton
+          product={product}
           variants={product.variants}
-          countryCode={region?.countries?.[0]?.iso_2 || "us"}
+          countryCode={region?.countries?.[0]?.iso_2 || "ng"}
         />
       </div>
     </div>
