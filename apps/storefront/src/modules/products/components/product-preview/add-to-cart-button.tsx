@@ -2,13 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import { addToCart } from "@lib/data/cart"
-import {
-  ShoppingCart,
-  Check,
-  X,
-  BookOpen,
-  Headphones,
-} from "lucide-react"
+import { Check, X } from "lucide-react"
 import { HttpTypes } from "@medusajs/types"
 import { getPricesForVariant } from "@lib/util/get-product-price"
 import { isDigitalVariant } from "@lib/util/is-digital"
@@ -20,11 +14,22 @@ type AddToCartButtonProps = {
   countryCode: string
 }
 
+const isVariantInStock = (v: HttpTypes.StoreProductVariant) => {
+  if (isDigitalVariant(v)) return true
+  if (!v.manage_inventory) return true
+  if (v.allow_backorder) return true
+  return (v.inventory_quantity ?? 0) > 0
+}
+
 export default function AddToCartButton({
   product,
   variants = [],
   countryCode,
 }: AddToCartButtonProps) {
+  const initialVariant = variants.find(isVariantInStock) || variants[0]
+  const [selectedVariantId, setSelectedVariantId] = useState<string>(
+    initialVariant?.id || ""
+  )
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false)
   const [isDesktopPopupOpen, setIsDesktopPopupOpen] = useState(false)
   const [isAddingId, setIsAddingId] = useState<string | null>(null)
@@ -33,6 +38,15 @@ export default function AddToCartButton({
 
   const hasMultipleVariants = variants.length > 1
   const singleVariant = variants[0]
+
+  useEffect(() => {
+    if (isDesktopPopupOpen) {
+      const active = variants.find(isVariantInStock) || variants[0]
+      if (active?.id) {
+        setSelectedVariantId(active.id)
+      }
+    }
+  }, [isDesktopPopupOpen, variants])
 
   // Close desktop overlay on click outside
   useEffect(() => {
@@ -103,10 +117,9 @@ export default function AddToCartButton({
         onClick={handleMainButtonClick}
         disabled={!!isAddingId || (!hasMultipleVariants && !singleVariant?.id)}
         type="button"
-        className="w-full py-2.5 px-3 bg-[#980000] hover:bg-[#7a0000] active:scale-[0.99] text-white text-xs font-bold rounded-md flex items-center justify-center gap-x-1.5 transition-all disabled:opacity-50 shadow-sm"
+        className="w-full py-2.5 px-3 bg-[#980000] hover:bg-[#7a0000] active:scale-[0.99] text-white text-xs font-bold rounded-md gap-x-1.5 transition-all disabled:opacity-50 shadow-sm"
         aria-expanded={isDesktopPopupOpen || isMobileDrawerOpen}
       >
-        <ShoppingCart className="w-3.5 h-3.5 shrink-0" />
         <span className="truncate">
           {isAddingId && !hasMultipleVariants ? "Adding..." : "Add to cart"}
         </span>
@@ -148,34 +161,60 @@ export default function AddToCartButton({
                 v as unknown as Parameters<typeof getPricesForVariant>[0]
               )
               const isDigital = isDigitalVariant(v)
-              const isAudio =
-                v.title?.toLowerCase().includes("audio") ||
-                (v.metadata?.format as string) === "audiobook"
+              const variantInStock = isVariantInStock(v)
+              const isSelected = v.id === selectedVariantId
               const isAddingThis = isAddingId === v.id
               const isSuccessThis = successId === v.id
 
               return (
                 <button
                   key={v.id}
-                  onClick={(e) => handleAddVariant(v.id, e)}
-                  disabled={!!isAddingId}
+                  onClick={(e) => {
+                    setSelectedVariantId(v.id)
+                    handleAddVariant(v.id, e)
+                  }}
+                  onMouseEnter={() => {
+                    if (variantInStock) {
+                      setSelectedVariantId(v.id)
+                    }
+                  }}
+                  disabled={!!isAddingId || !variantInStock}
                   type="button"
-                  className="w-full flex items-center justify-between gap-2 p-2 rounded-md border border-gray-100 bg-gray-50/70 hover:bg-red-50/60 hover:border-red-200 active:scale-[0.98] transition-all text-left group"
+                  className={`relative overflow-hidden w-full flex items-center justify-between gap-2 px-3 py-2.5 border text-left transition-all group ${
+                    isSelected
+                      ? variantInStock
+                        ? "border-[#980000] bg-[#980000]/5 text-[#382C2C] font-semibold shadow-sm after:absolute after:bottom-0 after:inset-x-0 after:h-1 after:bg-[#980000]"
+                        : "border-[#980000] bg-gray-50/80 text-gray-400 font-normal shadow-sm after:absolute after:bottom-0 after:inset-x-0 after:h-1 after:bg-[#980000]"
+                      : variantInStock
+                      ? "border-[#980000] hover:bg-[#980000]/5 bg-white text-[#4D4C4C] font-semibold active:scale-[0.98] cursor-pointer"
+                      : "border-gray-200 bg-gray-50/80 text-gray-400 font-normal cursor-not-allowed select-none"
+                  }`}
                 >
                   <div className="flex items-center gap-1.5 min-w-0">
-                    {isAudio ? (
-                      <Headphones className="w-3.5 h-3.5 shrink-0 text-[#980000]" />
-                    ) : (
-                      <BookOpen className="w-3.5 h-3.5 shrink-0 text-[#980000]" />
-                    )}
-                    <span className="text-xs font-semibold text-[#382C2C] group-hover:text-[#980000] truncate">
+                    <span
+                      className={`text-xs truncate ${
+                        isSelected
+                          ? "font-semibold text-[#382C2C]"
+                          : variantInStock
+                          ? "font-semibold text-[#4D4C4C] group-hover:text-[#980000]"
+                          : "text-gray-400 font-normal"
+                      }`}
+                    >
                       {v.title || (isDigital ? "Digital" : "Standard")}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-1.5 shrink-0">
                     {priceData?.calculated_price && (
-                      <span className="text-xs font-extrabold text-[#382C2C]">
+                      <span
+                        className={`text-xs ${
+                          isSelected
+                            ? "font-extrabold text-[#382C2C]"
+                            : variantInStock
+                            ? "font-extrabold text-[#382C2C] group-hover:text-[#980000]"
+                            : "text-gray-400 font-normal"
+                        }`}
+                      >
                         {priceData.calculated_price}
                       </span>
                     )}
@@ -187,6 +226,24 @@ export default function AddToCartButton({
                       </span>
                     ) : null}
                   </div>
+
+                  {/* Diagonal Strikethrough for Out of Stock */}
+                  {!variantInStock && (
+                    <svg
+                      className="absolute inset-0 w-full h-full pointer-events-none"
+                      preserveAspectRatio="none"
+                    >
+                      <line
+                        x1="0"
+                        y1="100%"
+                        x2="100%"
+                        y2="0"
+                        stroke="#9ca3af"
+                        strokeWidth="1.5"
+                        strokeDasharray="3 3"
+                      />
+                    </svg>
+                  )}
                 </button>
               )
             })}

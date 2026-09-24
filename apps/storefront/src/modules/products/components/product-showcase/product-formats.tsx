@@ -84,7 +84,7 @@ export default function ProductFormats({
                 key={variant.id}
                 type="button"
                 onClick={() => onSelectVariant(variant)}
-                className={`flex flex-col items-center justify-center min-w-[110px] sm:min-w-[120px] px-4 py-3 rounded border text-center transition-all relative overflow-hidden ${
+                className={`flex flex-col items-center justify-center min-w-[110px] sm:min-w-[120px] px-4 py-3 border text-center transition-all relative overflow-hidden ${
                   isSelected
                     ? "border-[#980000] bg-[#980000]/5 text-[#382C2C] shadow-sm after:absolute after:bottom-0 after:inset-x-0 after:h-1 after:bg-[#980000]"
                     : "border-[#980000] hover:bg-[#980000]/5 bg-white text-[#4D4C4C]"
