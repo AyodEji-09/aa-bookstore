@@ -184,7 +184,7 @@ export default function AddToCartButton({
                     isSelected
                       ? variantInStock
                         ? "border-[#980000] bg-[#980000]/5 text-[#382C2C] font-semibold shadow-sm after:absolute after:bottom-0 after:inset-x-0 after:h-1 after:bg-[#980000]"
-                        : "border-[#980000] bg-gray-50/80 text-gray-400 font-normal shadow-sm after:absolute after:bottom-0 after:inset-x-0 after:h-1 after:bg-[#980000]"
+                        : "border-gray-200 bg-[#980000]/5 text-gray-400 font-normal cursor-not-allowed select-none"
                       : variantInStock
                       ? "border-[#980000] hover:bg-[#980000]/5 bg-white text-[#4D4C4C] font-semibold active:scale-[0.98] cursor-pointer"
                       : "border-gray-200 bg-gray-50/80 text-gray-400 font-normal cursor-not-allowed select-none"

@@ -3,11 +3,12 @@ import SkeletonCartTotals from "@modules/skeletons/components/skeleton-cart-tota
 
 const SkeletonOrderSummary = () => {
   return (
-    <div className="grid-cols-1">
+    <div className="flex flex-col gap-y-4">
+      <div className="w-32 h-8 bg-gray-200 rounded animate-pulse" />
+      <div className="w-36 h-4 bg-gray-200 rounded animate-pulse my-1" />
+      <div className="w-full h-px bg-gray-200" />
       <SkeletonCartTotals header={false} />
-      <div className="mt-4">
-        <SkeletonButton />
-      </div>
+      <SkeletonButton />
     </div>
   )
 }
