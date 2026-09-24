@@ -72,3 +72,7 @@ export const noDivisionCurrencies = [
   "xdr",
   "xau",
 ]
+
+export const PRODUCT_PREVIEW_FIELDS =
+  "id,title,subtitle,handle,thumbnail,collection.title,+metadata.author,*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.metadata"
+

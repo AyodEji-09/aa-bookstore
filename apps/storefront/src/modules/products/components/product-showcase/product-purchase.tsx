@@ -8,6 +8,7 @@ import { addToCart } from "@lib/data/cart"
 import { isDigitalVariant } from "@lib/util/is-digital"
 import { listLibraryItems } from "@lib/data/library"
 import { useWishlist } from "@lib/context/wishlist-context"
+import { useCart } from "@lib/context/cart-context"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ProductPrice from "@modules/products/components/product-price"
 
@@ -30,6 +31,7 @@ export default function ProductPurchase({
   const [quantity] = useState(1)
   const [isAdding, setIsAdding] = useState(false)
   const { isWishlisted, toggleWishlist } = useWishlist()
+  const { notifyItemAdded, notifyItemRemoved } = useCart()
   const isFavorite = isWishlisted(product.id || "")
   const [ownedFormats, setOwnedFormats] = useState<string[]>([])
 
@@ -71,15 +73,22 @@ export default function ProductPurchase({
       return
     }
 
+    const qtyToAdd = isDigital ? 1 : quantity
     setIsAdding(true)
+
+    // Immediate optimistic update (0ms perceived latency)
+    notifyItemAdded(qtyToAdd)
+    toast.success("Added to cart")
+
     try {
       await addToCart({
         variantId: variantIdToUse,
-        quantity: isDigital ? 1 : quantity,
+        quantity: qtyToAdd,
         countryCode,
       })
-      toast.success("Added to cart")
     } catch (err: unknown) {
+      // Revert optimistic count on failure
+      notifyItemRemoved(qtyToAdd)
       const error = err as Error
       toast.error(error.message || "Failed to add to cart")
     } finally {

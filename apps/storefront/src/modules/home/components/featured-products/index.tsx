@@ -1,4 +1,5 @@
 import { listProducts } from "@lib/data/products"
+import { PRODUCT_PREVIEW_FIELDS } from "@lib/constants"
 import { HttpTypes } from "@medusajs/types"
 import ProductRail from "@modules/home/components/featured-products/product-rail"
 
@@ -17,7 +18,7 @@ export default async function FeaturedProducts({
         regionId: region.id,
         queryParams: {
           collection_id: collection.id,
-          fields: "*variants.calculated_price",
+          fields: PRODUCT_PREVIEW_FIELDS,
         },
       })
 

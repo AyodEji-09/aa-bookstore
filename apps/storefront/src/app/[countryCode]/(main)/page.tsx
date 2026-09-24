@@ -1,9 +1,11 @@
 import { Metadata } from "next"
+import { Suspense } from "react"
 
 import FeaturedProducts from "@modules/home/components/featured-products"
 import Hero from "@modules/home/components/hero"
 import FeatureBar from "@modules/home/components/feature-bar"
-// import PlaceholderRail from "@modules/home/components/placeholder-rail"
+import SkeletonProductPreview from "@modules/skeletons/components/skeleton-product-preview"
+import repeat from "@lib/util/repeat"
 import { listCollections } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
 
@@ -31,16 +33,28 @@ export default async function Home(props: {
       <Hero />
       <FeatureBar />
 
-      {/* Placeholder Collection Rails matching exact homepage design */}
-      {/* <PlaceholderRail title="Selected for you" /> */}
-      {/* <PlaceholderRail title="Trending books" /> */}
-      {/* <PlaceholderRail title="Recently released ebooks" /> */}
-
-      {/* Dynamic Medusa Collections if present in DB */}
+      {/* Dynamic Medusa Collections streamed via Suspense */}
       {region && collections && collections.length > 0 && (
         <div className="py-4">
           <ul className="flex flex-col">
-            <FeaturedProducts collections={collections} region={region} />
+            <Suspense
+              fallback={
+                <div className="content-container py-10 space-y-12">
+                  <div className="space-y-4">
+                    <div className="w-48 h-8 rounded-lg animate-pulse bg-gray-200" />
+                    <ul className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                      {repeat(4).map((i) => (
+                        <li key={i}>
+                          <SkeletonProductPreview />
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              }
+            >
+              <FeaturedProducts collections={collections} region={region} />
+            </Suspense>
           </ul>
         </div>
       )}

@@ -16,6 +16,7 @@ import Thumbnail from "@modules/products/components/thumbnail"
 import { usePathname } from "next/navigation"
 import { Fragment, useEffect, useRef, useState } from "react"
 import { ShoppingCart, ArrowRight } from "lucide-react"
+import { useCart } from "@lib/context/cart-context"
 
 const CartDropdown = ({
   cart: cartState,
@@ -26,15 +27,28 @@ const CartDropdown = ({
     undefined
   )
   const [cartDropdownOpen, setCartDropdownOpen] = useState(false)
+  const {
+    optimisticCountDelta,
+    triggerCartDropdown,
+    resetCartNotification,
+    clearOptimisticDelta,
+  } = useCart()
 
   const open = () => setCartDropdownOpen(true)
   const close = () => setCartDropdownOpen(false)
 
-  const totalItems =
+  const serverTotalItems =
     cartState?.items?.reduce((acc, item) => {
       return acc + item.quantity
     }, 0) || 0
 
+  useEffect(() => {
+    if (optimisticCountDelta > 0) {
+      clearOptimisticDelta()
+    }
+  }, [serverTotalItems, clearOptimisticDelta])
+
+  const totalItems = serverTotalItems + optimisticCountDelta
   const subtotal = cartState?.subtotal ?? 0
   const itemRef = useRef<number>(totalItems || 0)
 
@@ -65,7 +79,14 @@ const CartDropdown = ({
 
   const pathname = usePathname()
 
-  // open cart dropdown when modifying the cart items, but only if we're not on the cart page
+  // open cart dropdown when modifying the cart items or triggered optimistically
+  useEffect(() => {
+    if (triggerCartDropdown && !pathname.includes("/cart")) {
+      timedOpen()
+      resetCartNotification()
+    }
+  }, [triggerCartDropdown, pathname, resetCartNotification])
+
   useEffect(() => {
     if (itemRef.current !== totalItems && !pathname.includes("/cart")) {
       timedOpen()

@@ -7,6 +7,7 @@ import { HttpTypes } from "@medusajs/types"
 import { getPricesForVariant } from "@lib/util/get-product-price"
 import { isDigitalVariant } from "@lib/util/is-digital"
 import MobileFormatDrawer from "./mobile-format-drawer"
+import { useCart } from "@lib/context/cart-context"
 
 type AddToCartButtonProps = {
   product?: HttpTypes.StoreProduct
@@ -35,6 +36,7 @@ export default function AddToCartButton({
   const [isAddingId, setIsAddingId] = useState<string | null>(null)
   const [successId, setSuccessId] = useState<string | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const { notifyItemAdded, notifyItemRemoved } = useCart()
 
   const hasMultipleVariants = variants.length > 1
   const singleVariant = variants[0]
@@ -76,19 +78,25 @@ export default function AddToCartButton({
     if (!variantId || isAddingId) return
 
     setIsAddingId(variantId)
+
+    // Immediate optimistic update (0ms perceived latency)
+    notifyItemAdded(1)
+    setSuccessId(variantId)
+    setTimeout(() => {
+      setSuccessId(null)
+      setIsDesktopPopupOpen(false)
+      setIsMobileDrawerOpen(false)
+    }, 700)
+
     try {
       await addToCart({
         variantId,
         quantity: 1,
         countryCode,
       })
-      setSuccessId(variantId)
-      setTimeout(() => {
-        setSuccessId(null)
-        setIsDesktopPopupOpen(false)
-        setIsMobileDrawerOpen(false)
-      }, 700)
     } catch (err) {
+      // Revert optimistic count on failure
+      notifyItemRemoved(1)
       console.error("Failed to add item to cart:", err)
     } finally {
       setIsAddingId(null)

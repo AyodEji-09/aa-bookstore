@@ -14,7 +14,7 @@ import { isDigitalItem } from "@lib/util/is-digital"
 import { useWishlist } from "@lib/context/wishlist-context"
 import { Heart, Minus, Plus } from "lucide-react"
 import { Trash } from "@medusajs/icons"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 type ItemProps = {
   item: HttpTypes.StoreCartLineItem
@@ -25,49 +25,63 @@ type ItemProps = {
 const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
   const [updating, setUpdating] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isRemoved, setIsRemoved] = useState(false)
+  const [optimisticQuantity, setOptimisticQuantity] = useState(item.quantity)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    setOptimisticQuantity(item.quantity)
+  }, [item.quantity])
 
   const { isWishlisted, toggleWishlist } = useWishlist()
   const wishlisted = isWishlisted(item.product_id)
 
   const changeQuantity = async (quantity: number) => {
     setError(null)
+    const prevQty = optimisticQuantity
+    setOptimisticQuantity(quantity)
     setUpdating(true)
 
-    await updateLineItem({
-      lineId: item.id,
-      quantity,
-    })
-      .catch((err) => {
-        setError(err.message)
+    try {
+      await updateLineItem({
+        lineId: item.id,
+        quantity,
       })
-      .finally(() => {
-        setUpdating(false)
-      })
+    } catch (err: unknown) {
+      const error = err as Error
+      setError(error.message)
+      setOptimisticQuantity(prevQty)
+    } finally {
+      setUpdating(false)
+    }
   }
 
   const handleDelete = async () => {
     setError(null)
     setIsDeleting(true)
+    setIsRemoved(true)
 
-    await deleteLineItem(item.id)
-      .catch((err) => {
-        setError(err.message)
-        setIsDeleting(false)
-      })
+    try {
+      await deleteLineItem(item.id)
+    } catch (err: unknown) {
+      const error = err as Error
+      setError(error.message)
+      setIsDeleting(false)
+      setIsRemoved(false)
+    }
   }
 
   const handleDecrement = () => {
-    if (item.quantity <= 1) {
+    if (optimisticQuantity <= 1) {
       handleDelete()
     } else {
-      changeQuantity(item.quantity - 1)
+      changeQuantity(optimisticQuantity - 1)
     }
   }
 
   const handleIncrement = () => {
-    if (item.quantity < maxQuantity) {
-      changeQuantity(item.quantity + 1)
+    if (optimisticQuantity < maxQuantity) {
+      changeQuantity(optimisticQuantity + 1)
     }
   }
 
@@ -133,6 +147,22 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
     )
   }
 
+  if (isRemoved) {
+    return null
+  }
+
+  const unitPrice =
+    item.unit_price ??
+    ((item.total ?? 0) / (item.quantity || 1))
+  const displayItem = {
+    ...item,
+    quantity: optimisticQuantity,
+    total: unitPrice * optimisticQuantity,
+    original_total: item.original_total
+      ? (item.original_total / (item.quantity || 1)) * optimisticQuantity
+      : unitPrice * optimisticQuantity,
+  }
+
   return (
     <div
       className="py-4 sm:py-5 flex flex-col gap-y-3 sm:gap-y-4"
@@ -163,7 +193,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
           <LineItemOptions variant={item.variant} data-testid="product-variant" />
           <div className="pt-0.5 w-fit [&>div]:items-start">
             <LineItemPrice
-              item={item}
+              item={displayItem}
               style="tight"
               currencyCode={currencyCode}
             />
@@ -178,14 +208,14 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
           <button
             type="button"
             onClick={handleDecrement}
-            disabled={updating || isDeleting}
+            disabled={isDeleting}
             className="text-ui-fg-subtle hover:text-ui-fg-base transition-colors disabled:opacity-40 cursor-pointer p-0.5 flex items-center justify-center"
-            aria-label={item.quantity <= 1 ? "Remove item" : "Decrease quantity"}
+            aria-label={optimisticQuantity <= 1 ? "Remove item" : "Decrease quantity"}
             data-testid="product-decrement-button"
           >
             {isDeleting ? (
               <Spinner className="w-3.5 h-3.5 animate-spin" />
-            ) : item.quantity <= 1 ? (
+            ) : optimisticQuantity <= 1 ? (
               <Trash className="w-4 h-4" />
             ) : (
               <Minus className="w-3.5 h-3.5" />
@@ -196,14 +226,14 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
             className="text-xs font-semibold text-ui-fg-base min-w-[16px] text-center"
             data-testid="product-quantity"
           >
-            {updating ? <Spinner className="w-3 h-3 animate-spin mx-auto" /> : item.quantity}
+            {optimisticQuantity}
           </span>
 
           {!isDigital && (
             <button
               type="button"
               onClick={handleIncrement}
-              disabled={item.quantity >= maxQuantity || updating || isDeleting}
+              disabled={optimisticQuantity >= maxQuantity || isDeleting}
               className="text-ui-fg-subtle hover:text-ui-fg-base transition-colors disabled:opacity-30 cursor-pointer p-0.5 flex items-center justify-center"
               aria-label="Increase quantity"
               data-testid="product-increment-button"

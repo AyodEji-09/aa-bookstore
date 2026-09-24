@@ -1,4 +1,5 @@
 import { listProducts } from "@lib/data/products"
+import { PRODUCT_PREVIEW_FIELDS } from "@lib/constants"
 import { getRegion } from "@lib/data/regions"
 import { HttpTypes } from "@medusajs/types"
 import Product from "../product-preview"
@@ -35,6 +36,7 @@ export default async function RelatedProducts({
 
   const products = await listProducts({
     queryParams: {
+      fields: PRODUCT_PREVIEW_FIELDS,
       ...queryParams,
       limit: 10,
     },

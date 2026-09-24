@@ -3,6 +3,7 @@ import { getBaseURL } from "@lib/util/env"
 import { Metadata } from "next"
 import "styles/globals.css"
 import { WishlistProvider } from "@lib/context/wishlist-context"
+import { CartProvider } from "@lib/context/cart-context"
 import { Toaster } from "@medusajs/ui"
 
 const inter = Inter({
@@ -113,10 +114,12 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         />
       </head>
       <body className={`${inter.className} bg-white`}>
-        <WishlistProvider>
-          <main className="relative">{props.children}</main>
-          <Toaster position="top-right" />
-        </WishlistProvider>
+        <CartProvider>
+          <WishlistProvider>
+            <main className="relative">{props.children}</main>
+            <Toaster position="top-right" />
+          </WishlistProvider>
+        </CartProvider>
       </body>
     </html>
   )

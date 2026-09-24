@@ -8,6 +8,8 @@ import { SortOptions } from "@modules/store/components/refinement-list/sort-prod
 import { getAuthHeaders, getCacheOptions } from "./cookies"
 import { getRegion, retrieveRegion } from "./regions"
 
+import { PRODUCT_PREVIEW_FIELDS } from "@lib/constants"
+
 type ProductListQueryParams = (HttpTypes.FindParams &
   HttpTypes.StoreProductListParams) & {
   options?: string[]
@@ -123,6 +125,7 @@ export const listProductsWithSort = async ({
   } = await listProducts({
     pageParam: 0,
     queryParams: {
+      fields: PRODUCT_PREVIEW_FIELDS,
       ...queryParams,
       ...(optionFilters.length ? { option_value_id: optionFilters } : {}),
       limit: 100,
